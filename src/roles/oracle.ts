@@ -71,15 +71,19 @@ export class Oracle extends BaseRole {
         const crewmateColor = "ffffffff";
 
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => owner.getConnection() !== connection), owner, `[${owner.getRole() == PlayerRole.Impostor ? `${impostorColor}` : `${crewmateColor}`}]${owner.getName().toString()}[]`);
+          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${this.enchanted.getRole() == PlayerRole.Impostor ? `${impostorColor}` : `${crewmateColor}`}]${this.enchanted.getName().toString()}[]`);
       }
     });
 
     this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
+      if (this.enchanted === undefined) {
+        return;
+      }
+
       const crewmateColor = "ffffffff";
 
       Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-        .filter(connection => owner.getConnection() !== connection), owner, `[${crewmateColor}]${owner.getName().toString()}[]`);
+        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${crewmateColor}]${this.enchanted.getName().toString()}[]`);
     });
   }
 
