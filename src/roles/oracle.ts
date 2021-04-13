@@ -9,12 +9,6 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-const alignmentColors: readonly string[] = [
-  "FFFFFFFF",
-  "FF0000FF",
-  "C042FFFF",
-] as const;
-
 export class OracleManager extends BaseManager {
   getId(): string { return "oracle" }
   getTypeName(): string { return "Oracle" }
@@ -41,6 +35,12 @@ export class Oracle extends BaseRole {
   onReady(): void {
     this.owner.setTasks(new Set());
 
+    enum AlignmentColors {
+      "Crewmate" = "FFFFFFFF",
+      "Impostor" = "FF0000FF",
+      "Neutral" = "C042FFFF",
+    }
+
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Predict.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
@@ -63,11 +63,11 @@ export class Oracle extends BaseRole {
 
       Services.get(ServiceType.Animation).clearOutline(this.enchanted);
 
-      if (this.owner.isDead()) {
-        const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
+      if (this.owner.isDead() || this.owner.getGameDataEntry().isDisconnected()) {
+        const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment().toString();
 
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
+          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${AlignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
       }
     });
 
@@ -76,10 +76,10 @@ export class Oracle extends BaseRole {
         return;
       }
 
-      const crewmateColor = "ffffffff";
+      const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment().toString();
 
       Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${crewmateColor}]${this.enchanted.getName().toString()}[]`);
+        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${AlignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
     });
   }
 
