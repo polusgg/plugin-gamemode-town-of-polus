@@ -63,7 +63,7 @@ export class Oracle extends BaseRole {
 
       Services.get(ServiceType.Animation).clearOutline(this.enchanted);
 
-      if (this.owner.isDead()) {
+      if (this.owner.isDead() || this.owner.getGameDataEntry().isDisconnected()) {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
 
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
@@ -76,10 +76,10 @@ export class Oracle extends BaseRole {
         return;
       }
 
-      const crewmateColor = "ffffffff";
+      const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
 
       Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${crewmateColor}]${this.enchanted.getName().toString()}[]`);
+        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
     });
   }
 
