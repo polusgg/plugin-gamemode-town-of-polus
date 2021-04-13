@@ -1,31 +1,14 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 
 export class SnitchManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "snitch" }
   getTypeName(): string { return "Snitch" }
 }
@@ -40,6 +23,14 @@ export class Snitch extends BaseRole {
 
     owner.setTasks(new Set());
 
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
+
+  onReady(): void {
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
     this.catch("player.task.completed", event => event.getPlayer()).execute(async event => {
@@ -49,13 +40,13 @@ export class Snitch extends BaseRole {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.isImpostor()) {
-              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), this.getManager<SnitchManager>("snitch").bundle.getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
+              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
               await poi.attach(event.getPlayer());
             }
           });
       } else if (taskLeftCount == 0) {
-        const poi = await poiManager.spawnPointOfInterest(event.getPlayer().getSafeConnection(), this.getManager<SnitchManager>("snitch").bundle.getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
+        const poi = await poiManager.spawnPointOfInterest(event.getPlayer().getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
 
         poi.attach(event.getPlayer());
       }

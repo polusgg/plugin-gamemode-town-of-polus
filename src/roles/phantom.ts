@@ -8,27 +8,10 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Tasks } from "@nodepolus/framework/src/static";
 
 export class PhantomManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "phantom" }
   getTypeName(): string { return "Phantom" }
 }
@@ -43,13 +26,21 @@ export class Phantom extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
+
+  onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    owner.setTasks(new Set());
+    this.owner.setTasks(new Set());
 
-    Services.get(ServiceType.Button).spawnButton(owner.getSafeConnection(), {
-      asset: this.getManager<PhantomManager>("phantom").bundle.getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: owner.getLobby().getOptions().getKillCooldown(),
+    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
@@ -57,9 +48,9 @@ export class Phantom extends BaseRole {
     });
 
     this.catch("player.died", x => x.getPlayer()).execute(event => {
-      owner.revive();
+      this.owner.revive();
 
-      Services.get(ServiceType.Animation).setOpacity(owner, 1);
+      Services.get(ServiceType.Animation).setOpacity(this.owner, 1);
 
       let tasks = Tasks.forLevel(event.getPlayer().getLobby().getLevel());
 
@@ -77,7 +68,7 @@ export class Phantom extends BaseRole {
               title: "Defeat",
               subtitle: "",
               color: [255, 140, 238, 255],
-              yourTeam: [owner],
+              yourTeam: [this.owner],
             });
           });
       }

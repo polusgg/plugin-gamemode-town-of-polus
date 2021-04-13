@@ -1,36 +1,18 @@
+import { CameraAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/camera";
+import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
+import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import { Vector2 } from "@nodepolus/framework/src/types";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { AssassinManager } from "./assassin";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
-import { CameraAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/camera";
 
 export class GrenadierManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "grenadier" }
   getTypeName(): string { return "Grenadier" }
 }
@@ -43,20 +25,28 @@ export class Grenadier extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
+
+  onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    roleManager.setBaseRole(owner as Player, PlayerRole.Impostor);
+    roleManager.setBaseRole(this.owner as Player, PlayerRole.Impostor);
 
-    owner.setTasks(new Set());
+    this.owner.setTasks(new Set());
 
-    Services.get(ServiceType.Button).spawnButton(owner.getSafeConnection(), {
-      asset: this.getManager<AssassinManager>("grenadier").bundle.getSafeAsset("Assets/Mods/OfficialAssets/Throw.png"),
-      maxTimer: owner.getLobby().getOptions().getKillCooldown(),
+    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Throw.png"),
+      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
-        owner.getLobby().getPlayers().forEach(player => {
+        this.owner.getLobby().getPlayers().forEach(player => {
           Services.get(ServiceType.Animation)
             .beginCameraAnimation(Services.get(ServiceType.CameraManager).getController(player), [
               new CameraAnimationKeyframe({

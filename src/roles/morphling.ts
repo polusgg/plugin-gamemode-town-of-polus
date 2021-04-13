@@ -1,36 +1,19 @@
+import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { Vector2 } from "@nodepolus/framework/src/types";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
-import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 
 export class MorphlingManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "morphling" }
   getTypeName(): string { return "Morphling" }
 }
@@ -75,10 +58,18 @@ export class Morphling extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    Services.get(ServiceType.RoleManager).setBaseRole(owner as Player, PlayerRole.Impostor);
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
 
-    Services.get(ServiceType.Button).spawnButton(owner.getSafeConnection(), {
-      asset: this.getManager<MorphlingManager>("morphling").bundle.getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"),
+  onReady(): void {
+    Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, PlayerRole.Impostor);
+
+    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"),
       maxTimer: 20,
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
@@ -89,13 +80,13 @@ export class Morphling extends BaseRole {
 
           if (target !== undefined) {
             button.setColor([162, 18, 219, 0x7F]);
-            button.setAsset(this.getManager<MorphlingManager>("morphling").bundle.getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"));
+            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"));
             button.setCurrentTime(5);
             this.targetAppearance = PlayerAppearance.save(target);
           }
         } else {
-          this.ownAppearance = PlayerAppearance.save(owner);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(owner, [
+          this.ownAppearance = PlayerAppearance.save(this.owner);
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
             new PlayerAnimationKeyframe({
               angle: 0,
               duration: 100,
@@ -108,12 +99,12 @@ export class Morphling extends BaseRole {
             }),
           ], false);
 
-          if (owner.getLobby().getMeetingHud() !== undefined) {
+          if (this.owner.getLobby().getMeetingHud() !== undefined) {
             return;
           }
 
-          this.targetAppearance.apply(owner);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(owner, [
+          this.targetAppearance.apply(this.owner);
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
             new PlayerAnimationKeyframe({
               angle: 0,
               duration: 100,
@@ -127,7 +118,7 @@ export class Morphling extends BaseRole {
           ], false);
 
           this.timeout = setTimeout(async () => {
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(owner, [
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,
@@ -139,8 +130,8 @@ export class Morphling extends BaseRole {
                 secondaryColor: [255, 255, 255, 255],
               }),
             ], false);
-            this.ownAppearance!.apply(owner);
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(owner, [
+            this.ownAppearance!.apply(this.owner);
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,
@@ -158,7 +149,7 @@ export class Morphling extends BaseRole {
     });
 
     this.catch("meeting.started", event => event.getGame()).execute(() => {
-      this.ownAppearance?.apply(owner);
+      this.ownAppearance?.apply(this.owner);
     });
   }
 
