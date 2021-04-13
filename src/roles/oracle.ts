@@ -9,6 +9,7 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 
 export class OracleManager extends BaseManager {
   public bundle!: AssetBundle;
@@ -58,7 +59,7 @@ export class Oracle extends BaseRole {
       });
     });
 
-    this.catch("meeting.started", event => event.getVictim()).execute(() => {
+    this.catch("meeting.started", event => event.getVictim()).execute(event => {
       if (this.enchanted === undefined) {
         return;
       }
@@ -66,13 +67,19 @@ export class Oracle extends BaseRole {
       Services.get(ServiceType.Animation).clearOutline(this.enchanted);
 
       if (owner.isDead()) {
-        //set player name color
-        throw new Error("todooooooooooo");
+        const impostorColor = "ff0000ff";
+        const crewmateColor = "ffffffff";
+
+        Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
+          .filter(connection => owner.getConnection() !== connection), owner, `[${owner.getRole() == PlayerRole.Impostor ? `${impostorColor}` : `${crewmateColor}`}]${owner.getName().toString()}[]`);
       }
     });
 
-    this.catch("meeting.ended", event => event.getExiledPlayer()).execute(() => {
-      //todo
+    this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
+      const crewmateColor = "ffffffff";
+
+      Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
+        .filter(connection => owner.getConnection() !== connection), owner, `[${crewmateColor}]${owner.getName().toString()}[]`);
     });
   }
 
