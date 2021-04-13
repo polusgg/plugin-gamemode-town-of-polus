@@ -10,14 +10,14 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-export class AssassinManager extends BaseManager {
-  getId(): string { return "assassin" }
-  getTypeName(): string { return "Assassin" }
+export class SerialKillerManager extends BaseManager {
+  getId(): string { return "serial_killer" }
+  getTypeName(): string { return "Serial Killer" }
 }
 
-export class Assassin extends BaseRole {
+export class SerialKiller extends BaseRole {
   protected metadata: RoleMetadata = {
-    name: "Assassin",
+    name: "Serial Killer",
     alignment: RoleAlignment.Neutral,
   };
 
@@ -69,7 +69,7 @@ export class Assassin extends BaseRole {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
             title: "Defeat",
-            subtitle: "The assassin killed everyone",
+            subtitle: "The Serial Killer killed everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
           }));
@@ -86,12 +86,12 @@ export class Assassin extends BaseRole {
   }
 
   getManagerType(): typeof BaseManager {
-    return AssassinManager;
+    return SerialKillerManager;
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
-      title: "Assassin",
+      title: "Serial Killer",
       subtitle: "Kill everyone",
       color: [255, 84, 124, 255],
     };
