@@ -1,10 +1,11 @@
+import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
+import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 
 export class JesterManager extends BaseManager {
   getId(): string { return "jester" }
@@ -18,6 +19,10 @@ export class Jester extends BaseRole {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus"));
+    }
 
     const roleManager = Services.get(ServiceType.RoleManager);
 

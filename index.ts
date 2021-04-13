@@ -6,9 +6,10 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Jester } from "./src/roles/jester";
 import { Sheriff } from "./src/roles/sheriff";
 import { Snitch } from "./src/roles/snitch";
+import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 
 const pluginMetadata: PluginMetadata = {
-  name: "Polus.gg Template Plugin",
+  name: "Town Of Polus",
   version: [1, 0, 0],
   authors: [
     {
@@ -24,6 +25,10 @@ const pluginMetadata: PluginMetadata = {
 export default class extends BaseMod {
   constructor() {
     super(pluginMetadata);
+
+    AssetBundle.load("TownOfPolus").then(_ => {
+      this.getLogger().info("Loaded TownOfPolus AssetBundle");
+    });
 
     // todo set task strings for all impostor and neutral types
   }

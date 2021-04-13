@@ -3,31 +3,14 @@ import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edge
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 
 export class AssassinManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "assassin" }
   getTypeName(): string { return "Assassin" }
 }
@@ -47,15 +30,23 @@ export class Assassin extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
+
+  onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    owner.setTasks(new Set());
+    this.owner.setTasks(new Set());
 
     //todo pov you're assassin and you can't kill the impostors
 
-    Services.get(ServiceType.Button).spawnButton(owner.getSafeConnection(), {
-      asset: this.getManager<AssassinManager>("assassin").bundle.getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: owner.getLobby().getOptions().getKillCooldown(),
+    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
@@ -64,13 +55,13 @@ export class Assassin extends BaseRole {
 
     this.catch("player.murdered", event => event.getKiller()).execute(event => {
       if (event.getPlayer().getLobby().getPlayers()
-        .filter(player => player.isDead()).length == 1 && owner.isDead()) {
+        .filter(player => player.isDead()).length == 1 && this.owner.isDead()) {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
             title: "Defeat",
             subtitle: "The assassin killed everyone",
             color: [255, 84, 124, 255],
-            yourTeam: [owner],
+            yourTeam: [this.owner],
           }));
         roleManager.endGame(event.getKiller().getLobby().getSafeGame());
       }

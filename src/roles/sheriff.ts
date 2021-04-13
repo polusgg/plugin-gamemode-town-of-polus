@@ -7,26 +7,9 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
 export class SheriffManager extends BaseManager {
-  public bundle!: AssetBundle;
-
-  constructor(lobby: LobbyInstance) {
-    super(lobby);
-
-    this.load();
-  }
-
-  async load(): Promise<void> {
-    this.bundle = await AssetBundle.load("TownOfPolus");
-
-    this.owner.getConnections().forEach(connection => {
-      Services.get(ServiceType.Resource).load(connection, this.bundle!);
-    });
-  }
-
   getId(): string { return "sheriff" }
   getTypeName(): string { return "Sheriff" }
 }
@@ -39,9 +22,17 @@ export class Sheriff extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    Services.get(ServiceType.Button).spawnButton(owner.getSafeConnection(), {
-      asset: this.getManager<SheriffManager>("sheriff").bundle.getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: owner.getLobby().getOptions().getKillCooldown(),
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady);
+    } else {
+      this.onReady();
+    }
+  }
+
+  onReady(): void {
+    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
