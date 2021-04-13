@@ -2,7 +2,7 @@ import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/service
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
@@ -53,6 +53,7 @@ export class Morphling extends BaseRole {
 
   protected metadata: RoleMetadata = {
     name: "Morphling",
+    alignment: RoleAlignment.Impostor,
   };
 
   constructor(owner: PlayerInstance) {
@@ -80,7 +81,7 @@ export class Morphling extends BaseRole {
 
           if (target !== undefined) {
             button.setColor([162, 18, 219, 0x7F]);
-            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"));
+            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Morph.png"));
             button.setCurrentTime(5);
             this.targetAppearance = PlayerAppearance.save(target);
           }
