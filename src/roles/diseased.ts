@@ -33,7 +33,7 @@ export class Diseased extends BaseRole {
   onReady(): void {
     this.owner.setTasks(new Set());
 
-    this.catch("player.died", x => x.getPlayer()).execute(() => {
+    this.catch("player.died", player => player.getPlayer()).execute(() => {
       const killCooldown = this.owner.getLobby().getOptions().getKillCooldown();
 
       this.owner.getLobby().getOptions().setKillCooldown(killCooldown);
