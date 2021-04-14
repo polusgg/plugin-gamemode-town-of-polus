@@ -17,7 +17,7 @@ export class Diseased extends BaseRole {
 
   protected metadata: RoleMetadata = {
     name: "Diseased",
-    alignment: RoleAlignment.Neutral,
+    alignment: RoleAlignment.Crewmate,
   };
 
   constructor(owner: PlayerInstance) {
