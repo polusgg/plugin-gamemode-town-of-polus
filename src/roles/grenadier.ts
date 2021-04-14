@@ -2,7 +2,7 @@ import { CameraAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/service
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
@@ -20,6 +20,7 @@ export class GrenadierManager extends BaseManager {
 export class Grenadier extends BaseRole {
   protected metadata: RoleMetadata = {
     name: "Grenadier",
+    alignment: RoleAlignment.Impostor,
   };
 
   constructor(owner: PlayerInstance) {

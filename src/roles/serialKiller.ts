@@ -1,7 +1,7 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
@@ -10,14 +10,15 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-export class AssassinManager extends BaseManager {
-  getId(): string { return "assassin" }
-  getTypeName(): string { return "Assassin" }
+export class SerialKillerManager extends BaseManager {
+  getId(): string { return "serial_killer" }
+  getTypeName(): string { return "Serial Killer" }
 }
 
-export class Assassin extends BaseRole {
+export class SerialKiller extends BaseRole {
   protected metadata: RoleMetadata = {
-    name: "Assassin",
+    name: "Serial Killer",
+    alignment: RoleAlignment.Neutral,
   };
 
   protected canceledWinReasons: GameOverReason[] = [
@@ -42,7 +43,7 @@ export class Assassin extends BaseRole {
 
     this.owner.setTasks(new Set());
 
-    //todo pov you're assassin and you can't kill the impostors
+    //pov you're assassin and you CAN kill the impostors
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
@@ -51,6 +52,15 @@ export class Assassin extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
+      button.on("clicked", () => {
+        const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+
+        if (target === undefined) {
+          return;
+        }
+
+        target.murder(this.owner);
+      });
     });
 
     this.catch("player.murdered", event => event.getKiller()).execute(event => {
@@ -59,7 +69,7 @@ export class Assassin extends BaseRole {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
             title: "Defeat",
-            subtitle: "The assassin killed everyone",
+            subtitle: "The Serial Killer killed everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
           }));
@@ -71,17 +81,17 @@ export class Assassin extends BaseRole {
       if (!this.owner.isDead() && this.canceledWinReasons.includes(event.getReason())) {
         event.cancel();
       }
-      //this should only occur if the owner isn't dead
+      //this looks like its already done? => this should only occur if the owner isn't dead
     });
   }
 
   getManagerType(): typeof BaseManager {
-    return AssassinManager;
+    return SerialKillerManager;
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
-      title: "Assassin",
+      title: "Serial Killer",
       subtitle: "Kill everyone",
       color: [255, 84, 124, 255],
     };
