@@ -42,7 +42,7 @@ export class Oracle extends BaseRole {
     this.owner.setTasks(new Set());
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Predict.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,

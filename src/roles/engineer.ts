@@ -25,9 +25,19 @@ export class Engineer extends BaseRole {
     alignment: RoleAlignment.Crewmate,
   };
 
+  constructor(owner: PlayerInstance) {
+    super(owner);
+
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+    } else {
+      this.onReady();
+    }
+  }
+
   onReady(): void {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Fix.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
