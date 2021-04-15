@@ -10,11 +10,6 @@ import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { Vector2 } from "@nodepolus/framework/src/types";
 
-/*
-  TODO:
-    Button Asset
-*/
-
 class PlayerAppearance {
   constructor(
     public name: TextComponent,
