@@ -66,3 +66,5 @@ export class Jester extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

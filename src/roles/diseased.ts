@@ -52,3 +52,5 @@ export class Diseased extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

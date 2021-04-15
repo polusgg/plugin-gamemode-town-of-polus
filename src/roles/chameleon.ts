@@ -125,3 +125,5 @@ export class Chameleon extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

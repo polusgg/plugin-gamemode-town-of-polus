@@ -89,3 +89,5 @@ export class Grenadier extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

@@ -95,3 +95,5 @@ export class Phantom extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

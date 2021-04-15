@@ -96,3 +96,5 @@ export class Engineer extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me

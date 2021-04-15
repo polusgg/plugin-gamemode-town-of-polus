@@ -95,3 +95,5 @@ export class Oracle extends BaseRole {
     };
   }
 }
+
+//Author: Kadez - http://twitter.kadez.me
