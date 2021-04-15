@@ -61,6 +61,22 @@ export class Phantom extends BaseRole {
               yourTeam: [this.owner],
             });
           });
+        roleManager.endGame(event.getGame());
+      }
+    });
+
+    this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
+      if (this.died && event.getPlayer().getTasks().length < 1) {
+        event.getPlayer().getLobby().getGame()!.getLobby().getPlayers()
+          .forEach(player => {
+            roleManager.setEndGameData(player.getSafeConnection(), {
+              title: "Victory",
+              subtitle: "",
+              color: [255, 140, 238, 255],
+              yourTeam: [this.owner],
+            });
+          });
+        roleManager.endGame(event.getPlayer().getLobby().getGame()!);
       }
     });
   }
@@ -70,7 +86,7 @@ export class Phantom extends BaseRole {
   }
 
   getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
-    const impostors = player.getLobby().getPlayers().filter(x => x.isImpostor()).length;
+    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
 
     return {
       title: "Crewmate",
