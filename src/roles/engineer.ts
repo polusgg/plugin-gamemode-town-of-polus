@@ -27,7 +27,7 @@ export class Engineer extends BaseRole {
 
   onReady(): void {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Fix.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,

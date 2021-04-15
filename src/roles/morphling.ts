@@ -70,7 +70,7 @@ export class Morphling extends BaseRole {
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, PlayerRole.Impostor);
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Sample.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: 20,
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
@@ -81,7 +81,7 @@ export class Morphling extends BaseRole {
 
           if (target !== undefined) {
             button.setColor([162, 18, 219, 0x7F]);
-            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/Morph.png"));
+            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png"));
             button.setCurrentTime(5);
             this.targetAppearance = PlayerAppearance.save(target);
           }
