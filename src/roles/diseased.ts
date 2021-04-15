@@ -13,8 +13,6 @@ export class DiseasedManager extends BaseManager {
 }
 
 export class Diseased extends BaseRole {
-  public died = false;
-
   protected metadata: RoleMetadata = {
     name: "Diseased",
     alignment: RoleAlignment.Crewmate,

@@ -48,9 +48,7 @@ export class ChameleonManager extends BaseManager {
   getTypeName(): string { return "Chameleon" }
 }
 
-export class Phantom extends BaseRole {
-  public died = false;
-
+export class Chameleon extends BaseRole {
   protected metadata: RoleMetadata = {
     name: "Chameleon",
     alignment: RoleAlignment.Impostor,
@@ -68,7 +66,7 @@ export class Phantom extends BaseRole {
 
   onReady(): void {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Chameleon.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
       position: new Vector2(2.7, 0.7),
       alignment: EdgeAlignments.RightBottom,
