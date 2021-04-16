@@ -50,7 +50,7 @@ export class Sheriff extends BaseRole {
     });
 
     this.catch("player.murdered", event => event.getKiller()).execute(event => {
-      if (!event.getPlayer().isImpostor()) {
+      if (!event.getPlayer()) {
         event.getKiller().kill();
       }
     });

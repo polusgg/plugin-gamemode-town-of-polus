@@ -1,13 +1,15 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Tasks } from "@nodepolus/framework/src/static";
+import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
+import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -15,7 +17,7 @@ export class PhantomManager extends BaseManager {
 }
 
 export class Phantom extends BaseRole {
-  public died = false;
+  public transformed = false;
 
   protected metadata: RoleMetadata = {
     name: "Phantom",
@@ -40,6 +42,10 @@ export class Phantom extends BaseRole {
     this.catch("player.died", x => x.getPlayer()).execute(event => {
       this.owner.revive();
 
+      this.transformed = true;
+
+      this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText))
+
       Services.get(ServiceType.Animation).setOpacity(this.owner, 1);
 
       let tasks = Tasks.forLevel(event.getPlayer().getLobby().getLevel());
@@ -51,7 +57,7 @@ export class Phantom extends BaseRole {
     });
 
     this.catch("meeting.started", event => event.getCaller()).execute(event => {
-      if (this.died) {
+      if (this.transformed) {
         event.getGame().getLobby().getPlayers()
           .forEach(player => {
             roleManager.setEndGameData(player.getSafeConnection(), {
@@ -66,7 +72,7 @@ export class Phantom extends BaseRole {
     });
 
     this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
-      if (this.died && event.getPlayer().getTasks().length < 1) {
+      if (this.transformed && event.getPlayer().getTasks().length < 1) {
         event.getPlayer().getLobby().getGame()!.getLobby().getPlayers()
           .forEach(player => {
             roleManager.setEndGameData(player.getSafeConnection(), {

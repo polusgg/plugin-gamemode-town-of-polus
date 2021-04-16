@@ -9,6 +9,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
@@ -63,18 +64,14 @@ export class SerialKiller extends BaseRole {
       });
     });
 
-    this.catch("player.murdered", event => event.getKiller()).execute(event => {
-      if (event.getPlayer().getLobby().getPlayers()
-        .filter(player => player.isDead()).length == 1 && this.owner.isDead()) {
-        event.getPlayer().getLobby().getPlayers()
-          .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
-            title: "Defeat",
-            subtitle: "The Serial Killer killed everyone",
-            color: [255, 84, 124, 255],
-            yourTeam: [this.owner],
-          }));
-        roleManager.endGame(event.getKiller().getLobby().getSafeGame());
-      }
+    this.owner.getLobby().getServer().on("player.left", event => this.checkEndCriteria(event.getPlayer().getLobby()));
+
+    this.owner.getLobby().getServer().on("player.kicked", event => this.checkEndCriteria(event.getPlayer().getLobby()));
+
+    this.owner.getLobby().getServer().on("player.exiled", event => this.checkEndCriteria(event.getPlayer().getLobby()));
+
+    this.catch("player.murdered", event => event.getPlayer()).execute(event => {
+      this.checkEndCriteria(event.getKiller().getLobby())
     });
 
     this.catch("game.ended", event => event.getGame()).execute(event => {
@@ -83,6 +80,22 @@ export class SerialKiller extends BaseRole {
       }
       //this looks like its already done? => this should only occur if the owner isn't dead
     });
+  }
+
+  private checkEndCriteria(lobby: LobbyInstance) {
+    const roleManager = Services.get(ServiceType.RoleManager);
+
+    if (lobby.getPlayers()
+        .filter(player => player.isDead()).length == 1 && !this.owner.isDead()) {
+          lobby.getPlayers()
+          .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
+            title: "Defeat",
+            subtitle: "The Serial Killer killed everyone",
+            color: [255, 84, 124, 255],
+            yourTeam: [this.owner],
+          }));
+        roleManager.endGame(lobby.getSafeGame());
+      }
   }
 
   getManagerType(): typeof BaseManager {
