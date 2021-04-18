@@ -43,7 +43,7 @@ export class Grenadier extends BaseRole {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
-      position: new Vector2(2.7, 0.7),
+      position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {

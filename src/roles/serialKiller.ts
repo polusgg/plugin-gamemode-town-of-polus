@@ -49,7 +49,7 @@ export class SerialKiller extends BaseRole {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
       maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
-      position: new Vector2(2.7, 0.7),
+      position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());

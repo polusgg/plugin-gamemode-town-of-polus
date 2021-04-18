@@ -72,7 +72,7 @@ export class Morphling extends BaseRole {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: 20,
-      position: new Vector2(2.7, 0.7),
+      position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", async () => {
