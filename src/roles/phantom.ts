@@ -8,7 +8,6 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Tasks } from "@nodepolus/framework/src/static";
-import { RootPacket } from "@nodepolus/framework/src/protocol/packets/hazel";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 
 export class PhantomManager extends BaseManager {
@@ -44,7 +43,7 @@ export class Phantom extends BaseRole {
 
       this.transformed = true;
 
-      this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText))
+      this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
 
       Services.get(ServiceType.Animation).setOpacity(this.owner, 1);
 

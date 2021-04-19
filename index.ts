@@ -8,6 +8,43 @@ import { Sheriff } from "./src/roles/sheriff";
 import { Snitch } from "./src/roles/snitch";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 
+type TownOfPolusGameOptions = {
+  /* Engineer */
+  engineerProbability: number;
+  engineerCooldown: number;
+
+  /* Grenadier */
+  grenadierProbability: number;
+  grenadierCooldown: number;
+
+  /* Jester */
+  jesterProbability: number;
+
+  /* Morphling */
+  morphlingProbability: number;
+  morphlingCooldown: number;
+
+  /* Oracle */
+  oracleProbability: number;
+  oracleCooldown: number;
+  oracleAccuracy: number;
+
+  /* Phantom */
+  phantomProbability: number;
+
+  /* Serial Killer */
+  serialKillerProbability: number;
+  serialKillerCooldown: number;
+
+  /* Sheriff */
+  sheriffProbability: number;
+  sheriffCooldown: number;
+
+  /* Snitch */
+  snitchProbability: number;
+  remainingTasks: number;
+};
+
 const pluginMetadata: PluginMetadata = {
   name: "Town Of Polus",
   version: [1, 0, 0],

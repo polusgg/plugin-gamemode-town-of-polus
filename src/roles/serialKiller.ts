@@ -40,8 +40,6 @@ export class SerialKiller extends BaseRole {
   }
 
   onReady(): void {
-    const roleManager = Services.get(ServiceType.RoleManager);
-
     this.owner.setTasks(new Set());
 
     //pov you're assassin and you CAN kill the impostors
@@ -71,7 +69,7 @@ export class SerialKiller extends BaseRole {
     this.owner.getLobby().getServer().on("player.exiled", event => this.checkEndCriteria(event.getPlayer().getLobby()));
 
     this.catch("player.murdered", event => event.getPlayer()).execute(event => {
-      this.checkEndCriteria(event.getKiller().getLobby())
+      this.checkEndCriteria(event.getKiller().getLobby());
     });
 
     this.catch("game.ended", event => event.getGame()).execute(event => {
@@ -80,22 +78,6 @@ export class SerialKiller extends BaseRole {
       }
       //this looks like its already done? => this should only occur if the owner isn't dead
     });
-  }
-
-  private checkEndCriteria(lobby: LobbyInstance) {
-    const roleManager = Services.get(ServiceType.RoleManager);
-
-    if (lobby.getPlayers()
-        .filter(player => player.isDead()).length == 1 && !this.owner.isDead()) {
-          lobby.getPlayers()
-          .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
-            title: "Defeat",
-            subtitle: "The Serial Killer killed everyone",
-            color: [255, 84, 124, 255],
-            yourTeam: [this.owner],
-          }));
-        roleManager.endGame(lobby.getSafeGame());
-      }
   }
 
   getManagerType(): typeof BaseManager {
@@ -108,5 +90,21 @@ export class SerialKiller extends BaseRole {
       subtitle: "Kill everyone",
       color: [255, 84, 124, 255],
     };
+  }
+
+  private checkEndCriteria(lobby: LobbyInstance): void {
+    const roleManager = Services.get(ServiceType.RoleManager);
+
+    if (lobby.getPlayers()
+      .filter(player => player.isDead()).length == 1 && !this.owner.isDead()) {
+      lobby.getPlayers()
+        .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
+          title: "Defeat",
+          subtitle: "The Serial Killer killed everyone",
+          color: [255, 84, 124, 255],
+          yourTeam: [this.owner],
+        }));
+      roleManager.endGame(lobby.getSafeGame());
+    }
   }
 }
