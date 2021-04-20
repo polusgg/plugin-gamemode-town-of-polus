@@ -11,6 +11,7 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
+import { TownOfPolusGameOptions } from "../..";
 
 export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
@@ -34,6 +35,7 @@ export class Grenadier extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const roleManager = Services.get(ServiceType.RoleManager);
 
     roleManager.setBaseRole(this.owner as Player, PlayerRole.Impostor);
@@ -42,11 +44,13 @@ export class Grenadier extends BaseRole {
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
-      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
+      maxTimer: gameOptions.getOption("engineerCooldown").getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
+        button.reset();
+
         this.owner.getLobby().getPlayers().forEach(player => {
           Services.get(ServiceType.Animation)
             .beginCameraAnimation(Services.get(ServiceType.CameraManager).getController(player), [

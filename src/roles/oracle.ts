@@ -8,6 +8,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { TownOfPolusGameOptions } from "../..";
 
 const alignmentColors: readonly string[] = [
   "FFFFFFFF",
@@ -39,15 +40,19 @@ export class Oracle extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
     this.owner.setTasks(new Set());
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
-      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
+      maxTimer: gameOptions.getOption("oracleCooldown").getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
+        button.reset();
+
         this.enchanted = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
         if (this.enchanted !== undefined) {
@@ -67,7 +72,7 @@ export class Oracle extends BaseRole {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
 
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
+          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}]${this.enchanted.getName().toString()}[]`);
       }
     });
 

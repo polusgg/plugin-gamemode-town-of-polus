@@ -7,6 +7,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { TownOfPolusGameOptions } from "../..";
 
 export class SnitchManager extends BaseManager {
   getId(): string { return "snitch" }
@@ -32,12 +33,13 @@ export class Snitch extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
     this.catch("player.task.completed", event => event.getPlayer()).execute(async event => {
       const taskLeftCount = event.getPlayer().getTasks().map(task => !task[1]).length;
 
-      if (taskLeftCount == 2) {
+      if (taskLeftCount == gameOptions.getOption("snitchRemainingTasks").getValue().value) {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.isImpostor()) {

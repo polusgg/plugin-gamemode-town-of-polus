@@ -8,6 +8,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
+import { TownOfPolusGameOptions } from "../..";
 
 export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
@@ -31,9 +32,11 @@ export class Sheriff extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
+      maxTimer: gameOptions.getOption("sheriffCooldown").getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
@@ -44,6 +47,8 @@ export class Sheriff extends BaseRole {
         if (target === undefined) {
           return;
         }
+
+        button.reset();
 
         this.owner.murder(target);
       });

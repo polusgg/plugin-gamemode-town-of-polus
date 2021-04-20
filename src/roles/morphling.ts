@@ -12,6 +12,7 @@ import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
+import { TownOfPolusGameOptions } from "../..";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -67,11 +68,13 @@ export class Morphling extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, PlayerRole.Impostor);
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
-      maxTimer: 20,
+      maxTimer: gameOptions.getOption("morphlingCooldown").getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {

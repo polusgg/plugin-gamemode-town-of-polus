@@ -10,6 +10,7 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
+import { TownOfPolusGameOptions } from "../..";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
@@ -40,16 +41,20 @@ export class SerialKiller extends BaseRole {
   }
 
   onReady(): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
     this.owner.setTasks(new Set());
 
     //pov you're assassin and you CAN kill the impostors
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
-      maxTimer: this.owner.getLobby().getOptions().getKillCooldown(),
+      maxTimer: gameOptions.getOption("serialKillerCooldown").getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
+      button.reset();
+
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());

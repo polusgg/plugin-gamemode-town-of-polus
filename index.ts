@@ -16,7 +16,7 @@ import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
 
-type TownOfPolusGameOptions = {
+export type TownOfPolusGameOptions = {
   /* Engineer */
   engineerProbability: NumberValue;
   engineerCooldown: NumberValue;
@@ -50,7 +50,7 @@ type TownOfPolusGameOptions = {
 
   /* Snitch */
   snitchProbability: NumberValue;
-  remainingTasks: NumberValue;
+  snitchRemainingTasks: NumberValue;
 };
 
 const pluginMetadata: PluginMetadata = {
