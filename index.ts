@@ -117,32 +117,36 @@ export default class extends BaseMod {
     return true;
   }
 
-  onEnable(lobby: LobbyInstance): void {
+  async onEnable(lobby: LobbyInstance): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
-    gameOptions.createOption("engineerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("grenadierProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("jesterProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("morphlingProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("oracleProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("phantomProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("serialKillerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("sheriffProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
-    gameOptions.createOption("snitchProbability", new NumberValue(50, 10, 0, 100, false, "{0}%"));
+    await Promise.all([
+      gameOptions.createOption("engineerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("grenadierProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("jesterProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("morphlingProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("oracleProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("phantomProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("serialKillerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("sheriffProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("snitchProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+    ]);
   }
 
-  onDisable(lobby: LobbyInstance): void {
+  async onDisable(lobby: LobbyInstance): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
-    gameOptions.deleteOption("engineerProbability");
-    gameOptions.deleteOption("grenadierProbability");
-    gameOptions.deleteOption("jesterProbability");
-    gameOptions.deleteOption("morphlingProbability");
-    gameOptions.deleteOption("oracleProbability");
-    gameOptions.deleteOption("phantomProbability");
-    gameOptions.deleteOption("serialKillerProbability");
-    gameOptions.deleteOption("sheriffProbability");
-    gameOptions.deleteOption("snitchProbability");
+    await Promise.all([
+      gameOptions.deleteOption("engineerProbability"),
+      gameOptions.deleteOption("grenadierProbability"),
+      gameOptions.deleteOption("jesterProbability"),
+      gameOptions.deleteOption("morphlingProbability"),
+      gameOptions.deleteOption("oracleProbability"),
+      gameOptions.deleteOption("phantomProbability"),
+      gameOptions.deleteOption("serialKillerProbability"),
+      gameOptions.deleteOption("sheriffProbability"),
+      gameOptions.deleteOption("snitchProbability"),
+    ]);
   }
 
   private resolveOptionPercent(percent: number): number {
