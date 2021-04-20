@@ -121,15 +121,31 @@ export default class extends BaseMod {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
     await Promise.all([
-      gameOptions.createOption("engineerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("grenadierProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("jesterProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("morphlingProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("oracleProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("phantomProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("serialKillerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("sheriffProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("snitchProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("roles", "engineerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "engineerCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption("roles", "grenadierProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "grenadierCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption("roles", "jesterProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+
+      gameOptions.createOption("roles", "morphlingProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "morphlingCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption("roles", "oracleProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "oracleCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption("config", "oracleAccuracy", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+
+      gameOptions.createOption("roles", "phantomProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+
+      gameOptions.createOption("roles", "serialKillerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "serialKillerCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption("roles", "sheriffProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "sheriffCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption("roles", "snitchProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption("config", "snitchRemainingTasks", new NumberValue(2, 1, 0, 6, false, "{0} tasks")),
     ]);
   }
 
@@ -138,14 +154,30 @@ export default class extends BaseMod {
 
     await Promise.all([
       gameOptions.deleteOption("engineerProbability"),
+      gameOptions.deleteOption("engineerCooldown"),
+
       gameOptions.deleteOption("grenadierProbability"),
+      gameOptions.deleteOption("grenadierCooldown"),
+
       gameOptions.deleteOption("jesterProbability"),
+
       gameOptions.deleteOption("morphlingProbability"),
+      gameOptions.deleteOption("morphlingCooldown"),
+
       gameOptions.deleteOption("oracleProbability"),
+      gameOptions.deleteOption("oracleCooldown"),
+      gameOptions.deleteOption("oracleAccuracy"),
+
       gameOptions.deleteOption("phantomProbability"),
+
       gameOptions.deleteOption("serialKillerProbability"),
+      gameOptions.deleteOption("serialKillerCooldown"),
+
       gameOptions.deleteOption("sheriffProbability"),
+      gameOptions.deleteOption("sheriffCooldown"),
+
       gameOptions.deleteOption("snitchProbability"),
+      gameOptions.deleteOption("snitchRemainingTasks"),
     ]);
   }
 
