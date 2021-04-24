@@ -15,6 +15,7 @@ import { Oracle } from "./src/roles/oracle";
 import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -85,30 +86,39 @@ export default class extends BaseMod {
       {
         role: Engineer,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("engineerProbability").getValue().value),
+        assignWith: RoleAlignment.Crewmate,
       }, {
         role: Grenadier,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("grenadierProbability").getValue().value),
+        assignWith: RoleAlignment.Impostor,
       }, {
         role: Jester,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("jesterProbability").getValue().value),
+        assignWith: RoleAlignment.Neutral,
       }, {
         role: Morphling,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("morphlingProbability").getValue().value),
+        assignWith: RoleAlignment.Impostor,
       }, {
         role: Oracle,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("oracleProbability").getValue().value),
+        assignWith: RoleAlignment.Crewmate,
       }, {
         role: Phantom,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("phantomProbability").getValue().value),
+        assignWith: RoleAlignment.Neutral,
       }, {
         role: SerialKiller,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("serialKillerProbability").getValue().value),
+        assignWith: RoleAlignment.Neutral,
       }, {
         role: Sheriff,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("sheriffProbability").getValue().value),
+        assignWith: RoleAlignment.Crewmate,
       }, {
         role: Snitch,
         playerCount: this.resolveOptionPercent(gameOptions.getOption("snitchProbability").getValue().value),
+        assignWith: RoleAlignment.Crewmate,
       },
     ];
   }
