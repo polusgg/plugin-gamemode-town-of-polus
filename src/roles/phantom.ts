@@ -9,6 +9,7 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Tasks } from "@nodepolus/framework/src/static";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
+import { TownOfPolusGameOptions } from "../..";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -36,9 +37,9 @@ export class Phantom extends BaseRole {
   onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    this.owner.setTasks(new Set());
+    // this.owner.setTasks(new Set()); why did this get put here? snitch should have same tasks as crewmate
 
-    this.catch("player.died", x => x.getPlayer()).execute(event => {
+    this.catch("player.died", x => x.getPlayer()).execute(() => {
       this.owner.revive();
 
       this.transformed = true;
@@ -47,12 +48,7 @@ export class Phantom extends BaseRole {
 
       Services.get(ServiceType.Animation).setOpacity(this.owner, 1);
 
-      let tasks = Tasks.forLevel(event.getPlayer().getLobby().getLevel());
-
-      tasks = shuffleArrayClone([...tasks]);
-      tasks = tasks.slice(0, 4);
-
-      event.getPlayer().setTasks(new Set(tasks));
+      this.giveTasks();
     });
 
     this.catch("meeting.started", event => event.getCaller()).execute(event => {
@@ -86,6 +82,18 @@ export class Phantom extends BaseRole {
     });
   }
 
+  giveTasks(): void {
+    let tasks = Tasks.forLevel(this.owner.getLobby().getLevel());
+
+    tasks = shuffleArrayClone([...tasks]);
+    tasks = tasks.slice(0, Services.get(ServiceType.GameOptions)
+      .getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption("snitchRemainingTasks")
+      .getValue().value,
+    );
+
+    this.owner.setTasks(new Set(tasks));
+  }
+
   getManagerType(): typeof BaseManager {
     return PhantomManager;
   }
@@ -95,7 +103,7 @@ export class Phantom extends BaseRole {
 
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostors > 1 ? "are" : "is")} [FF1919FF]impostor${(impostors > 1 ? "s" : "")}[] among us`,
+      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: [255, 140, 238, 255],
     };
   }

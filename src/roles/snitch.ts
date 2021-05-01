@@ -23,8 +23,6 @@ export class Snitch extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    owner.setTasks(new Set());
-
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {

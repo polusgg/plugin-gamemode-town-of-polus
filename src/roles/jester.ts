@@ -22,7 +22,11 @@ export class Jester extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus"));
+      Services.get(ServiceType.Resource).load(owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus"));
+
+      const nameService = Services.get(ServiceType.Name);
+
+      nameService.setFor(owner.getSafeConnection(), owner, nameService.getFor(owner.getSafeConnection(), owner));
     }
 
     const roleManager = Services.get(ServiceType.RoleManager);
@@ -36,8 +40,6 @@ export class Jester extends BaseRole {
           subtitle: "The jester was voted out",
           color: [255, 140, 238, 255],
           yourTeam: [owner],
-          displayPlayAgain: true,
-          displayQuit: true,
         });
       });
 
@@ -46,8 +48,6 @@ export class Jester extends BaseRole {
         subtitle: "You got voted out",
         color: [255, 140, 238, 255],
         yourTeam: [owner],
-        displayPlayAgain: true,
-        displayQuit: true,
       });
 
       roleManager.endGame(event.getGame());
