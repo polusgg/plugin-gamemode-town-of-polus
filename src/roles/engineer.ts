@@ -8,7 +8,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { Level, SystemType } from "@nodepolus/framework/src/types/enums";
+import { GameState, Level, SystemType } from "@nodepolus/framework/src/types/enums";
 import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { ElectricalAmount, HeliSabotageAmount, MiraCommunicationsAmount, NormalCommunicationsAmount, OxygenAmount, ReactorAmount } from "@nodepolus/framework/src/protocol/packets/rpc/repairSystem/amounts";
 import { HeliSabotageAction, MiraCommunicationsAction, OxygenAction, ReactorAction } from "@nodepolus/framework/src/protocol/packets/rpc/repairSystem/actions";
@@ -36,6 +36,62 @@ export class Engineer extends BaseRole {
     }
   }
 
+  sabotageIsOccurring(): boolean {
+    const systems: (BaseSystem | undefined)[] = this
+      .owner
+      .getLobby()
+      .getSafeShipStatus()
+      .getShipStatus()
+      .getSystems();
+
+    for (let i: SystemType = 0; i < systems.length; i++) {
+      const element = systems[i];
+
+      if (element !== undefined) {
+        switch (i) {
+          case SystemType.Laboratory:
+          case SystemType.Reactor:
+            if (this.owner.getLobby().getLevel() === Level.Airship) {
+              const heliSystem = element as HeliSabotageSystem;
+
+              console.log(heliSystem);
+
+              if (heliSystem.getCompletedConsoles().size !== 2) {
+                return true;
+              }
+            } else {
+              const reactorSystem = element as ReactorSystem;
+
+              if (reactorSystem.getCountdown() !== 10000) {
+                return true;
+              }
+            }
+            break;
+          case SystemType.Oxygen:
+            if ((element as LifeSuppSystem).getCompletedConsoles().size !== 2) {
+              return true;
+            }
+            break;
+          case SystemType.Electrical:
+            if ((element as SwitchSystem).getActualSwitches().equals((element as SwitchSystem).getExpectedSwitches())) {
+              return true;
+            }
+            break;
+          case SystemType.Communications:
+            if (this.owner.getLobby().getLevel() === Level.MiraHq) {
+              if ((element as HqHudSystem).getCompletedConsoles().size !== 2) {
+                return true;
+              }
+            } else if ((element as HudOverrideSystem).isSabotaged()) {
+              return true;
+            }
+        }
+      }
+    }
+
+    return false;
+  }
+
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
@@ -46,6 +102,21 @@ export class Engineer extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
+
+      const interval = setInterval(() => {
+        if (this.owner.getLobby().getGameState() !== GameState.Started) {
+          clearInterval(interval);
+
+          return;
+        }
+
+        const isSaturated = button.getSaturated();
+
+        if (this.sabotageIsOccurring() !== isSaturated) {
+          button.setSaturated(!isSaturated);
+        }
+      }, 16.66);
+
       button.on("clicked", () => {
         button.reset();
 
