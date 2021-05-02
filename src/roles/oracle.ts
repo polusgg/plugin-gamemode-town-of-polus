@@ -42,8 +42,6 @@ export class Oracle extends BaseRole {
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
-    this.owner.setTasks(new Set());
-
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
       maxTimer: gameOptions.getOption("oracleCooldown").getValue().value,

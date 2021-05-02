@@ -63,7 +63,7 @@ export class SerialKiller extends BaseRole {
           return;
         }
 
-        target.murder(this.owner);
+        this.owner.murder(target);
       });
     });
 
