@@ -52,8 +52,12 @@ export class Grenadier extends BaseRole {
         button.reset();
 
         this.owner.getLobby().getPlayers().forEach(player => {
+          if (player.getConnection() === undefined) {
+            return;
+          }
+
           Services.get(ServiceType.Animation)
-            .beginCameraAnimation(Services.get(ServiceType.CameraManager).getController(player), [
+            .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
               new CameraAnimationKeyframe({
                 angle: 0,
                 color: [255, 255, 255, 0],
