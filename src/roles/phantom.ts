@@ -7,7 +7,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { Tasks } from "@nodepolus/framework/src/static";
+import { Palette, Tasks } from "@nodepolus/framework/src/static";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 import { TownOfPolusGameOptions } from "../..";
 
@@ -37,7 +37,7 @@ export class Phantom extends BaseRole {
   onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    // this.owner.setTasks(new Set()); why did this get put here? snitch should have same tasks as crewmate
+    // this.owner.setTasks(new Set()); why did this get put here? phantom should have same tasks as crewmate
 
     this.catch("player.died", x => x.getPlayer()).execute(() => {
       this.owner.revive();
@@ -104,7 +104,7 @@ export class Phantom extends BaseRole {
     return {
       title: "Crewmate",
       subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
-      color: [255, 140, 238, 255],
+      color: Palette.crewmateBlue(),
     };
   }
 }
