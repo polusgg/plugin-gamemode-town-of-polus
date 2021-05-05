@@ -70,7 +70,7 @@ export class Oracle extends BaseRole {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
 
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}]${this.enchanted.getName().toString()}[]`);
+          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `<color=#${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`);
       }
     });
 
