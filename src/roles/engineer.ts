@@ -9,11 +9,12 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { GameState, Level, SystemType } from "@nodepolus/framework/src/types/enums";
-import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
+import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { ElectricalAmount, HeliSabotageAmount, MiraCommunicationsAmount, NormalCommunicationsAmount, OxygenAmount, ReactorAmount } from "@nodepolus/framework/src/protocol/packets/rpc/repairSystem/amounts";
 import { HeliSabotageAction, MiraCommunicationsAction, OxygenAction, ReactorAction } from "@nodepolus/framework/src/protocol/packets/rpc/repairSystem/actions";
 import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
+import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
 export class EngineerManager extends BaseManager {
   getId(): string { return "engineer" }
@@ -44,47 +45,50 @@ export class Engineer extends BaseRole {
       .getShipStatus()
       .getSystems();
 
-    for (let i: SystemType = 0; i < systems.length; i++) {
+    for (let i: InternalSystemType = 0; i < systems.length; i++) {
       const element = systems[i];
 
       if (element !== undefined) {
         switch (i) {
-          case SystemType.Laboratory:
-          case SystemType.Reactor:
-            if (this.owner.getLobby().getLevel() === Level.Airship) {
-              const heliSystem = element as HeliSabotageSystem;
-
-              console.log(heliSystem);
-
-              if (heliSystem.getCompletedConsoles().size !== 2) {
-                return true;
-              }
-            } else {
-              const reactorSystem = element as ReactorSystem;
-
-              if (reactorSystem.getCountdown() !== 10000) {
-                return true;
-              }
+          case InternalSystemType.HeliSabotageSystem:
+            if ((element as HeliSabotageSystem).getCompletedConsoles().size !== 2) {
+              return true;
             }
             break;
-          case SystemType.Oxygen:
+          case InternalSystemType.Reactor:
+            if ((element as ReactorSystem).getCountdown() !== 10000) {
+              return true;
+            }
+            break;
+          case InternalSystemType.Laboratory: {
+            const labSystem = element as LaboratorySystem;
+            const a = [...labSystem.getUserConsoles().values()];
+
+            if (a.filter((e, p) => a.indexOf(e) === p).length !== 2) {
+              return true;
+            }
+            break;
+          }
+          case InternalSystemType.Oxygen:
             if ((element as LifeSuppSystem).getCompletedConsoles().size !== 2) {
               return true;
             }
             break;
-          case SystemType.Electrical:
+          case InternalSystemType.Switch:
             if ((element as SwitchSystem).getActualSwitches().equals((element as SwitchSystem).getExpectedSwitches())) {
               return true;
             }
             break;
-          case SystemType.Communications:
-            if (this.owner.getLobby().getLevel() === Level.MiraHq) {
-              if ((element as HqHudSystem).getCompletedConsoles().size !== 2) {
-                return true;
-              }
-            } else if ((element as HudOverrideSystem).isSabotaged()) {
+          case InternalSystemType.HudOverride:
+            if ((element as HudOverrideSystem).isSabotaged()) {
               return true;
             }
+            break;
+          case InternalSystemType.HqHud:
+            if ((element as HqHudSystem).getCompletedConsoles().size !== 2) {
+              return true;
+            }
+            break;
         }
       }
     }

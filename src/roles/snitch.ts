@@ -35,7 +35,7 @@ export class Snitch extends BaseRole {
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
     this.catch("player.task.completed", event => event.getPlayer()).execute(async event => {
-      const taskLeftCount = event.getPlayer().getTasks().map(task => !task[1]).length;
+      const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
 
       if (taskLeftCount == gameOptions.getOption("snitchRemainingTasks").getValue().value) {
         event.getPlayer().getLobby().getPlayers()
