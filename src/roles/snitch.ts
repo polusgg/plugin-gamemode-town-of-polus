@@ -24,7 +24,13 @@ export class Snitch extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      const impostors = owner.getLobby().getRealPlayers().filter(player => player.getMeta<BaseRole>("pgg.api.role").getAlignment() == RoleAlignment.Impostor);
+
+      impostors.push(owner);
+
+      for (let i = 0; i < impostors.length; i++) {
+        Services.get(ServiceType.Resource).load(impostors[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus"));
+      }
     } else {
       this.onReady();
     }
@@ -40,14 +46,14 @@ export class Snitch extends BaseRole {
       if (taskLeftCount == gameOptions.getOption("snitchRemainingTasks").getValue().value) {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
-            if (player.isImpostor()) {
+            if (player.getMeta<BaseRole>("pgg.api.role").getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
               await poi.attach(event.getPlayer());
             }
           });
       } else if (taskLeftCount == 0) {
-        const poi = await poiManager.spawnPointOfInterest(event.getPlayer().getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
+        const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
 
         poi.attach(event.getPlayer());
       }
