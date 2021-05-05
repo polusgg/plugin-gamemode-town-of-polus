@@ -53,6 +53,10 @@ export class SerialKiller extends BaseRole {
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
+      if (button.getCurrentTime() != 0) {
+        return;
+      }
+
       button.reset();
 
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());

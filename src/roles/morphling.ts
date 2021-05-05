@@ -79,6 +79,12 @@ export class Morphling extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", async () => {
+        if (button.getCurrentTime() != 0) {
+          return;
+        }
+
+        button.reset();
+
         if (this.targetAppearance === undefined) {
           const target = button.getTarget(3);
 

@@ -49,6 +49,10 @@ export class Oracle extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
+        if (button.getCurrentTime() != 0) {
+          return;
+        }
+
         button.reset();
 
         this.enchanted = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());

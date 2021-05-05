@@ -42,6 +42,10 @@ export class Sheriff extends BaseRole {
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
       button.on("clicked", () => {
+        if (button.getCurrentTime() != 0) {
+          return;
+        }
+
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
         if (target === undefined) {

@@ -66,9 +66,9 @@ export class Phantom extends BaseRole {
       }
     });
 
-    this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
-      if (this.transformed && event.getPlayer().getTasks().length < 1) {
-        event.getPlayer().getLobby().getGame()!.getLobby().getPlayers()
+    this.catch("meeting.started", event => event.getCaller()).execute(event => {
+      if (this.transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1) {
+        event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
           .forEach(player => {
             roleManager.setEndGameData(player.getSafeConnection(), {
               title: "Victory",
@@ -77,7 +77,7 @@ export class Phantom extends BaseRole {
               yourTeam: [this.owner],
             });
           });
-        roleManager.endGame(event.getPlayer().getLobby().getGame()!);
+        roleManager.endGame(event.getCaller().getLobby().getGame()!);
       }
     });
   }
@@ -98,12 +98,15 @@ export class Phantom extends BaseRole {
     return PhantomManager;
   }
 
-  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
-    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
+  getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
+  // getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
+    // const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
 
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
+      // title: "Crewmate",
+      subtitle: "Uncomment original intro on startup",
+      // subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

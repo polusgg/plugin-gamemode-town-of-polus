@@ -49,6 +49,10 @@ export class Grenadier extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
+        if (button.getCurrentTime() != 0) {
+          return;
+        }
+
         button.reset();
 
         this.owner.getLobby().getPlayers().forEach(player => {
