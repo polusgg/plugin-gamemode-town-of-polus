@@ -80,7 +80,7 @@ export class Grenadier extends BaseRole {
                 angle: 0,
                 color: [255, 255, 255, 0],
                 duration: 3000,
-                offset: 150,
+                offset: 3000,
                 position: Vector2.zero(),
               }),
             ]);

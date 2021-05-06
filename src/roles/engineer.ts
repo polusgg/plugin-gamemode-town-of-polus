@@ -123,15 +123,12 @@ export class Engineer extends BaseRole {
       button.on("clicked", () => {
         const host = this.owner.getLobby().getHostInstance();
 
-        if (button.getCurrentTime() != 0) {
+        if (button.getCurrentTime() != 0 || !this.sabotageIsOccurring()) {
           return;
         }
 
         button.reset();
-
-        if (this.sabotageIsOccurring()) {
-          host.getSystemsHandler()!.repairAll();
-        }
+        host.getSystemsHandler()!.repairAll(true);
       });
     });
   }
