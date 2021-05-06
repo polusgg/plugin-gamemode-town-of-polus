@@ -37,8 +37,6 @@ export class Phantom extends BaseRole {
   onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    // this.owner.setTasks(new Set()); why did this get put here? phantom should have same tasks as crewmate
-
     this.catch("player.died", x => x.getPlayer()).execute(() => {
       this.owner.revive();
 

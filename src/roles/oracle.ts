@@ -9,6 +9,8 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
+import { Player } from "@nodepolus/framework/src/player";
+import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
 
 const alignmentColors: readonly string[] = [
   "FFFFFFFF",
@@ -49,17 +51,15 @@ export class Oracle extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", () => {
-        if (button.getCurrentTime() != 0) {
+        const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+
+        if (button.getCurrentTime() != 0 || target === undefined) {
           return;
         }
 
         button.reset();
-
-        this.enchanted = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
-
-        if (this.enchanted !== undefined) {
-          Services.get(ServiceType.Animation).setOutline(this.enchanted, [255, 140, 238, 255]);
-        }
+        this.enchanted = target;
+        this.owner.getLobby().sendRpcPacket((this.enchanted as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
       });
     });
 
@@ -70,24 +70,31 @@ export class Oracle extends BaseRole {
 
       Services.get(ServiceType.Animation).clearOutline(this.enchanted);
 
-      if (this.owner.isDead() || this.owner.getGameDataEntry().isDisconnected()) {
+      // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
+      if (this.owner.isDead()) {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
+        const newName = `<color=#${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
 
+        // how should i namespace this
+        // this.enchanted.setMeta("pgg.role.oracle", );
+        this.enchanted.getGameDataEntry().setName(newName);
+        this.enchanted.updateGameData();
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `<color=#${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`);
+          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, newName);
       }
     });
 
-    this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
-      if (this.enchanted === undefined) {
-        return;
-      }
+    // in what description did it say that the player's name would change?
+    // this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
+    //   if (this.enchanted === undefined) {
+    //     return;
+    //   }
 
-      const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
+    //   const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
 
-      Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-        .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
-    });
+    //   Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
+    //     .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
+    // });
   }
 
   getManagerType(): typeof BaseManager {
