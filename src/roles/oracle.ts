@@ -75,26 +75,12 @@ export class Oracle extends BaseRole {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
         const newName = `<color=#${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
 
-        // how should i namespace this
-        // this.enchanted.setMeta("pgg.role.oracle", );
         this.enchanted.getGameDataEntry().setName(newName);
         this.enchanted.updateGameData();
         Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
           .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, newName);
       }
     });
-
-    // in what description did it say that the player's name would change?
-    // this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
-    //   if (this.enchanted === undefined) {
-    //     return;
-    //   }
-
-    //   const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
-
-    //   Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-    //     .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, `[${alignmentColors[alignment]}]${this.enchanted.getName().toString()}[]`);
-    // });
   }
 
   getManagerType(): typeof BaseManager {
