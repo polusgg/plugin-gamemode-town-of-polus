@@ -192,6 +192,11 @@ export default class extends BaseMod {
   }
 
   private resolveOptionPercent(percent: number): number {
-    return Math.round(percent / 100);
+    // example input: 230%
+    // split the 230% into 2 + (30%)
+    // floor p/100 = 2
+    // (mod p, 100) / 100 to get 0.3
+    // if Math.random <= 0.3 = 1 : 0
+    return Math.floor(percent / 100) + (Math.random() <= ((percent % 100) / 100) ? 1 : 0);
   }
 }
