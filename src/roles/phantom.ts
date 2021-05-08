@@ -38,9 +38,9 @@ export class Phantom extends BaseRole {
     const roleManager = Services.get(ServiceType.RoleManager);
 
     this.catch("player.died", x => x.getPlayer()).execute(() => {
+      this.owner.revive();
       this.owner.getGameDataEntry().setDead(false);
       this.owner.updateGameData();
-      this.owner.revive();
 
       this.transformed = true;
 
