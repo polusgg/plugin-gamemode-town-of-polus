@@ -37,17 +37,12 @@ export class Phantom extends BaseRole {
   onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    this.catch("player.died", x => x.getPlayer()).execute(() => {
+    this.catch("player.died", x => x.getPlayer()).execute(event => {
+      event.cancel();
       this.owner.revive();
-      this.owner.getGameDataEntry().setDead(false);
-      this.owner.updateGameData();
-
       this.transformed = true;
-
       this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
-
       Services.get(ServiceType.Animation).setOpacity(this.owner, 0.25);
-
       this.giveTasks();
     });
 
