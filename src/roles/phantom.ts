@@ -46,7 +46,7 @@ export class Phantom extends BaseRole {
 
       this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
 
-      Services.get(ServiceType.Animation).setOpacity(this.owner, 1);
+      Services.get(ServiceType.Animation).setOpacity(this.owner, 0.25);
 
       this.giveTasks();
     });
