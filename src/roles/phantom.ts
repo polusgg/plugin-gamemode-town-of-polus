@@ -38,6 +38,8 @@ export class Phantom extends BaseRole {
     const roleManager = Services.get(ServiceType.RoleManager);
 
     this.catch("player.died", x => x.getPlayer()).execute(() => {
+      this.owner.getGameDataEntry().setDead(false);
+      this.owner.updateGameData();
       this.owner.revive();
 
       this.transformed = true;
@@ -101,9 +103,9 @@ export class Phantom extends BaseRole {
     // const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
 
     return {
-      title: "Crewmate",
+      title: "Phantom",
       // title: "Crewmate",
-      subtitle: "Uncomment original intro on startup",
+      subtitle: "Uncomment original intro when beta testing",
       // subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
