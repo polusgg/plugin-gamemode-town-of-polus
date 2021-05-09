@@ -52,6 +52,7 @@ export class Morphling extends BaseRole {
   public targetAppearance?: PlayerAppearance;
   public ownAppearance?: PlayerAppearance;
   public timeout?: NodeJS.Timeout;
+  public transformed: boolean;
 
   protected metadata: RoleMetadata = {
     name: "Morphling",
@@ -60,6 +61,7 @@ export class Morphling extends BaseRole {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+    this.transformed = false;
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
@@ -81,7 +83,7 @@ export class Morphling extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
       button.on("clicked", async () => {
-        if (button.getCurrentTime() != 0) {
+        if (button.getCurrentTime() != 0 && !this.transformed) {
           return;
         }
 
@@ -96,6 +98,8 @@ export class Morphling extends BaseRole {
           }
         } else {
           button.reset(true);
+          this.transformed = true;
+          button.setSaturated(false);
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
             new PlayerAnimationKeyframe({
               angle: 0,
@@ -153,6 +157,8 @@ export class Morphling extends BaseRole {
                 secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
               }),
             ], false);
+            this.transformed = false;
+            button.setSaturated(true);
           }, 5000);
         }
       });
