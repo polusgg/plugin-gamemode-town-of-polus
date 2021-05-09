@@ -123,8 +123,8 @@ export class Morphling extends BaseRole {
               opacity: 1,
               position: Vector2.zero(),
               scale: Vector2.one(),
-              primaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].light as Mutable<[number, number, number, number]>,
-              secondaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+              primaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+              secondaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].light as Mutable<[number, number, number, number]>,
             }),
           ], false);
 
@@ -150,8 +150,8 @@ export class Morphling extends BaseRole {
                 opacity: 1,
                 position: Vector2.zero(),
                 scale: Vector2.one(),
-                primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
-                secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+                primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+                secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
               }),
             ], false);
           }, 5000);
