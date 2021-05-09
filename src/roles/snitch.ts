@@ -8,6 +8,7 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
+import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 
 export class SnitchManager extends BaseManager {
   getId(): string { return "snitch" }
@@ -28,12 +29,15 @@ export class Snitch extends BaseRole {
 
       impostors.push(owner);
 
+      const promises: Promise<ResourceResponse>[] = [];
+
       for (let i = 0; i < impostors.length; i++) {
-        Services.get(ServiceType.Resource).load(impostors[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus"));
+        promises.push(Services.get(ServiceType.Resource).load(impostors[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
       }
-    } else {
-      this.onReady();
+
+      Promise.allSettled(promises).then(this.onReady);
     }
+    this.onReady();
   }
 
   onReady(): void {
