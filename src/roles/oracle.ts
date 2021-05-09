@@ -11,6 +11,8 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { Player } from "@nodepolus/framework/src/player";
 import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
+import { GameState } from "@nodepolus/framework/src/types/enums";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 
 const alignmentColors: readonly string[] = [
   "FFFFFFFF",
@@ -41,6 +43,23 @@ export class Oracle extends BaseRole {
     }
   }
 
+  * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+    if (player.getLobby().getGameState() !== GameState.Started) {
+      yield;
+    }
+
+    while (true) {
+      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+
+      const isSaturated = button.getSaturated();
+
+      if ((target === undefined) === isSaturated) {
+        button.setSaturated(!isSaturated);
+      }
+      yield;
+    }
+  }
+
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
@@ -50,6 +69,9 @@ export class Oracle extends BaseRole {
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
+      Services.get(ServiceType.CoroutineManagerService)
+        .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
+
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
