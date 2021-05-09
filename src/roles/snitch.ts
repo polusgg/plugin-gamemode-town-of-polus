@@ -25,7 +25,7 @@ export class Snitch extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      const impostors = owner.getLobby().getRealPlayers().filter(player => player.getMeta<BaseRole>("pgg.api.role").getAlignment() == RoleAlignment.Impostor);
+      const impostors = owner.getLobby().getRealPlayers().filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor);
 
       impostors.push(owner);
 
@@ -35,9 +35,10 @@ export class Snitch extends BaseRole {
         promises.push(Services.get(ServiceType.Resource).load(impostors[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
       }
 
-      Promise.allSettled(promises).then(this.onReady);
+      Promise.allSettled(promises).then(this.onReady.bind(this));
+    } else {
+      this.onReady();
     }
-    this.onReady();
   }
 
   onReady(): void {
@@ -50,7 +51,7 @@ export class Snitch extends BaseRole {
       if (taskLeftCount == gameOptions.getOption("snitchRemainingTasks").getValue().value) {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
-            if (player.getMeta<BaseRole>("pgg.api.role").getAlignment() == RoleAlignment.Impostor) {
+            if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
               await poi.attach(event.getPlayer());
