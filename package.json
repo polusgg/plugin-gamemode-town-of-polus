@@ -7,6 +7,10 @@
     "type": "git",
     "url": "git+https://github.com/polusgg/plugin-gamemode-town-of-polus.git"
   },
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint-and-fix": "eslint . --ext .ts --fix"
+  },
   "author": "Polus.gg",
   "license": "ISC",
   "bugs": {
