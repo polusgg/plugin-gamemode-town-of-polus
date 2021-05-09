@@ -32,7 +32,7 @@ class PlayerAppearance {
   static save(player: PlayerInstance): PlayerAppearance {
     return new PlayerAppearance(
       player.getName(),
-      player.getColor(),
+      player.getHat(),
       player.getPet(),
       player.getSkin(),
       player.getColor(),
