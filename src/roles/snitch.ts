@@ -48,6 +48,8 @@ export class Snitch extends BaseRole {
     this.catch("player.task.completed", event => event.getPlayer()).execute(async event => {
       const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
 
+      console.log(`${taskLeftCount} tasks left poobscoob™ ${gameOptions.getOption("snitchRemainingTasks").getValue().value}`);
+
       if (taskLeftCount == gameOptions.getOption("snitchRemainingTasks").getValue().value) {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {

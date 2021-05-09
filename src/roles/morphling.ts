@@ -95,7 +95,7 @@ export class Morphling extends BaseRole {
             this.targetAppearance = PlayerAppearance.save(target);
           }
         } else {
-          button.reset();
+          button.reset(true);
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
             new PlayerAnimationKeyframe({
               angle: 0,
