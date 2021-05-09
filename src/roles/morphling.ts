@@ -72,6 +72,7 @@ export class Morphling extends BaseRole {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, PlayerRole.Impostor);
+    this.ownAppearance = PlayerAppearance.save(this.owner);
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
@@ -84,8 +85,6 @@ export class Morphling extends BaseRole {
           return;
         }
 
-        button.reset();
-
         if (this.targetAppearance === undefined) {
           const target = button.getTarget(3);
 
@@ -96,7 +95,7 @@ export class Morphling extends BaseRole {
             this.targetAppearance = PlayerAppearance.save(target);
           }
         } else {
-          this.ownAppearance = PlayerAppearance.save(this.owner);
+          button.reset();
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
             new PlayerAnimationKeyframe({
               angle: 0,
