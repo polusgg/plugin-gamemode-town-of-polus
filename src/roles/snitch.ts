@@ -45,8 +45,8 @@ export class Snitch extends BaseRole {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
-    this.catch("player.task.completed", event => event.getPlayer()).execute(async event => {
-      const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
+    this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
+      const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length - 1;
 
       console.log(`${taskLeftCount} tasks left poobscoob™ ${gameOptions.getOption("snitchRemainingTasks").getValue().value}`);
 
@@ -56,13 +56,18 @@ export class Snitch extends BaseRole {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
-              await poi.attach(event.getPlayer());
+              await poi.attach(this.owner);
             }
           });
       } else if (taskLeftCount == 0) {
-        const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
+        event.getPlayer().getLobby().getPlayers()
+          .forEach(async player => {
+            if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
+              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
-        poi.attach(event.getPlayer());
+              await poi.attach(player);
+            }
+          });
       }
     });
   }
