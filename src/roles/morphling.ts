@@ -9,10 +9,11 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
-import { Vector2 } from "@nodepolus/framework/src/types";
+import { PlayerColor, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
+import { Palette } from "@nodepolus/framework/src/static";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -122,8 +123,8 @@ export class Morphling extends BaseRole {
               opacity: 1,
               position: Vector2.zero(),
               scale: Vector2.one(),
-              primaryColor: [255, 255, 255, 255],
-              secondaryColor: [255, 255, 255, 255],
+              primaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+              secondaryColor: Palette.playerBody()[this.ownAppearance.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
             }),
           ], false);
 
@@ -149,8 +150,8 @@ export class Morphling extends BaseRole {
                 opacity: 1,
                 position: Vector2.zero(),
                 scale: Vector2.one(),
-                primaryColor: [255, 255, 255, 255],
-                secondaryColor: [255, 255, 255, 255],
+                primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+                secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
               }),
             ], false);
           }, 5000);
