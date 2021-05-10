@@ -60,30 +60,34 @@ export class Grenadier extends BaseRole {
             return;
           }
 
-          Services.get(ServiceType.Animation)
-            .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
-              new CameraAnimationKeyframe({
-                angle: 0,
-                color: [255, 255, 255, 0],
-                duration: 75,
-                offset: 0,
-                position: Vector2.zero(),
-              }),
-              new CameraAnimationKeyframe({
-                angle: 0,
-                color: [255, 255, 255, 255],
-                duration: 75,
-                offset: 0,
-                position: Vector2.zero(),
-              }),
-              new CameraAnimationKeyframe({
-                angle: 0,
-                color: [255, 255, 255, 0],
-                duration: 3000,
-                offset: 3000,
-                position: Vector2.zero(),
-              }),
-            ]);
+          const val = gameOptions.getOption("grenadierRange").getValue();
+
+          if (player !== this.owner && player.getPosition().distance(this.owner.getPosition()) <= val.value) {
+            Services.get(ServiceType.Animation)
+              .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
+                new CameraAnimationKeyframe({
+                  angle: 0,
+                  color: [255, 255, 255, 0],
+                  duration: 75,
+                  offset: 0,
+                  position: Vector2.zero(),
+                }),
+                new CameraAnimationKeyframe({
+                  angle: 0,
+                  color: [255, 255, 255, 255],
+                  duration: 75,
+                  offset: 75,
+                  position: Vector2.zero(),
+                }),
+                new CameraAnimationKeyframe({
+                  angle: 0,
+                  color: [255, 255, 255, 0],
+                  duration: 3000 * (val.value / val.upper),
+                  offset: 150,
+                  position: Vector2.zero(),
+                }),
+              ]);
+          }
         });
       });
     });
