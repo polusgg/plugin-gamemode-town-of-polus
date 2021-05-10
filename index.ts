@@ -197,6 +197,6 @@ export default class extends BaseMod {
     // floor p/100 = 2
     // (mod p, 100) / 100 to get 0.3
     // if Math.random <= 0.3 = 1 : 0
-    return Math.floor(percent / 100) + (Math.random() <= ((percent % 100) / 100) ? 1 : 0);
+    return Math.floor(percent / 100) + (Math.random() < ((percent % 100) / 100) ? 1 : 0);
   }
 }
