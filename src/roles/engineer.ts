@@ -12,6 +12,7 @@ import { GameState } from "@nodepolus/framework/src/types/enums";
 import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { TownOfPolusGameOptions } from "../..";
 import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class EngineerManager extends BaseManager {
   getId(): string { return "engineer" }
@@ -100,7 +101,7 @@ export class Engineer extends BaseRole {
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-      maxTimer: gameOptions.getOption("engineerCooldown").getValue().value,
+      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.EngineerCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
