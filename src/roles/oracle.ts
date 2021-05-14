@@ -11,6 +11,7 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { Player } from "@nodepolus/framework/src/player";
 import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
+import { TownOfPolusGameOptionNames } from "../types";
 
 const alignmentColors: readonly string[] = [
   "FFFFFFFF",
@@ -46,7 +47,7 @@ export class Oracle extends BaseRole {
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
-      maxTimer: gameOptions.getOption("oracleCooldown").getValue().value,
+      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.OracleCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
@@ -73,7 +74,7 @@ export class Oracle extends BaseRole {
       // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
       if (this.owner.isDead()) {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
-        const newName = `<color=#${(gameOptions.getOption("oracleAccuracy").getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
+        const newName = `<color=#${(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
 
         this.enchanted.getGameDataEntry().setName(newName);
         this.enchanted.updateGameData();

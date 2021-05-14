@@ -14,6 +14,7 @@ import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -78,7 +79,7 @@ export class Morphling extends BaseRole {
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
-      maxTimer: gameOptions.getOption("morphlingCooldown").getValue().value,
+      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {

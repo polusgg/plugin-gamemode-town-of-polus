@@ -10,6 +10,7 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Palette, Tasks } from "@nodepolus/framework/src/static";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 import { TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -38,6 +39,7 @@ export class Phantom extends BaseRole {
     const roleManager = Services.get(ServiceType.RoleManager);
 
     this.catch("player.died", x => x.getPlayer()).execute(event => {
+      console.log("Phantom died");
       event.cancel();
       this.owner.revive();
       this.transformed = true;
@@ -82,7 +84,7 @@ export class Phantom extends BaseRole {
 
     tasks = shuffleArrayClone([...tasks]);
     tasks = tasks.slice(0, Services.get(ServiceType.GameOptions)
-      .getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption("snitchRemainingTasks")
+      .getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks)
       .getValue().value,
     );
 

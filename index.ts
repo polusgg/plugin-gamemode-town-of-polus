@@ -16,42 +16,44 @@ import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
 import { RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { TownOfPolusGameOptionCategories, TownOfPolusGameOptionNames } from "./src/types";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
-  engineerProbability: NumberValue;
-  engineerCooldown: NumberValue;
+  [TownOfPolusGameOptionNames.EngineerProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.EngineerCooldown]: NumberValue;
 
   /* Grenadier */
-  grenadierProbability: NumberValue;
-  grenadierCooldown: NumberValue;
+  [TownOfPolusGameOptionNames.GrenadierProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.GrenadierCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.GrenadierRange]: NumberValue;
 
   /* Jester */
-  jesterProbability: NumberValue;
+  [TownOfPolusGameOptionNames.JesterProbability]: NumberValue;
 
   /* Morphling */
-  morphlingProbability: NumberValue;
-  morphlingCooldown: NumberValue;
+  [TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
 
   /* Oracle */
-  oracleProbability: NumberValue;
-  oracleCooldown: NumberValue;
-  oracleAccuracy: NumberValue;
+  [TownOfPolusGameOptionNames.OracleProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.OracleCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.OracleAccuracy]: NumberValue;
 
   /* Phantom */
-  phantomProbability: NumberValue;
+  [TownOfPolusGameOptionNames.PhantomProbability]: NumberValue;
 
   /* Serial Killer */
-  serialKillerProbability: NumberValue;
-  serialKillerCooldown: NumberValue;
+  [TownOfPolusGameOptionNames.SerialKillerProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.SerialKillerCooldown]: NumberValue;
 
   /* Sheriff */
-  sheriffProbability: NumberValue;
-  sheriffCooldown: NumberValue;
+  [TownOfPolusGameOptionNames.SheriffProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.SheriffCooldown]: NumberValue;
 
   /* Snitch */
-  snitchProbability: NumberValue;
-  snitchRemainingTasks: NumberValue;
+  [TownOfPolusGameOptionNames.SnitchProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.SnitchRemainingTasks]: NumberValue;
 };
 
 const pluginMetadata: PluginMetadata = {
@@ -85,39 +87,39 @@ export default class extends BaseMod {
     return [
       {
         role: Engineer,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("engineerProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.EngineerProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Grenadier,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("grenadierProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
       }, {
         role: Jester,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("jesterProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       }, {
         role: Morphling,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("morphlingProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
       }, {
         role: Oracle,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("oracleProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Phantom,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("phantomProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PhantomProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       }, {
         role: SerialKiller,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("serialKillerProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       }, {
         role: Sheriff,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("sheriffProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Snitch,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption("snitchProbability").getValue().value),
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SnitchProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       },
     ];
@@ -131,64 +133,39 @@ export default class extends BaseMod {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
     await Promise.all([
-      gameOptions.createOption("roles", "engineerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "engineerCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.EngineerCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
 
-      gameOptions.createOption("roles", "grenadierProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "grenadierCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units")),
 
-      gameOptions.createOption("roles", "jesterProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
 
-      gameOptions.createOption("roles", "morphlingProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "morphlingCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
 
-      gameOptions.createOption("roles", "oracleProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "oracleCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
-      gameOptions.createOption("config", "oracleAccuracy", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.OracleProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.OracleCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.OracleAccuracy, new NumberValue(50, 10, 0, 100, false, "{0}%")),
 
-      gameOptions.createOption("roles", "phantomProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.PhantomProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
 
-      gameOptions.createOption("roles", "serialKillerProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "serialKillerCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
 
-      gameOptions.createOption("roles", "sheriffProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "sheriffCooldown", new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SheriffProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SheriffCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
 
-      gameOptions.createOption("roles", "snitchProbability", new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption("config", "snitchRemainingTasks", new NumberValue(2, 1, 0, 6, false, "{0} tasks")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks")),
     ]);
   }
 
   async onDisable(lobby: LobbyInstance): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
-    await Promise.all([
-      gameOptions.deleteOption("engineerProbability"),
-      gameOptions.deleteOption("engineerCooldown"),
-
-      gameOptions.deleteOption("grenadierProbability"),
-      gameOptions.deleteOption("grenadierCooldown"),
-
-      gameOptions.deleteOption("jesterProbability"),
-
-      gameOptions.deleteOption("morphlingProbability"),
-      gameOptions.deleteOption("morphlingCooldown"),
-
-      gameOptions.deleteOption("oracleProbability"),
-      gameOptions.deleteOption("oracleCooldown"),
-      gameOptions.deleteOption("oracleAccuracy"),
-
-      gameOptions.deleteOption("phantomProbability"),
-
-      gameOptions.deleteOption("serialKillerProbability"),
-      gameOptions.deleteOption("serialKillerCooldown"),
-
-      gameOptions.deleteOption("sheriffProbability"),
-      gameOptions.deleteOption("sheriffCooldown"),
-
-      gameOptions.deleteOption("snitchProbability"),
-      gameOptions.deleteOption("snitchRemainingTasks"),
-    ]);
+    await Promise.all(Object.keys(TownOfPolusGameOptionNames).filter(e => parseInt(e, 10).toString() !== e).map(async i => gameOptions.deleteOption(i as TownOfPolusGameOptionNames)));
   }
 
   private resolveOptionPercent(percent: number): number {

@@ -12,6 +12,7 @@ import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
@@ -44,7 +45,7 @@ export class Grenadier extends BaseRole {
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
-      maxTimer: gameOptions.getOption("grenadierCooldown").getValue().value,
+      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
@@ -60,7 +61,7 @@ export class Grenadier extends BaseRole {
             return;
           }
 
-          const val = gameOptions.getOption("grenadierRange").getValue();
+          const val = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
 
           if (player !== this.owner && player.getPosition().distance(this.owner.getPosition()) <= val.value) {
             Services.get(ServiceType.Animation)
