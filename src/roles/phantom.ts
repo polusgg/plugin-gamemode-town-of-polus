@@ -38,13 +38,13 @@ export class Phantom extends BaseRole {
   onReady(): void {
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    this.catch("player.murdered", x => x.getPlayer()).execute(event => {
-      const notMurderer = event.getKiller().getLobby().getPlayers().filter(p => p !== event.getKiller());
+    // this.catch("player.murdered", x => x.getPlayer()).execute(event => {
+    //   // const notMurderer = event.getKiller().getLobby().getPlayers().filter(p => p !== event.getKiller());
 
-      for (let i = 0; i < notMurderer.length; i++) {
-        Services.get(ServiceType.DeadBody).
-      }
-    })
+    //   // for (let i = 0; i < notMurderer.length; i++) {
+
+    //   // }
+    // });
 
     this.catch("player.died", x => x.getPlayer()).execute(event => {
       event.cancel();
@@ -71,8 +71,11 @@ export class Phantom extends BaseRole {
       }
     });
 
-    this.catch("meeting.started", event => event.getCaller()).execute(event => {
-      if (this.transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1) {
+    //make phantom not be able to report a body
+
+    this.catch("meeting.started", event => event.getCaller())
+      .where(event => this.transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
+      .execute(event => {
         event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
           .forEach(player => {
             roleManager.setEndGameData(player.getSafeConnection(), {
@@ -83,8 +86,7 @@ export class Phantom extends BaseRole {
             });
           });
         roleManager.endGame(event.getCaller().getLobby().getGame()!);
-      }
-    });
+      });
   }
 
   giveTasks(): void {
