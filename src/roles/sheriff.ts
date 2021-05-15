@@ -56,13 +56,11 @@ export class Sheriff extends BaseRole {
         button.reset();
 
         this.owner.murder(target);
-      });
-    });
 
-    this.catch("player.murdered", event => event.getKiller()).execute(event => {
-      if (!event.getPlayer().isImpostor()) {
-        event.getKiller().kill();
-      }
+        if (!target.isImpostor()) {
+          this.owner.murder(this.owner);
+        }
+      });
     });
   }
 

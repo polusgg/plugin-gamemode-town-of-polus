@@ -64,8 +64,6 @@ export class SerialKiller extends BaseRole {
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
-        console.log(target);
-
         if (target === undefined) {
           return;
         }
