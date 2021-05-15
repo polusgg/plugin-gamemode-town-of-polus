@@ -10,6 +10,7 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
+import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 
 export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
@@ -62,6 +63,11 @@ export class Sheriff extends BaseRole {
         }
       });
     });
+    this.catch("game.ended", event => event.getGame())
+      .where(event => event.getReason() == GameOverReason.ImpostorsByKill &&
+        event.getGame().getLobby().getPlayers()
+          .filter(x => x.isImpostor() && !x.isDead()).length > 0)
+      .execute(event => event.cancel());
   }
 
   getManagerType(): typeof BaseManager {
