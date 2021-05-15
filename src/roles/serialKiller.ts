@@ -31,6 +31,8 @@ export class SerialKiller extends BaseRole {
     GameOverReason.ImpostorsByKill,
   ];
 
+  protected won = false;
+
   constructor(owner: PlayerInstance) {
     super(owner);
 
@@ -83,7 +85,7 @@ export class SerialKiller extends BaseRole {
     });
 
     this.catch("game.ended", event => event.getGame()).execute(event => {
-      if (!this.owner.isDead() && this.canceledWinReasons.includes(event.getReason())) {
+      if ((!this.owner.isDead() && this.canceledWinReasons.includes(event.getReason())) || this.won) {
         event.cancel();
       }
       //this looks like its already done? => this should only occur if the owner isn't dead
@@ -103,10 +105,12 @@ export class SerialKiller extends BaseRole {
   }
 
   private checkEndCriteria(lobby: LobbyInstance): void {
+
     const roleManager = Services.get(ServiceType.RoleManager);
 
     if (lobby.getPlayers()
       .filter(player => player.isDead()).length == 1 && !this.owner.isDead()) {
+      this.won = true;
       lobby.getPlayers()
         .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
           title: "Defeat",
