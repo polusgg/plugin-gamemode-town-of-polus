@@ -11,6 +11,7 @@ import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edge
 import { GameState } from "@nodepolus/framework/src/types/enums";
 import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { TownOfPolusGameOptions } from "../..";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 import { TownOfPolusGameOptionNames } from "../types";
 
@@ -96,6 +97,21 @@ export class Engineer extends BaseRole {
     return false;
   }
 
+  * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+    if (player.getLobby().getGameState() !== GameState.Started) {
+      yield;
+    }
+
+    while (true) {
+      const isSaturated = button.getSaturated();
+
+      if (this.sabotageIsOccurring() !== isSaturated) {
+        button.setSaturated(!isSaturated);
+      }
+      yield;
+    }
+  }
+
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
@@ -107,19 +123,8 @@ export class Engineer extends BaseRole {
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
 
-      const interval = setInterval(() => {
-        if (this.owner.getLobby().getGameState() !== GameState.Started) {
-          clearInterval(interval);
-
-          return;
-        }
-
-        const isSaturated = button.getSaturated();
-
-        if (this.sabotageIsOccurring() !== isSaturated) {
-          button.setSaturated(!isSaturated);
-        }
-      }, 16.66);
+      Services.get(ServiceType.CoroutineManagerService)
+        .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
       button.on("clicked", () => {
         const host = this.owner.getLobby().getHostInstance();
