@@ -11,6 +11,7 @@ import { Palette, Tasks } from "@nodepolus/framework/src/static";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -19,11 +20,12 @@ export class PhantomManager extends BaseManager {
 
 export class Phantom extends BaseRole {
   public transformed = false;
-
   protected metadata: RoleMetadata = {
     name: "Phantom",
     alignment: RoleAlignment.Neutral,
   };
+
+  private button: Button | undefined;
 
   constructor(owner: PlayerInstance) {
     super(owner);
@@ -52,7 +54,7 @@ export class Phantom extends BaseRole {
       this.owner.revive();
       this.transformed = true;
       this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
-      Services.get(ServiceType.Animation).setOpacity(this.owner, 0.25);
+      this.owner.setMeta("pgg.api.targetable", false);
       this.giveTasks();
     });
 
@@ -99,6 +101,18 @@ export class Phantom extends BaseRole {
     );
 
     this.owner.setTasks(new Set(tasks));
+  }
+
+  async unshowPhantom(): Promise<void> {
+    await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
+    //fuck the button
+    this.button?.getEntity().despawn();
+    this.button = undefined;
+  }
+
+  async showPhantom(): Promise<void> {
+    // slowly reveal phantom, then add a button onto them (button.attachTo) and save it in this.button
+    // await Services.get(ServiceType.Animation).beginPlayerAnimation()
   }
 
   getManagerType(): typeof BaseManager {
