@@ -123,7 +123,7 @@ export class Engineer extends BaseRole {
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
 
-      Services.get(ServiceType.CoroutineManagerService)
+      Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
       button.on("clicked", () => {

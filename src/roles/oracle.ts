@@ -70,13 +70,13 @@ export class Oracle extends BaseRole {
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
-      Services.get(ServiceType.CoroutineManagerService)
+      Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
-        if (button.getCurrentTime() != 0 || target === undefined) {
+        if (!button.getSaturated()) {
           return;
         }
 
