@@ -101,14 +101,19 @@ export class Morphling extends BaseRole {
           button.reset(true);
           this.transformed = true;
           button.setSaturated(false);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
+            hatOpacity: true,
+            petOpacity: true,
+            skinOpacity: true,
+            primaryColor: true,
+            secondaryColor: true,
+          }, [
             new PlayerAnimationKeyframe({
-              angle: 0,
-              duration: 100,
               offset: 0,
-              opacity: 0,
-              position: Vector2.zero(),
-              scale: Vector2.one(),
+              duration: 100,
+              hatOpacity: 1,
+              petOpacity: 1,
+              skinOpacity: 1,
               primaryColor: [255, 255, 255, 255],
               secondaryColor: [255, 255, 255, 255],
             }),
@@ -119,21 +124,32 @@ export class Morphling extends BaseRole {
           }
 
           this.targetAppearance.apply(this.owner);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
+            hatOpacity: true,
+            petOpacity: true,
+            skinOpacity: true,
+            primaryColor: true,
+            secondaryColor: true,
+          }, [
             new PlayerAnimationKeyframe({
-              angle: 0,
-              duration: 100,
               offset: 0,
-              opacity: 1,
-              position: Vector2.zero(),
-              scale: Vector2.one(),
+              duration: 100,
+              hatOpacity: 1,
+              petOpacity: 1,
+              skinOpacity: 1,
               primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
               secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
             }),
           ], false);
 
           this.timeout = setTimeout(async () => {
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
+              hatOpacity: true,
+              petOpacity: true,
+              skinOpacity: true,
+              primaryColor: true,
+              secondaryColor: true,
+            }, [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,
@@ -146,7 +162,13 @@ export class Morphling extends BaseRole {
               }),
             ], false);
             this.ownAppearance!.apply(this.owner);
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
+              hatOpacity: true,
+              petOpacity: true,
+              skinOpacity: true,
+              primaryColor: true,
+              secondaryColor: true,
+            }, [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,
