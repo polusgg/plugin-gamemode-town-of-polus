@@ -6,6 +6,7 @@ import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/bas
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
 import { PlayerColor, PlayerRole } from "@nodepolus/framework/src/types/enums";
@@ -14,7 +15,7 @@ import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
-import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -49,7 +50,7 @@ class PlayerAppearance {
   }
 }
 
-export class Morphling extends Impostor {
+export class Morphling extends BaseRole {
   public targetAppearance?: PlayerAppearance;
   public ownAppearance?: PlayerAppearance;
   public timeout?: NodeJS.Timeout;
@@ -65,9 +66,9 @@ export class Morphling extends Impostor {
     this.transformed = false;
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReadyImpostor.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
-      this.onReadyImpostor();
+      this.onReady();
     }
   }
 
@@ -101,13 +102,7 @@ export class Morphling extends Impostor {
           button.reset(true);
           this.transformed = true;
           button.setSaturated(false);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
-            hatOpacity: true,
-            petOpacity: true,
-            skinOpacity: true,
-            primaryColor: true,
-            secondaryColor: true,
-          }, [
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
             new PlayerAnimationKeyframe({
               offset: 0,
               duration: 100,
@@ -124,13 +119,7 @@ export class Morphling extends Impostor {
           }
 
           this.targetAppearance.apply(this.owner);
-          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
-            hatOpacity: true,
-            petOpacity: true,
-            skinOpacity: true,
-            primaryColor: true,
-            secondaryColor: true,
-          }, [
+          await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
             new PlayerAnimationKeyframe({
               offset: 0,
               duration: 100,
@@ -143,13 +132,7 @@ export class Morphling extends Impostor {
           ], false);
 
           this.timeout = setTimeout(async () => {
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
-              hatOpacity: true,
-              petOpacity: true,
-              skinOpacity: true,
-              primaryColor: true,
-              secondaryColor: true,
-            }, [
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,
@@ -162,13 +145,7 @@ export class Morphling extends Impostor {
               }),
             ], false);
             this.ownAppearance!.apply(this.owner);
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
-              hatOpacity: true,
-              petOpacity: true,
-              skinOpacity: true,
-              primaryColor: true,
-              secondaryColor: true,
-            }, [
+            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
               new PlayerAnimationKeyframe({
                 angle: 0,
                 duration: 100,

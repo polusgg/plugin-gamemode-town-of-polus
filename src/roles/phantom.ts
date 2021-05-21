@@ -15,6 +15,7 @@ import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -115,10 +116,7 @@ export class Phantom extends BaseRole {
 
   async showPhantom(): Promise<void> {
     // slowly reveal phantom, then add a button onto them (button.attachTo) and save it in this.button
-    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
-      opacity: true,
-      petOpacity: true,
-    }, [
+    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.PetOpacity], [
       new PlayerAnimationKeyframe({
         duration: 10000,
         opacity: 0,
