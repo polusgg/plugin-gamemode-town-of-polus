@@ -42,6 +42,7 @@ export type TownOfPolusGameOptions = {
 
   /* Phantom */
   [TownOfPolusGameOptionNames.PhantomProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.PhantomAppearTime]: NumberValue;
 
   /* Serial Killer */
   [TownOfPolusGameOptionNames.SerialKillerProbability]: NumberValue;
