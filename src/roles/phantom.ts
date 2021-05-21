@@ -12,6 +12,9 @@ import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { Vector2 } from "@nodepolus/framework/src/types";
+import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -105,14 +108,35 @@ export class Phantom extends BaseRole {
 
   async unshowPhantom(): Promise<void> {
     await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
-    //fuck the button
     this.button?.getEntity().despawn();
     this.button = undefined;
   }
 
   async showPhantom(): Promise<void> {
     // slowly reveal phantom, then add a button onto them (button.attachTo) and save it in this.button
-    // await Services.get(ServiceType.Animation).beginPlayerAnimation()
+    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, {
+      opacity: true,
+      petOpacity: true,
+    }, [
+      new PlayerAnimationKeyframe({
+        duration: 10000,
+        opacity: 0,
+        petOpacity: 0,
+      }),
+      new PlayerAnimationKeyframe({
+        duration: 10000,
+        opacity: 0.25,
+        petOpacity: 0,
+      }),
+    ]);
+
+    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
+      maxTimer: 0,
+      position: Vector2.zero(),
+      alignment: EdgeAlignments.None,
+    });
+    await this.button.attach(this.owner);
   }
 
   getManagerType(): typeof BaseManager {
@@ -120,7 +144,6 @@ export class Phantom extends BaseRole {
   }
 
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
-  // getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
     // const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
 
     return {
