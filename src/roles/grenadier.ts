@@ -29,9 +29,9 @@ export class Grenadier extends Impostor {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReadyImpostor.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
-      this.onReadyImpostor();
+      this.onReady();
     }
   }
 

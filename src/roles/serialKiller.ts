@@ -6,7 +6,6 @@ import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { GameOverReason } from "@nodepolus/framework/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
@@ -38,13 +37,13 @@ export class SerialKiller extends Impostor {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReadyImpostor.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
-      this.onReadyImpostor();
+      this.onReady();
     }
   }
 
-  onReadyImpostor(): void {
+  onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
     this.owner.setTasks(new Set());

@@ -117,3 +117,7 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node
 node_modules/
+*.d.ts
+*.d.ts.map
+*.js
+*.js.map
