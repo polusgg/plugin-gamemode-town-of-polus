@@ -51,14 +51,15 @@ export class Phantom extends BaseRole {
     //   // }
     // });
 
-    this.catch("player.died", x => x.getPlayer()).execute(event => {
+    this.catch("player.died", x => x.getPlayer()).execute(async event => {
       event.cancel();
 
-      this.owner.revive();
+      await this.showPhantom();
       this.transformed = true;
-      this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
+      await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
       this.giveTasks();
+      this.owner.revive();
     });
 
     this.catch("meeting.started", event => event.getCaller()).execute(event => {

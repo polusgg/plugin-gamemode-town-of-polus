@@ -12,13 +12,14 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
+import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
   getTypeName(): string { return "Serial Killer" }
 }
 
-export class SerialKiller extends BaseRole {
+export class SerialKiller extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Serial Killer",
     alignment: RoleAlignment.Neutral,
@@ -37,21 +38,19 @@ export class SerialKiller extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReadyImpostor.bind(this));
     } else {
-      this.onReady();
+      this.onReadyImpostor();
     }
   }
 
-  onReady(): void {
+  onReadyImpostor(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
     this.owner.setTasks(new Set());
 
-    //pov you're assassin and you CAN kill the impostors
-
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      asset: AssetBundle.loadSafeFromCache("Global").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
@@ -105,7 +104,6 @@ export class SerialKiller extends BaseRole {
   }
 
   private checkEndCriteria(lobby: LobbyInstance): void {
-
     const roleManager = Services.get(ServiceType.RoleManager);
 
     if (lobby.getPlayers()

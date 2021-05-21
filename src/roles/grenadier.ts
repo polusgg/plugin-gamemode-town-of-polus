@@ -6,20 +6,20 @@ import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/bas
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
+import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 
 export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
   getTypeName(): string { return "Grenadier" }
 }
 
-export class Grenadier extends BaseRole {
+export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Grenadier",
     alignment: RoleAlignment.Impostor,
@@ -29,9 +29,9 @@ export class Grenadier extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReadyImpostor.bind(this));
     } else {
-      this.onReady();
+      this.onReadyImpostor();
     }
   }
 

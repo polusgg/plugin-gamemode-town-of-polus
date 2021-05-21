@@ -37,7 +37,7 @@ export class Sheriff extends BaseRole {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
+      asset: AssetBundle.loadSafeFromCache("Global").getSafeAsset("Assets/Mods/OfficialAssets/KillButton.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
