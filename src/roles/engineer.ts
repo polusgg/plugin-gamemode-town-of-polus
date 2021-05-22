@@ -121,6 +121,8 @@ export class Engineer extends BaseRole {
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
     }).then(button => {
+      button.setCountingDown(false);
+      button.setCurrentTime(0);
       this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
 
       Services.get(ServiceType.CoroutineManager)
@@ -129,7 +131,7 @@ export class Engineer extends BaseRole {
       button.on("clicked", () => {
         const host = this.owner.getLobby().getHostInstance();
 
-        if (button.getCurrentTime() != 0 || !this.sabotageIsOccurring()) {
+        if (!button.getSaturated() || !this.sabotageIsOccurring()) {
           return;
         }
 

@@ -76,7 +76,7 @@ export class Oracle extends BaseRole {
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
 
-        if (!button.getSaturated()) {
+        if (!button.getSaturated() || target === undefined || this.enchanted !== undefined) {
           return;
         }
 

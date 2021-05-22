@@ -9,13 +9,13 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
-import { PlayerColor, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { PlayerColor } from "@nodepolus/framework/src/types/enums";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
-import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -75,7 +75,6 @@ export class Morphling extends BaseRole {
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
-    Services.get(ServiceType.RoleManager).setBaseRole(this.owner as Player, PlayerRole.Impostor);
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
@@ -83,9 +82,20 @@ export class Morphling extends BaseRole {
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),
       alignment: EdgeAlignments.RightBottom,
-    }).then(button => {
+    }).then(parameterButton => {
+      let button: Button | undefined = parameterButton;
+
+      this.catch("player.died", event => event.getPlayer()).execute(_ => {
+        if (button === undefined) {
+          return;
+        }
+
+        button.getEntity().despawn();
+        button = undefined;
+      });
+
       button.on("clicked", async () => {
-        if (button.getCurrentTime() != 0 && !this.transformed) {
+        if (button === undefined || button.getCurrentTime() != 0 || !this.transformed) {
           return;
         }
 
@@ -106,9 +116,9 @@ export class Morphling extends BaseRole {
             new PlayerAnimationKeyframe({
               offset: 0,
               duration: 100,
-              hatOpacity: 1,
-              petOpacity: 1,
-              skinOpacity: 1,
+              hatOpacity: 0,
+              petOpacity: 0,
+              skinOpacity: 0,
               primaryColor: [255, 255, 255, 255],
               secondaryColor: [255, 255, 255, 255],
             }),
@@ -158,7 +168,10 @@ export class Morphling extends BaseRole {
               }),
             ], false);
             this.transformed = false;
-            button.setSaturated(true);
+
+            if (button !== undefined) {
+              button.setSaturated(true);
+            }
           }, 5000);
         }
       });

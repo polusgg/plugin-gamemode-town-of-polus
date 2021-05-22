@@ -63,21 +63,6 @@ export class Phantom extends BaseRole {
       this.owner.revive();
     });
 
-    this.catch("meeting.started", event => event.getCaller()).execute(event => {
-      if (this.transformed) {
-        event.getGame().getLobby().getPlayers()
-          .forEach(player => {
-            roleManager.setEndGameData(player.getSafeConnection(), {
-              title: "Defeat",
-              subtitle: "",
-              color: [255, 140, 238, 255],
-              yourTeam: [this.owner],
-            });
-          });
-        roleManager.endGame(event.getGame());
-      }
-    });
-
     //make phantom not be able to report a body
 
     this.catch("meeting.started", event => event.getCaller())
@@ -86,7 +71,7 @@ export class Phantom extends BaseRole {
         event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
           .forEach(player => {
             roleManager.setEndGameData(player.getSafeConnection(), {
-              title: "Victory",
+              title: player === this.owner ? "Victory" : "Defeat",
               subtitle: "",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
