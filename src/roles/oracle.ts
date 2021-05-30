@@ -50,12 +50,13 @@ export class Oracle extends BaseRole {
     }
 
     while (true) {
-      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
 
-      const isSaturated = button.getSaturated();
+      const isSaturated = button.isSaturated();
 
       if ((target === undefined) === isSaturated) {
         button.setSaturated(!isSaturated);
+        this.owner.getLobby().sendRpcPacket((target as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
       }
       yield;
     }
@@ -69,14 +70,15 @@ export class Oracle extends BaseRole {
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.OracleCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
+      currentTime: 10,
     }).then(button => {
       Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
       button.on("clicked", () => {
-        const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance());
+        const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
 
-        if (!button.getSaturated() || target === undefined || this.enchanted !== undefined) {
+        if (!button.isSaturated() || target === undefined || this.enchanted !== undefined) {
           return;
         }
 
@@ -94,7 +96,7 @@ export class Oracle extends BaseRole {
       Services.get(ServiceType.Animation).clearOutline(this.enchanted);
 
       // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
-      if (this.owner.isDead()) {
+      if (this.owner.isDead() && !this.enchanted.isDead()) {
         const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
         const newName = `<color=#${(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
 

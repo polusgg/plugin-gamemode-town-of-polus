@@ -6,16 +6,16 @@ import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/bas
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TextComponent } from "@nodepolus/framework/src/api/text";
-import { PlayerColor } from "@nodepolus/framework/src/types/enums";
+import { GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -50,11 +50,12 @@ class PlayerAppearance {
   }
 }
 
-export class Morphling extends BaseRole {
+export class Morphling extends Impostor {
   public targetAppearance?: PlayerAppearance;
   public ownAppearance?: PlayerAppearance;
   public timeout?: NodeJS.Timeout;
   public transformed: boolean;
+  public morphButton: Button | undefined;
 
   protected metadata: RoleMetadata = {
     name: "Morphling",
@@ -72,114 +73,146 @@ export class Morphling extends BaseRole {
     }
   }
 
-  onReady(): void {
+  async onReady(): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
-    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),
       alignment: EdgeAlignments.RightBottom,
-    }).then(parameterButton => {
-      let button: Button | undefined = parameterButton;
+    });
 
-      this.catch("player.died", event => event.getPlayer()).execute(_ => {
-        if (button === undefined) {
+    this.catch("player.died", event => event.getPlayer()).execute(_ => {
+      if (this.morphButton === undefined) {
+        return;
+      }
+
+      this.morphButton.getEntity().despawn();
+      this.morphButton = undefined;
+    });
+
+    Services.get(ServiceType.CoroutineManager)
+      .beginCoroutine(this.owner, this.coSaturateMorphlingButton(this.owner, this.morphButton));
+
+    this.morphButton.on("clicked", async () => {
+      if (this.morphButton === undefined || this.morphButton.getCurrentTime() !== 0 || this.transformed) {
+        return;
+      }
+
+      if (this.targetAppearance === undefined) {
+        const target = this.morphButton.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
+
+        if (target !== undefined) {
+          this.morphButton.setColor([162, 18, 219, 0x7F]);
+          this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png"));
+          this.morphButton.setCurrentTime(5);
+          this.targetAppearance = PlayerAppearance.save(target);
+        }
+      } else {
+        this.morphButton.reset(true);
+        this.transformed = true;
+        await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
+          new PlayerAnimationKeyframe({
+            offset: 0,
+            duration: 100,
+            hatOpacity: 0,
+            petOpacity: 0,
+            skinOpacity: 0,
+            primaryColor: [255, 255, 255, 255],
+            secondaryColor: [255, 255, 255, 255],
+          }),
+        ], false);
+
+        if (this.owner.getLobby().getMeetingHud() !== undefined) {
           return;
         }
 
-        button.getEntity().despawn();
-        button = undefined;
-      });
+        this.targetAppearance.apply(this.owner);
+        await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
+          new PlayerAnimationKeyframe({
+            offset: 0,
+            duration: 100,
+            hatOpacity: 1,
+            petOpacity: 1,
+            skinOpacity: 1,
+            primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+            secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+          }),
+        ], false);
 
-      button.on("clicked", async () => {
-        if (button === undefined || button.getCurrentTime() != 0 || !this.transformed) {
-          return;
-        }
-
-        if (this.targetAppearance === undefined) {
-          const target = button.getTarget(3);
-
-          if (target !== undefined) {
-            button.setColor([162, 18, 219, 0x7F]);
-            button.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png"));
-            button.setCurrentTime(5);
-            this.targetAppearance = PlayerAppearance.save(target);
-          }
-        } else {
-          button.reset(true);
-          this.transformed = true;
-          button.setSaturated(false);
+        this.timeout = setTimeout(async () => {
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
             new PlayerAnimationKeyframe({
-              offset: 0,
+              angle: 0,
               duration: 100,
-              hatOpacity: 0,
-              petOpacity: 0,
-              skinOpacity: 0,
+              offset: 0,
+              opacity: 0,
+              position: Vector2.zero(),
+              scale: Vector2.one(),
               primaryColor: [255, 255, 255, 255],
               secondaryColor: [255, 255, 255, 255],
             }),
           ], false);
-
-          if (this.owner.getLobby().getMeetingHud() !== undefined) {
-            return;
-          }
-
-          this.targetAppearance.apply(this.owner);
+          this.ownAppearance!.apply(this.owner);
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
             new PlayerAnimationKeyframe({
-              offset: 0,
+              angle: 0,
               duration: 100,
-              hatOpacity: 1,
-              petOpacity: 1,
-              skinOpacity: 1,
-              primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-              secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+              offset: 0,
+              opacity: 1,
+              position: Vector2.zero(),
+              scale: Vector2.one(),
+              primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+              secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
             }),
           ], false);
+          this.transformed = false;
+        }, 5000);
+      }
+    });
 
-          this.timeout = setTimeout(async () => {
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
-              new PlayerAnimationKeyframe({
-                angle: 0,
-                duration: 100,
-                offset: 0,
-                opacity: 0,
-                position: Vector2.zero(),
-                scale: Vector2.one(),
-                primaryColor: [255, 255, 255, 255],
-                secondaryColor: [255, 255, 255, 255],
-              }),
-            ], false);
-            this.ownAppearance!.apply(this.owner);
-            await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
-              new PlayerAnimationKeyframe({
-                angle: 0,
-                duration: 100,
-                offset: 0,
-                opacity: 1,
-                position: Vector2.zero(),
-                scale: Vector2.one(),
-                primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-                secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
-              }),
-            ], false);
-            this.transformed = false;
-
-            if (button !== undefined) {
-              button.setSaturated(true);
-            }
-          }, 5000);
-        }
+    this.catch("meeting.started", event => event.getGame())
+      .where(() => !this.owner.isDead())
+      .execute(() => {
+        this.ownAppearance?.apply(this.owner);
+        this.targetAppearance = undefined;
+        this.morphButton?.setColor([162, 18, 219, 0x7F]);
+        this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
+        this.morphButton?.setCurrentTime(5);
       });
-    });
+  }
 
-    this.catch("meeting.started", event => event.getGame()).execute(() => {
-      this.ownAppearance?.apply(this.owner);
-    });
+  * coSaturateMorphlingButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+    if (player.getLobby().getGameState() !== GameState.Started) {
+      yield;
+    }
+
+    while (true) {
+      if (player.isDead()) {
+        console.log("saturation broke out");
+        break;
+      }
+
+      if (this.targetAppearance !== undefined) {
+        yield;
+        continue;
+      }
+
+      console.log(button.getCurrentTime());
+
+      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
+
+      const isSaturated = button.isSaturated();
+
+      if ((target === undefined) === isSaturated) {
+        console.log("saturation updated", !isSaturated);
+        button.setSaturated(!isSaturated);
+      }
+      yield;
+    }
   }
 
   getManagerType(): typeof BaseManager {

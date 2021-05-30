@@ -7,7 +7,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 
 export class SheriffManager extends BaseManager {
@@ -35,6 +35,10 @@ export class Sheriff extends Impostor {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const button = this.getImpostorButton();
 
+    this.owner.getLobby().getServer().on("game.ended", event => {
+      console.log("SUSUSUSUSUSUUJSUSSUUSUSUSUSUUSUSUSUSU", event.isCancelled());
+    });
+
     if (button !== undefined) {
       button.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value);
 
@@ -44,9 +48,14 @@ export class Sheriff extends Impostor {
         if (!target.isImpostor()) {
           this.owner.murder(this.owner);
         }
+
+        if (this.owner.getLobby().getPlayers().filter(x => x.isImpostor() && !x.isDead()).length == 0) {
+          // ending by vote is the most logical game over reason, if we want to change this later then we can
+          this.owner.getLobby().getHostInstance().endGame(GameOverReason.CrewmatesByVote);
+        }
       });
 
-      this.setTargetPredicate(players => players[0]);
+      this.setTargetSelector(players => players[0]);
     }
   }
 

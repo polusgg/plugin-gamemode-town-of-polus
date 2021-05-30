@@ -48,9 +48,11 @@ export class Grenadier extends Impostor {
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),
       alignment: EdgeAlignments.RightBottom,
+      currentTime: 10,
     }).then(button => {
+      this.catch("player.died", event => event.getPlayer()).execute(() => button.destroy());
       button.on("clicked", () => {
-        if (button.getCurrentTime() != 0) {
+        if (button.getCurrentTime() != 0 || button.isDestroyed()) {
           return;
         }
 
@@ -61,9 +63,10 @@ export class Grenadier extends Impostor {
             return;
           }
 
-          const val = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
+          const range = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
+          const blindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
 
-          if (player !== this.owner && player.getPosition().distance(this.owner.getPosition()) <= val.value) {
+          if (!player.isImpostor() && !player.isDead() && player.getPosition().distance(this.owner.getPosition()) <= range.value) {
             Services.get(ServiceType.Animation)
               .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
                 new CameraAnimationKeyframe({
@@ -83,8 +86,8 @@ export class Grenadier extends Impostor {
                 new CameraAnimationKeyframe({
                   angle: 0,
                   color: [255, 255, 255, 0],
-                  duration: 3000 * (val.value / val.upper),
-                  offset: 150,
+                  duration: 300,
+                  offset: 150 + (1000 * blindness.value),
                   position: Vector2.zero(),
                 }),
               ]);

@@ -10,7 +10,7 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { Engineer } from "./src/roles/engineer";
 import { Grenadier } from "./src/roles/grenadier";
-import { Morphling } from "./src/roles/morphling";
+// import { Morphling } from "./src/roles/morphling";
 import { Oracle } from "./src/roles/oracle";
 import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
@@ -21,19 +21,19 @@ import { TownOfPolusGameOptionCategories, TownOfPolusGameOptionNames } from "./s
 export type TownOfPolusGameOptions = {
   /* Engineer */
   [TownOfPolusGameOptionNames.EngineerProbability]: NumberValue;
-  [TownOfPolusGameOptionNames.EngineerCooldown]: NumberValue;
 
   /* Grenadier */
   [TownOfPolusGameOptionNames.GrenadierProbability]: NumberValue;
   [TownOfPolusGameOptionNames.GrenadierCooldown]: NumberValue;
   [TownOfPolusGameOptionNames.GrenadierRange]: NumberValue;
+  [TownOfPolusGameOptionNames.GrenadierBlindness]: NumberValue;
 
   /* Jester */
   [TownOfPolusGameOptionNames.JesterProbability]: NumberValue;
 
   /* Morphling */
-  [TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
-  [TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
+  // [TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
+  // [TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
 
   /* Oracle */
   [TownOfPolusGameOptionNames.OracleProbability]: NumberValue;
@@ -98,10 +98,10 @@ export default class extends BaseMod {
         role: Jester,
         playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
-      }, {
-        role: Morphling,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
-        assignWith: RoleAlignment.Impostor,
+      // }, {
+      //   role: Morphling,
+      //   playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
+      //   assignWith: RoleAlignment.Impostor,
       }, {
         role: Oracle,
         playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
@@ -141,11 +141,12 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units")),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s")),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
 
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.OracleProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.OracleCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),

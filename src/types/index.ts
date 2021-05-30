@@ -1,15 +1,15 @@
 export enum TownOfPolusGameOptionNames {
   EngineerProbability = "Engineer Probability",
-  EngineerCooldown = "Engineer Cooldown",
 
   GrenadierProbability = "Grenadier Probability",
   GrenadierCooldown = "Grenadier Cooldown",
   GrenadierRange = "Grenadier Range",
+  GrenadierBlindness = "Grenadier Blindness",
 
   JesterProbability = "Jester Probability",
 
-  MorphlingProbability = "Morphling Probability",
-  MorphlingCooldown = "Morphling Cooldown",
+  // MorphlingProbability = "Morphling Probability",
+  // MorphlingCooldown = "Morphling Cooldown",
 
   OracleProbability = "Oracle Probability",
   OracleCooldown = "Oracle Cooldown",

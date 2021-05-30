@@ -9,11 +9,9 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { GameState } from "@nodepolus/framework/src/types/enums";
-import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
-import { TownOfPolusGameOptions } from "../..";
+// import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
-import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
-import { TownOfPolusGameOptionNames } from "../types";
+// import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
 export class EngineerManager extends BaseManager {
   getId(): string { return "engineer" }
@@ -21,6 +19,7 @@ export class EngineerManager extends BaseManager {
 }
 
 export class Engineer extends BaseRole {
+  public button: Button | undefined;
   protected metadata: RoleMetadata = {
     name: "Engineer",
     alignment: RoleAlignment.Crewmate,
@@ -37,64 +36,8 @@ export class Engineer extends BaseRole {
   }
 
   sabotageIsOccurring(): boolean {
-    const systems: (BaseSystem | undefined)[] = this
-      .owner
-      .getLobby()
-      .getSafeShipStatus()
-      .getShipStatus()
-      .getSystems();
-
-    for (let i: InternalSystemType = 0; i < systems.length; i++) {
-      const element = systems[i];
-
-      if (element !== undefined) {
-        switch (i) {
-          case InternalSystemType.HeliSabotageSystem:
-            if ((element as HeliSabotageSystem).getCompletedConsoles().size !== 2) {
-              return true;
-            }
-            break;
-          case InternalSystemType.Reactor:
-            if ((element as ReactorSystem).getCountdown() !== 10000) {
-              return true;
-            }
-            break;
-          case InternalSystemType.Laboratory: {
-            const labSystem = element as LaboratorySystem;
-            const a = [...labSystem.getUserConsoles().values()];
-
-            if (a.filter((e, p) => a.indexOf(e) === p).length !== 2) {
-              return true;
-            }
-            break;
-          }
-          case InternalSystemType.Oxygen:
-            if ((element as LifeSuppSystem).getCompletedConsoles().size !== 2) {
-              return true;
-            }
-            break;
-          case InternalSystemType.Switch:
-            if ((element as SwitchSystem).getActualSwitches().equals((element as SwitchSystem).getExpectedSwitches())) {
-              return true;
-            }
-            break;
-          case InternalSystemType.HudOverride:
-            if ((element as HudOverrideSystem).isSabotaged()) {
-              return true;
-            }
-            break;
-          case InternalSystemType.HqHud:
-            if ((element as HqHudSystem).getCompletedConsoles().size !== 2) {
-              return true;
-            }
-            break;
-          default:
-            break;
-        }
-      }
-    }
-
-    return false;
+    return this.owner.getLobby().getHostInstance().getSystemsHandler()
+      ?.isSabotaged(true) ?? false;
   }
 
   * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
@@ -103,7 +46,13 @@ export class Engineer extends BaseRole {
     }
 
     while (true) {
-      const isSaturated = button.getSaturated();
+      if (player.isDead()) {
+        return;
+      }
+
+      const isSaturated = button.isSaturated();
+
+      console.log("sabocurring:", this.sabotageIsOccurring(), isSaturated);
 
       if (this.sabotageIsOccurring() !== isSaturated) {
         button.setSaturated(!isSaturated);
@@ -112,32 +61,38 @@ export class Engineer extends BaseRole {
     }
   }
 
-  onReady(): void {
-    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
-
-    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+  async onReady(): Promise<void> {
+    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.EngineerCooldown).getValue().value,
+      maxTimer: 10,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
-    }).then(button => {
-      button.setCountingDown(false);
-      button.setCurrentTime(0);
-      this.catch("player.died", event => event.getPlayer()).execute(_ => button.getEntity().despawn());
+      currentTime: 0,
+      saturated: false,
+    });
 
-      Services.get(ServiceType.CoroutineManager)
-        .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
+    this.catch("player.died", event => event.getPlayer()).execute(_ => {
+      if (this.button !== undefined) {
+        this.button.getEntity().despawn();
+        this.button = undefined;
+      }
+    });
 
-      button.on("clicked", () => {
-        const host = this.owner.getLobby().getHostInstance();
+    Services.get(ServiceType.CoroutineManager)
+      .beginCoroutine(this.owner, this.coSaturateButton(this.owner, this.button));
 
-        if (!button.getSaturated() || !this.sabotageIsOccurring()) {
-          return;
-        }
+    this.button.on("clicked", () => {
+      const host = this.owner.getLobby().getHostInstance();
 
-        button.reset();
-        host.getSystemsHandler()!.repairAll(true);
-      });
+      if (this.button === undefined || !this.button.isSaturated() || !this.sabotageIsOccurring()) {
+        console.log("lmfao rofl lmafao", this.button === undefined, !this.button?.isSaturated(), !this.sabotageIsOccurring());
+
+        return;
+      }
+
+      host.getSystemsHandler()!.repairAll(true);
+      this.button.getEntity().despawn();
+      this.button = undefined;
     });
   }
 
