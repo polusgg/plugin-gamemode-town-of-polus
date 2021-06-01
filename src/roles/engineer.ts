@@ -52,8 +52,6 @@ export class Engineer extends BaseRole {
 
       const isSaturated = button.isSaturated();
 
-      console.log("sabocurring:", this.sabotageIsOccurring(), isSaturated);
-
       if (this.sabotageIsOccurring() !== isSaturated) {
         button.setSaturated(!isSaturated);
       }
@@ -84,9 +82,7 @@ export class Engineer extends BaseRole {
     this.button.on("clicked", () => {
       const host = this.owner.getLobby().getHostInstance();
 
-      if (this.button === undefined || !this.button.isSaturated() || !this.sabotageIsOccurring()) {
-        console.log("lmfao rofl lmafao", this.button === undefined, !this.button?.isSaturated(), !this.sabotageIsOccurring());
-
+      if (this.button === undefined || !this.button.isSaturated() || !this.sabotageIsOccurring() || this.button.isDestroyed()) {
         return;
       }
 

@@ -35,10 +35,6 @@ export class Sheriff extends Impostor {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const button = this.getImpostorButton();
 
-    this.owner.getLobby().getServer().on("game.ended", event => {
-      console.log("SUSUSUSUSUSUUJSUSSUUSUSUSUSUUSUSUSUSU", event.isCancelled());
-    });
-
     if (button !== undefined) {
       button.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value);
 
@@ -55,7 +51,7 @@ export class Sheriff extends Impostor {
         }
       });
 
-      this.setTargetSelector(players => players[0]);
+      this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
     }
   }
 

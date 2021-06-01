@@ -48,7 +48,7 @@ export class SerialKiller extends Impostor {
 
     this.getImpostorButton()?.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerCooldown).getValue().value);
     this.setOnClicked(target => this.owner.murder(target));
-    this.setTargetSelector(players => players[0]);
+    this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
 
     this.owner.getLobby().getServer().on("player.left", event => {
       this.checkEndCriteria(event.getPlayer().getLobby());
@@ -87,19 +87,19 @@ export class SerialKiller extends Impostor {
   }
 
   private checkEndCriteria(lobby: LobbyInstance): boolean {
-    const roleManager = Services.get(ServiceType.RoleManager);
+    const endGame = Services.get(ServiceType.EndGame);
 
     if (lobby.getPlayers()
       .filter(player => !player.isDead() && player !== this.owner).length == 0) {
       this.won = true;
       lobby.getPlayers()
-        .forEach(async player => roleManager.setEndGameData(player.getSafeConnection(), {
+        .forEach(async player => await endGame.setEndGameData(player.getSafeConnection(), {
           title: "Defeat",
           subtitle: "The Serial Killer killed everyone",
           color: [255, 84, 124, 255],
           yourTeam: [this.owner],
         }));
-      roleManager.endGame(lobby.getSafeGame());
+      endGame.endGame(lobby.getSafeGame());
 
       return true;
     }

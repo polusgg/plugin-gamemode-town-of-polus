@@ -29,28 +29,29 @@ export class Jester extends BaseRole {
       nameService.setFor(owner.getSafeConnection(), owner, nameService.getFor(owner.getSafeConnection(), owner));
     }
 
-    const roleManager = Services.get(ServiceType.RoleManager);
+    const endGame = Services.get(ServiceType.EndGame);
 
     owner.setTasks(new Set());
 
     this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
-      this.owner.getLobby().getConnections().forEach(connection => {
-        roleManager.setEndGameData(connection, {
-          title: "Defeated",
-          subtitle: "The jester was voted out",
-          color: [255, 140, 238, 255],
-          yourTeam: [owner],
+      this.owner.getLobby().getConnections().filter(conn => conn !== this.owner.getConnection())
+        .forEach(connection => {
+          endGame.setEndGameData(connection, {
+            title: "Defeated",
+            subtitle: "The jester was voted out",
+            color: [255, 140, 238, 255],
+            yourTeam: [owner],
+          });
         });
-      });
 
-      roleManager.setEndGameData(owner.getConnection(), {
+      endGame.setEndGameData(owner.getConnection(), {
         title: "Victory",
         subtitle: "You got voted out",
         color: [255, 140, 238, 255],
         yourTeam: [owner],
       });
 
-      roleManager.endGame(event.getGame());
+      endGame.endGame(event.getGame());
     });
   }
 

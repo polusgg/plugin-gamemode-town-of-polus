@@ -16,7 +16,7 @@ export enum TownOfPolusGameOptionNames {
   OracleAccuracy = "Oracle Accuracy",
 
   PhantomProbability = "Phantom Probability",
-  // bad name?
+  PhantomRemainingTasks = "Phantom Remaining Tasks",
   PhantomAppearTime = "Phantom Reappear Time",
 
   SerialKillerProbability = "Serial Killer Probability",
@@ -30,6 +30,6 @@ export enum TownOfPolusGameOptionNames {
 }
 
 export enum TownOfPolusGameOptionCategories {
-  Roles = "roles",
-  Config = "config",
+  Roles = "Roles",
+  Config = "Config",
 }

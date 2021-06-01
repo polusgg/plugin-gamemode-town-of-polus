@@ -17,6 +17,7 @@ import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PhantomState } from "../types/enums/phantomState";
+import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -36,14 +37,24 @@ export class Phantom extends BaseRole {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      const allPlayers = owner.getLobby().getRealPlayers();
+
+      allPlayers.push(owner);
+
+      const promises: Promise<ResourceResponse>[] = [];
+
+      for (let i = 0; i < allPlayers.length; i++) {
+        promises.push(Services.get(ServiceType.Resource).load(allPlayers[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
+      }
+
+      Promise.allSettled(promises).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
   }
 
   onReady(): void {
-    const roleManager = Services.get(ServiceType.RoleManager);
+    const gameEnd = Services.get(ServiceType.EndGame);
 
     this.catch("player.murdered", x => x.getPlayer()).execute(event => {
       const notMurderer = event.getKiller().getLobby().getPlayers()
@@ -59,34 +70,41 @@ export class Phantom extends BaseRole {
     });
 
     this.catch("player.died", x => x.getPlayer()).execute(async event => {
+      if (this.state !== PhantomState.Alive) {
+        if (this.state === PhantomState.Transformed) {
+          console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
+        }
+
+        return;
+      }
+
       event.cancel();
 
-      await this.showPhantom();
-      this.state = PhantomState.Caught;
+      this.state = PhantomState.Transformed;
       await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
       this.giveTasks();
       this.owner.revive();
+      await this.showPhantom();
     });
 
-    //make phantom not be able to report a body
-    // this.catch("meeting.started", event => event.getCaller())
-    //   .where(event => this.transformed && event.getCaller().getTasks().filter(x => !x[1]).length > 1 && event.getVictim() === undefined)
-    //   .execute()
+    this.catch("meeting.started", event => event.getCaller())
+      .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1)
+      .execute(event => event.cancel());
 
     this.catch("meeting.started", event => event.getCaller())
       .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
-      .execute(event => {
-        event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
-          .forEach(player => {
-            roleManager.setEndGameData(player.getSafeConnection(), {
+      .execute(async event => {
+        await Promise.allSettled(event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
+          .map(async player => {
+            await gameEnd.setEndGameData(player.getSafeConnection(), {
               title: player === this.owner ? "Victory" : "Defeat",
               subtitle: "",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
             });
-          });
-        roleManager.endGame(event.getCaller().getLobby().getGame()!);
+          }));
+        gameEnd.endGame(event.getCaller().getLobby().getGame()!);
       });
   }
 
@@ -95,7 +113,7 @@ export class Phantom extends BaseRole {
 
     tasks = shuffleArrayClone([...tasks]);
     tasks = tasks.slice(0, Services.get(ServiceType.GameOptions)
-      .getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks)
+      .getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRemainingTasks)
       .getValue().value,
     );
 
@@ -117,34 +135,48 @@ export class Phantom extends BaseRole {
       return;
     }
 
+    const appearTime = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomAppearTime)
+      .getValue().value;
+
+    // await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
     // slowly reveal phantom, then add a button onto them (button.attachTo) and save it in this.button
-    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.PetOpacity], [
+    await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
       new PlayerAnimationKeyframe({
-        duration: 10000,
+        offset: 0,
+        duration: 0,
         opacity: 0,
         petOpacity: 0,
       }),
       new PlayerAnimationKeyframe({
-        duration: 10000,
-        opacity: 0.25,
+        offset: 5000,
+        duration: appearTime === 0
+          ? 1
+          : 1000 * appearTime,
+        opacity: 0.05,
         petOpacity: 0,
       }),
-    ]);
+    ], false);
 
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
-      maxTimer: 100,
+      maxTimer: 69,
       position: Vector2.zero(),
       alignment: EdgeAlignments.None,
       // isCountingDown: false,
       currentTime: 0,
-    });
-    this.button.on("clicked", () => {
-      if (this.button?.isDestroyed()) {
+    }, this.owner.getLobby().getConnections());
+    this.button.on("clicked", event => {
+      if (event.connection === this.owner.getSafeConnection()) {
         return;
       }
 
+      this.state = PhantomState.Caught;
       this.owner.kill();
+      this.owner.getGameDataEntry().setDead(true);
+      this.owner.updateGameData();
+      this.button?.destroy();
+      this.owner.setTasks(new Set());
+      console.log("pahnto ,cluciekd");
     });
     await this.button.attach(this.owner);
   }

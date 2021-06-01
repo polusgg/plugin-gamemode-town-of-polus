@@ -28,7 +28,6 @@ export class OracleManager extends BaseManager {
 
 export class Oracle extends BaseRole {
   public enchanted: PlayerInstance | undefined;
-
   protected metadata: RoleMetadata = {
     name: "Oracle",
     alignment: RoleAlignment.Crewmate,
@@ -49,14 +48,37 @@ export class Oracle extends BaseRole {
       yield;
     }
 
+    const animService = Services.get(ServiceType.Animation);
+    let outlined = false;
+    let lastTarget: PlayerInstance | undefined;
+
     while (true) {
-      const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
+      if (this.enchanted !== undefined) {
+        yield;
+        continue;
+      }
+
+      const target = button.getTargets(this.owner.getLobby().getOptions().getKillDistance() + 1).filter(poo => !poo.isDead())[0] as PlayerInstance | undefined;
 
       const isSaturated = button.isSaturated();
 
       if ((target === undefined) === isSaturated) {
         button.setSaturated(!isSaturated);
-        this.owner.getLobby().sendRpcPacket((target as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
+      }
+
+      if ((target === undefined) === outlined || lastTarget !== target) {
+        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner);
+
+        for (let i = 0; i < players.length; i++) {
+          if (players[i] === target) {
+            animService.setOutline(players[i], [255, 140, 238, 255], [this.owner.getSafeConnection()]);
+          } else {
+            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
+          }
+        }
+
+        lastTarget = target;
+        outlined = !outlined;
       }
       yield;
     }
@@ -72,17 +94,21 @@ export class Oracle extends BaseRole {
       alignment: EdgeAlignments.RightBottom,
       currentTime: 10,
     }).then(button => {
+      this.catch("player.died", event => event.getPlayer())
+        .execute(() => {
+          button.destroy();
+        });
       Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
       button.on("clicked", () => {
         const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
 
-        if (!button.isSaturated() || target === undefined || this.enchanted !== undefined) {
+        if (!button.isSaturated() || target === undefined || this.enchanted !== undefined || button.isDestroyed()) {
           return;
         }
 
-        button.reset();
+        button.setCountingDown(false);
         this.enchanted = target;
         this.owner.getLobby().sendRpcPacket((this.enchanted as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
       });
