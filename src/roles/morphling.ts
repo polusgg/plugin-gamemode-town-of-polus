@@ -222,7 +222,7 @@ export class Morphling extends Impostor {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Morphling",
-      subtitle: "Transform and deceive the crew",
+      subtitle: "Transform and deceive the <color=#8CFFFFFF>crewmates</color>",
       color: [162, 18, 219, 255],
     };
   }

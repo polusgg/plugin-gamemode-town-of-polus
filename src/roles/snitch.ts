@@ -10,13 +10,14 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { TownOfPolusGameOptionNames } from "../types";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 
 export class SnitchManager extends BaseManager {
   getId(): string { return "snitch" }
   getTypeName(): string { return "Snitch" }
 }
 
-export class Snitch extends BaseRole {
+export class Snitch extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Snitch",
     alignment: RoleAlignment.Crewmate,
@@ -78,7 +79,7 @@ export class Snitch extends BaseRole {
   getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
     return {
       title: "Snitch",
-      subtitle: `Finish your tasks to reveal the impostor${(player.getLobby().getPlayers().filter(x => x.isImpostor()).length > 1 ? "s" : "")}`,
+      subtitle: `Finish your tasks to reveal the <color=#FF1919FF>impostor${(player.getLobby().getPlayers().filter(x => x.isImpostor()).length > 1 ? "s" : "")}</color>`,
       color: [0, 255, 221, 255],
     };
   }

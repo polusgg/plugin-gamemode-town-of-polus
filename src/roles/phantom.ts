@@ -5,7 +5,6 @@ import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enu
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Palette, Tasks } from "@nodepolus/framework/src/static";
 import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
@@ -18,17 +17,19 @@ import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edge
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PhantomState } from "../types/enums/phantomState";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
+import { Player } from "@nodepolus/framework/src/player";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
   getTypeName(): string { return "Phantom" }
 }
 
-export class Phantom extends BaseRole {
+export class Phantom extends Crewmate {
   public state: PhantomState = PhantomState.Alive;
   protected metadata: RoleMetadata = {
     name: "Phantom",
-    alignment: RoleAlignment.Neutral,
+    alignment: RoleAlignment.Crewmate,
   };
 
   private button: Button | undefined;
@@ -54,22 +55,24 @@ export class Phantom extends BaseRole {
   }
 
   onReady(): void {
-    const gameEnd = Services.get(ServiceType.EndGame);
+    const endGame = Services.get(ServiceType.EndGame);
 
     this.catch("player.murdered", x => x.getPlayer()).execute(event => {
-      const notMurderer = event.getKiller().getLobby().getPlayers()
-        .filter(p => p !== event.getKiller());
+      const notMurderers = event.getKiller().getLobby().getPlayers()
+        .filter(p => p !== event.getKiller())
+        .map(player => player.getSafeConnection());
 
-      for (let i = 0; i < notMurderer.length; i++) {
-        Services.get(ServiceType.DeadBody).spawnFor(notMurderer[i].getSafeConnection(), {
-          color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
-          shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
-          position: this.owner.getPosition(),
-        });
-      }
+      // todo make sure dead bodies can be reported (they can't right now!!!)
+      // todo stop spawning vanilla among us dead bodies on the client?
+
+      Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
+        color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
+        shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
+        position: this.owner.getPosition(),
+      }, notMurderers);
     });
 
-    this.catch("player.died", x => x.getPlayer()).execute(async event => {
+    this.catch("player.died", x => x.getPlayer()).execute(async _event => {
       if (this.state !== PhantomState.Alive) {
         if (this.state === PhantomState.Transformed) {
           console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
@@ -78,11 +81,12 @@ export class Phantom extends BaseRole {
         return;
       }
 
-      event.cancel();
+      // event.cancel();
 
       this.state = PhantomState.Transformed;
       await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
+      this.setAlignment(RoleAlignment.Neutral);
       this.giveTasks();
       this.owner.revive();
       await this.showPhantom();
@@ -94,17 +98,17 @@ export class Phantom extends BaseRole {
 
     this.catch("meeting.started", event => event.getCaller())
       .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
-      .execute(async event => {
-        await Promise.allSettled(event.getCaller().getLobby().getGame()!.getLobby().getPlayers()
-          .map(async player => {
-            await gameEnd.setEndGameData(player.getSafeConnection(), {
+      .execute(event => {
+        endGame.registerEndGameIntent(event.getGame(), {
+          endGameData: new Map(event.getGame().getLobby().getPlayers()
+            .map(player => [player as Player, {
               title: player === this.owner ? "Victory" : "Defeat",
               subtitle: "",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
-            });
-          }));
-        gameEnd.endGame(event.getCaller().getLobby().getGame()!);
+            }])),
+          intentName: "phantomMeeting",
+        });
       });
   }
 
@@ -176,7 +180,18 @@ export class Phantom extends BaseRole {
       this.owner.updateGameData();
       this.button?.destroy();
       this.owner.setTasks(new Set());
-      console.log("pahnto ,cluciekd");
+      // console.log("phantom clicked");
+
+      Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
+        endGameData: new Map(this.owner.getLobby().getPlayers()
+          .map(player => [player, {
+            title: player === this.owner ? "Victory" : "Defeat",
+            subtitle: "",
+            color: [255, 84, 124, 255],
+            yourTeam: [this.owner],
+          }])),
+        intentName: "serialKilledAll",
+      });
     });
     await this.button.attach(this.owner);
   }
@@ -185,14 +200,14 @@ export class Phantom extends BaseRole {
     return PhantomManager;
   }
 
-  getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
-    // const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
+  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
+    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
 
     return {
-      title: "Phantom",
-      // title: "Crewmate",
-      subtitle: "Uncomment original intro when beta testing",
-      // subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
+      // title: "Phantom",
+      title: "Crewmate",
+      // subtitle: "Uncomment original intro in production :)",
+      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

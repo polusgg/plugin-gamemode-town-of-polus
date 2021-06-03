@@ -1,6 +1,5 @@
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { Vector2 } from "@nodepolus/framework/src/types";
@@ -11,6 +10,7 @@ import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edge
 import { GameState } from "@nodepolus/framework/src/types/enums";
 // import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 // import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
 export class EngineerManager extends BaseManager {
@@ -18,7 +18,7 @@ export class EngineerManager extends BaseManager {
   getTypeName(): string { return "Engineer" }
 }
 
-export class Engineer extends BaseRole {
+export class Engineer extends Crewmate {
   public button: Button | undefined;
   protected metadata: RoleMetadata = {
     name: "Engineer",

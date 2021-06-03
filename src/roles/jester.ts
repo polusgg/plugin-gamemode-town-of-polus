@@ -34,24 +34,16 @@ export class Jester extends BaseRole {
     owner.setTasks(new Set());
 
     this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
-      this.owner.getLobby().getConnections().filter(conn => conn !== this.owner.getConnection())
-        .forEach(connection => {
-          endGame.setEndGameData(connection, {
-            title: "Defeated",
-            subtitle: "The jester was voted out",
-            color: [255, 140, 238, 255],
-            yourTeam: [owner],
-          });
-        });
-
-      endGame.setEndGameData(owner.getConnection(), {
-        title: "Victory",
-        subtitle: "You got voted out",
-        color: [255, 140, 238, 255],
-        yourTeam: [owner],
+      endGame.registerEndGameIntent(event.getGame()!, {
+        endGameData: new Map(event.getGame().getLobby().getPlayers()
+          .map(player => [player, {
+            title: player === this.owner ? "Victory" : "Defeat",
+            subtitle: player === this.owner ? "You got voted out" : "The jester was voted out",
+            color: [255, 84, 124, 255],
+            yourTeam: [this.owner],
+          }])),
+        intentName: "jesterVoted",
       });
-
-      endGame.endGame(event.getGame());
     });
   }
 

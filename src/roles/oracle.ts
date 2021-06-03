@@ -14,6 +14,7 @@ import { Player } from "@nodepolus/framework/src/player";
 import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
 import { GameState } from "@nodepolus/framework/src/types/enums";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 
 const alignmentColors: readonly string[] = [
   "FFFFFFFF",
@@ -26,7 +27,7 @@ export class OracleManager extends BaseManager {
   getTypeName(): string { return "Oracle" }
 }
 
-export class Oracle extends BaseRole {
+export class Oracle extends Crewmate {
   public enchanted: PlayerInstance | undefined;
   protected metadata: RoleMetadata = {
     name: "Oracle",
@@ -141,7 +142,7 @@ export class Oracle extends BaseRole {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Oracle",
-      subtitle: "Enchant a player",
+      subtitle: "Enchant a player and reveal their role",
       color: [255, 140, 238, 255],
     };
   }
