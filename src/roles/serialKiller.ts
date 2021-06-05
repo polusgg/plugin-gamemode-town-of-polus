@@ -10,6 +10,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
+import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
@@ -67,15 +68,8 @@ export class SerialKiller extends Impostor {
     this.catch("player.died", event => event.getPlayer().getLobby())
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby()));
 
-    this.catch("player.murdered", event => event.getKiller()).execute(event => this.checkEndCriteria(event.getPlayer().getLobby()));
-
-    this.catch("player.died", event => event.getPlayer())
-      .execute(() => {
-        endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
-        endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
-        endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
-        endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorKill");
-      });
+    this.catch("player.murdered", event => event.getKiller())
+      .execute(event => this.checkEndCriteria(event.getPlayer().getLobby()));
   }
 
   getManagerType(): typeof BaseManager {
@@ -93,15 +87,30 @@ export class SerialKiller extends Impostor {
   private checkEndCriteria(lobby: LobbyInstance): void {
     const endGame = Services.get(ServiceType.EndGame);
 
+    console.log("sussy criteria fuck you");
+
+    if (this.owner.isDead() || this.owner.getGameDataEntry().isDisconnected()) {
+      console.log("sussy");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorKill");
+
+      return;
+    }
+
+    console.log("sdfafojfsaogipogm[");
+
     if (lobby.getPlayers()
-      .filter(player => !player.isDead() && player !== this.owner).length == 0) {
+      .filter(player => !player.isDead() && player !== this.owner).length <= 0) {
       endGame.registerEndGameIntent(lobby.getGame()!, {
         endGameData: new Map(lobby.getPlayers()
           .map(player => [player, {
             title: player === this.owner ? "Victory" : "Defeat",
-            subtitle: "",
+            subtitle: "The serial killer murdered everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
+            winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "serialKilledAll",
       });

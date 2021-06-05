@@ -72,7 +72,7 @@ export class Oracle extends Crewmate {
 
         for (let i = 0; i < players.length; i++) {
           if (players[i] === target) {
-            animService.setOutline(players[i], [255, 140, 238, 255], [this.owner.getSafeConnection()]);
+            animService.setOutline(players[i], [44, 76, 201, 255], [this.owner.getSafeConnection()]);
           } else {
             animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
           }
@@ -143,7 +143,7 @@ export class Oracle extends Crewmate {
     return {
       title: "Oracle",
       subtitle: "Enchant a player and reveal their role",
-      color: [255, 140, 238, 255],
+      color: [44, 76, 201, 255],
     };
   }
 }

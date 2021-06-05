@@ -11,6 +11,7 @@ import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { Palette } from "@nodepolus/framework/src/static";
 import { Mutable } from "@nodepolus/framework/src/types";
+import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
@@ -44,12 +45,13 @@ export class Sheriff extends Impostor {
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
+            winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateTasks",
       }));
 
     // this is going to call this code for every crewmate at least once
-    this.catch("meeting.closed", event => event.getGame())
+    this.catch("meeting.ended", event => event.getGame())
       .where(() => this.getAlignment() === RoleAlignment.Crewmate)
       .where(event => event.getGame().getLobby().getPlayers()
         .filter(player => player.isImpostor() && !player.isDead())
@@ -63,11 +65,12 @@ export class Sheriff extends Impostor {
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getGame().getLobby().getPlayers()
               .filter(sus => !sus.isImpostor()),
+            winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "crewmateVote",
       }));
 
-    this.catch("player.left", event => event.getPlayer())
+    this.catch("player.left", event => event.getLobby())
       .where(event => event.getLobby().getPlayers().filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
@@ -76,6 +79,7 @@ export class Sheriff extends Impostor {
             subtitle: "<color=#FF1919FF>Crewmates</color> disconnected",
             color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers(),
+            winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "crewmateDisconnected",
       }));

@@ -21,9 +21,15 @@ export class Jester extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus"));
+    const connections = owner.getLobby().getConnections();
 
+    // a vote win can never happen within the time it will take for every connection to load the bundle
+    // so i'm not refactoring this to use an onready method
+    for (let i = 0; i < connections.length; i++) {
+      Services.get(ServiceType.Resource).load(connections[i], AssetBundle.loadSafeFromCache("TownOfPolus"));
+    }
+
+    if (owner.getConnection() !== undefined) {
       const nameService = Services.get(ServiceType.Name);
 
       nameService.setFor(owner.getSafeConnection(), owner, nameService.getFor(owner.getSafeConnection(), owner));
@@ -33,18 +39,39 @@ export class Jester extends BaseRole {
 
     owner.setTasks(new Set());
 
-    this.catch("meeting.ended", event => event.getExiledPlayer()).execute(event => {
-      endGame.registerEndGameIntent(event.getGame()!, {
-        endGameData: new Map(event.getGame().getLobby().getPlayers()
-          .map(player => [player, {
-            title: player === this.owner ? "Victory" : "Defeat",
-            subtitle: player === this.owner ? "You got voted out" : "The jester was voted out",
-            color: [255, 84, 124, 255],
-            yourTeam: [this.owner],
-          }])),
-        intentName: "jesterVoted",
+    this.catch("meeting.started", event => event.getGame())
+      .where(() => !this.owner.isDead())
+      .execute(event => {
+        endGame.registerExclusion(event.getGame(), {
+          intentName: "impostorVote",
+        });
+        endGame.registerExclusion(event.getGame(), {
+          intentName: "crewmateVote",
+        });
       });
-    });
+
+    this.catch("meeting.ended", event => event.getGame())
+      .where(event => event.getExiledPlayer() !== this.owner)
+      .execute(event => {
+        endGame.unregisterExclusion(event.getGame(), "impostorVote");
+        endGame.unregisterExclusion(event.getGame(), "crewmateVote");
+      });
+
+    this.catch("meeting.ended", event => event.getGame())
+      .where(event => event.getExiledPlayer() === this.owner)
+      .execute(event => {
+        endGame.registerEndGameIntent(event.getGame()!, {
+          endGameData: new Map(event.getGame().getLobby().getPlayers()
+            .map(player => [player, {
+              title: player === this.owner ? "Victory" : "Defeat",
+              subtitle: player === this.owner ? "You got voted out" : "The jester was voted out",
+              color: [255, 84, 124, 255],
+              yourTeam: [this.owner],
+              winSound: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
+            }])),
+          intentName: "jesterVoted",
+        });
+      });
   }
 
   getManagerType(): typeof BaseManager {

@@ -19,6 +19,7 @@ import { PhantomState } from "../types/enums/phantomState";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -106,6 +107,7 @@ export class Phantom extends Crewmate {
               subtitle: "",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
+              winSound: WinSoundType.ImpostorWin,
             }])),
           intentName: "phantomMeeting",
         });
@@ -186,11 +188,12 @@ export class Phantom extends Crewmate {
         endGameData: new Map(this.owner.getLobby().getPlayers()
           .map(player => [player, {
             title: player === this.owner ? "Victory" : "Defeat",
-            subtitle: "",
-            color: [255, 84, 124, 255],
+            subtitle: "The <color=#5454FF>phantom</color> won",
+            color: [84, 84, 255, 255],
             yourTeam: [this.owner],
+            winSound: WinSoundType.ImpostorWin,
           }])),
-        intentName: "serialKilledAll",
+        intentName: "phantom",
       });
     });
     await this.button.attach(this.owner);
