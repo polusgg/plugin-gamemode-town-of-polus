@@ -23,6 +23,8 @@ export class SerialKiller extends Impostor {
     alignment: RoleAlignment.Neutral,
   };
 
+  private unexcluded = false;
+
   constructor(owner: PlayerInstance) {
     super(owner, PlayerRole.Crewmate);
 
@@ -52,7 +54,7 @@ export class SerialKiller extends Impostor {
     });
 
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
-      intentName: "impostorKill",
+      intentName: "impostorVote",
     });
 
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
@@ -60,16 +62,17 @@ export class SerialKiller extends Impostor {
     });
 
     this.catch("player.left", event => event.getLobby())
-      .execute(event => this.checkEndCriteria(event.getLobby()));
+      // .where(() => this.owner.isDead())
+      .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
 
     this.catch("player.kicked", event => event.getLobby())
-      .execute(event => this.checkEndCriteria(event.getLobby()));
+      .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
 
     this.catch("player.died", event => event.getPlayer().getLobby())
-      .execute(event => this.checkEndCriteria(event.getPlayer().getLobby()));
+      .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
 
     this.catch("player.murdered", event => event.getKiller())
-      .execute(event => this.checkEndCriteria(event.getPlayer().getLobby()));
+      .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
   }
 
   getManagerType(): typeof BaseManager {
@@ -84,17 +87,22 @@ export class SerialKiller extends Impostor {
     };
   }
 
-  private checkEndCriteria(lobby: LobbyInstance): void {
+  private checkEndCriteria(lobby: LobbyInstance, player?: PlayerInstance): void {
+    if (this.unexcluded) {
+      return;
+    }
+
     const endGame = Services.get(ServiceType.EndGame);
 
     console.log("sussy criteria fuck you");
 
-    if (this.owner.isDead() || this.owner.getGameDataEntry().isDisconnected()) {
+    if (player === this.owner) {
       console.log("sussy");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorKill");
+      this.unexcluded = true;
 
       return;
     }
@@ -102,11 +110,11 @@ export class SerialKiller extends Impostor {
     console.log("sdfafojfsaogipogm[");
 
     if (lobby.getPlayers()
-      .filter(player => !player.isDead() && player !== this.owner).length <= 0) {
+      .filter(player2 => !player2.isDead() && player2 !== this.owner).length <= 0) {
       endGame.registerEndGameIntent(lobby.getGame()!, {
         endGameData: new Map(lobby.getPlayers()
-          .map(player => [player, {
-            title: player === this.owner ? "Victory" : "Defeat",
+          .map(player2 => [player2, {
+            title: player2 === this.owner ? "Victory" : "Defeat",
             subtitle: "The serial killer murdered everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
