@@ -2,7 +2,7 @@ import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/ro
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
@@ -61,6 +61,10 @@ export class SerialKiller extends Impostor {
       intentName: "impostorKill",
     });
 
+    endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+      intentName: "sheriffKill",
+    });
+
     this.catch("player.left", event => event.getLobby())
       // .where(() => this.owner.isDead())
       .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
@@ -71,8 +75,14 @@ export class SerialKiller extends Impostor {
     this.catch("player.died", event => event.getPlayer().getLobby())
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
 
-    this.catch("player.murdered", event => event.getKiller())
+    this.catch("player.murdered", event => event.getPlayer().getLobby())
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
+  }
+
+  onDestroy(): void {
+    if (this.owner.getLobby().getGameState() === GameState.Started) {
+      this.checkEndCriteria(this.owner.getLobby(), this.owner);
+    }
   }
 
   getManagerType(): typeof BaseManager {
@@ -102,6 +112,7 @@ export class SerialKiller extends Impostor {
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorKill");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "sheriffKill");
       this.unexcluded = true;
 
       return;

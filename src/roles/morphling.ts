@@ -46,7 +46,7 @@ class PlayerAppearance {
     player.setHat(this.hat);
     player.setPet(this.pet);
     player.setSkin(this.skin);
-    player.setColor(this.color);
+    // player.setColor(this.color);
   }
 }
 
@@ -200,8 +200,6 @@ export class Morphling extends Impostor {
         yield;
         continue;
       }
-
-      console.log(button.getCurrentTime());
 
       const target = button.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
 

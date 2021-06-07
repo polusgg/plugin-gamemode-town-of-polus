@@ -121,3 +121,4 @@ node_modules/
 *.d.ts.map
 *.js
 *.js.map
+.idea/

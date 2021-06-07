@@ -58,7 +58,15 @@ export class Phantom extends Crewmate {
   onReady(): void {
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.murdered", x => x.getPlayer()).execute(event => {
+    this.catch("player.murdered", x => x.getPlayer()).execute(async event => {
+      if (this.state !== PhantomState.Alive) {
+        if (this.state === PhantomState.Transformed) {
+          console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
+        }
+
+        return;
+      }
+
       const notMurderers = event.getKiller().getLobby().getPlayers()
         .filter(p => p !== event.getKiller())
         .map(player => player.getSafeConnection());
@@ -71,18 +79,6 @@ export class Phantom extends Crewmate {
         shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
         position: this.owner.getPosition(),
       }, notMurderers);
-    });
-
-    this.catch("player.died", x => x.getPlayer()).execute(async _event => {
-      if (this.state !== PhantomState.Alive) {
-        if (this.state === PhantomState.Transformed) {
-          console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
-        }
-
-        return;
-      }
-
-      // event.cancel();
 
       this.state = PhantomState.Transformed;
       await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));

@@ -9,8 +9,9 @@ import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { Palette } from "@nodepolus/framework/src/static";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { Mutable } from "@nodepolus/framework/src/types";
+import { Palette } from "@nodepolus/framework/src/static";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 export class SheriffManager extends BaseManager {
@@ -29,59 +30,27 @@ export class Sheriff extends Impostor {
   constructor(owner: PlayerInstance) {
     super(owner, PlayerRole.Crewmate);
 
+    Crewmate.setupWinConditions(this);
+
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.task.completed", event => event.getPlayer())
-      .where(() => this.getAlignment() === RoleAlignment.Crewmate)
+    this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()
-        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
-        .filter(player => player.getTasks().filter(x => !x[1]).length < 1).length == 0,
-      )
+        // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
+        .filter(player => player.isImpostor() && !player.isDead())
+        .length == 0)
       .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: player.isImpostor() ? "Defeat" : "Victory",
-            subtitle: "<color=#8CFFFFFF>Crew</color> won by tasks",
+            title: "Victory",
+            // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
+            subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
-            winSound: WinSoundType.CrewmateWin,
-          }])),
-        intentName: "crewmateTasks",
-      }));
-
-    // this is going to call this code for every crewmate at least once
-    this.catch("meeting.ended", event => event.getGame())
-      .where(() => this.getAlignment() === RoleAlignment.Crewmate)
-      .where(event => event.getGame().getLobby().getPlayers()
-        .filter(player => player.isImpostor() && !player.isDead())
-        .length == 0,
-      )
-      .execute(event => endGame.registerEndGameIntent(event.getGame(), {
-        endGameData: new Map(event.getGame().getLobby().getPlayers()
-          .map(player => [player, {
-            title: player.isImpostor() ? "Defeat" : "Victory",
-            subtitle: "<color=#8CFFFFFF>Crewmates</color> voted out the <color=#FF1919FF>Impostors</color>",
-            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getGame().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
-            winSound: WinSoundType.CrewmateWin,
-          }])),
-        intentName: "crewmateVote",
-      }));
-
-    this.catch("player.left", event => event.getLobby())
-      .where(event => event.getLobby().getPlayers().filter(player => !player.isImpostor() && player !== event.getPlayer()).length == 0)
-      .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
-        endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-          .map(player => [player, {
-            title: "Defeat",
-            subtitle: "<color=#FF1919FF>Crewmates</color> disconnected",
-            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getPlayer().getLobby().getPlayers(),
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
             winSound: WinSoundType.ImpostorWin,
           }])),
-        intentName: "crewmateDisconnected",
+        intentName: "sheriffKill",
       }));
 
     if (owner.getConnection() !== undefined) {
