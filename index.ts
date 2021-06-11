@@ -127,10 +127,6 @@ export default class extends BaseMod {
     ];
   }
 
-  getEnabled(): boolean {
-    return true;
-  }
-
   async onEnable(lobby: LobbyInstance): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
