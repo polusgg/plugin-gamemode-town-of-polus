@@ -171,7 +171,7 @@ export default class extends BaseMod {
   async onDisable(lobby: LobbyInstance): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
-    await Promise.all(Object.keys(TownOfPolusGameOptionNames).filter(e => parseInt(e, 10).toString() !== e).map(async i => gameOptions.deleteOption(i as TownOfPolusGameOptionNames)));
+    await Promise.all(Object.values(TownOfPolusGameOptionNames).map(async option => await gameOptions.deleteOption(option)));
   }
 
   private resolveOptionPercent(percent: number): number {

@@ -107,7 +107,7 @@ export class SerialKiller extends Impostor {
     console.log("sussy criteria fuck you");
 
     if (player === this.owner) {
-      console.log("sussy");
+      // console.log("sussy");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
