@@ -128,6 +128,8 @@ export default class extends BaseMod {
   }
 
   async onEnable(lobby: LobbyInstance): Promise<void> {
+    await super.onEnable(lobby);
+
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
     await Promise.all([
