@@ -9,7 +9,6 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { Player } from "@nodepolus/framework/src/player";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
