@@ -6,6 +6,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 
 export class JesterManager extends BaseManager {
   getId(): string { return "jester" }
@@ -20,6 +21,8 @@ export class Jester extends BaseRole {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    Services.get(ServiceType.RoleManager).setBaseRole(this.owner, PlayerRole.Crewmate);
 
     const connections = owner.getLobby().getConnections();
 

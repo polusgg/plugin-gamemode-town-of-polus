@@ -39,7 +39,7 @@ export class Grenadier extends Impostor {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const roleManager = Services.get(ServiceType.RoleManager);
 
-    roleManager.setBaseRole(this.owner as Player, PlayerRole.Impostor);
+    roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
 
     this.owner.setTasks(new Set());
 
