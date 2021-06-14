@@ -11,6 +11,7 @@ import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
+import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
@@ -66,7 +67,6 @@ export class SerialKiller extends Impostor {
     });
 
     this.catch("player.left", event => event.getLobby())
-      // .where(() => this.owner.isDead())
       .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
 
     this.catch("player.kicked", event => event.getLobby())
@@ -79,8 +79,8 @@ export class SerialKiller extends Impostor {
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
   }
 
-  onDestroy(): void {
-    if (this.owner.getLobby().getGameState() === GameState.Started) {
+  onDestroy(destroyReason: RoleDestroyedReason): void {
+    if (this.owner.getLobby().getGameState() === GameState.Started && destroyReason === RoleDestroyedReason.Disconnect) {
       this.checkEndCriteria(this.owner.getLobby(), this.owner);
     }
   }
@@ -104,10 +104,10 @@ export class SerialKiller extends Impostor {
 
     const endGame = Services.get(ServiceType.EndGame);
 
-    console.log("sussy criteria fuck you");
+    console.log("sussy criteria cereal killer");
 
     if (player === this.owner) {
-      // console.log("sussy");
+      console.log("excluded?????");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
@@ -118,7 +118,7 @@ export class SerialKiller extends Impostor {
       return;
     }
 
-    console.log("sdfafojfsaogipogm[");
+    console.log("serial killer didn't disappear");
 
     if (lobby.getPlayers()
       .filter(player2 => !player2.isDead() && player2 !== this.owner).length <= 0) {

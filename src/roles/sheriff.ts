@@ -9,7 +9,6 @@ import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { Mutable } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
@@ -30,8 +29,6 @@ export class Sheriff extends Impostor {
   constructor(owner: PlayerInstance) {
     super(owner, PlayerRole.Crewmate);
 
-    Crewmate.setupWinConditions(this);
-
     const endGame = Services.get(ServiceType.EndGame);
 
     this.catch("player.murdered", event => event.getPlayer().getLobby())
@@ -44,10 +41,10 @@ export class Sheriff extends Impostor {
           .map(player => [player, {
             title: "Victory",
             // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
-            subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
+            subtitle: "<color=#>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
-              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+              .filter(sus => !sus.isImpostor()),
             winSound: WinSoundType.ImpostorWin,
           }])),
         intentName: "sheriffKill",
@@ -70,7 +67,7 @@ export class Sheriff extends Impostor {
       this.setOnClicked(target => {
         this.owner.murder(target);
 
-        if (!target.isImpostor()) {
+        if (target.getMeta<BaseRole>("pgg.api.role").getAlignment() === RoleAlignment.Crewmate) {
           this.owner.murder(this.owner);
         }
 
