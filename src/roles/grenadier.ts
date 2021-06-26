@@ -40,8 +40,6 @@ export class Grenadier extends Impostor {
 
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
 
-    this.owner.setTasks(new Set());
-
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
@@ -51,46 +49,46 @@ export class Grenadier extends Impostor {
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(() => button.destroy());
       button.on("clicked", () => {
+        const range = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
+        const blindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
+
         if (button.getCurrentTime() != 0 || button.isDestroyed()) {
           return;
         }
 
+        const inRangePlayers = this.owner.getLobby().getPlayers()
+          .filter(player => !player.isImpostor() && !player.isDead() && player.getPosition().distance(this.owner.getPosition()) <= range.value && player.getConnection() !== undefined);
+
+        if (inRangePlayers.length === 0) {
+          return;
+        }
+
         button.reset();
-
-        this.owner.getLobby().getPlayers().forEach(player => {
-          if (player.getConnection() === undefined) {
-            return;
-          }
-
-          const range = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
-          const blindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
-
-          if (!player.isImpostor() && !player.isDead() && player.getPosition().distance(this.owner.getPosition()) <= range.value) {
-            Services.get(ServiceType.Animation)
-              .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
-                new CameraAnimationKeyframe({
-                  angle: 0,
-                  color: [255, 255, 255, 0],
-                  duration: 75,
-                  offset: 0,
-                  position: Vector2.zero(),
-                }),
-                new CameraAnimationKeyframe({
-                  angle: 0,
-                  color: [255, 255, 255, 255],
-                  duration: 75,
-                  offset: 75,
-                  position: Vector2.zero(),
-                }),
-                new CameraAnimationKeyframe({
-                  angle: 0,
-                  color: [255, 255, 255, 0],
-                  duration: 300,
-                  offset: 150 + (1000 * blindness.value),
-                  position: Vector2.zero(),
-                }),
-              ]);
-          }
+        inRangePlayers.forEach(player => {
+          Services.get(ServiceType.Animation)
+            .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
+              new CameraAnimationKeyframe({
+                angle: 0,
+                color: [255, 255, 255, 0],
+                duration: 75,
+                offset: 0,
+                position: Vector2.zero(),
+              }),
+              new CameraAnimationKeyframe({
+                angle: 0,
+                color: [255, 255, 255, 255],
+                duration: 75,
+                offset: 75,
+                position: Vector2.zero(),
+              }),
+              new CameraAnimationKeyframe({
+                angle: 0,
+                color: [255, 255, 255, 0],
+                duration: 300,
+                offset: 150 + (1000 * blindness.value),
+                position: Vector2.zero(),
+              }),
+            ]);
         });
       });
     });

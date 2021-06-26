@@ -7,7 +7,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
-import { GameOverReason, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { Mutable } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
@@ -36,7 +36,7 @@ export class Sheriff extends Impostor {
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
         .filter(player => player.isImpostor() && !player.isDead())
         .length == 0)
-      .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getGame()!, {
+      .execute(event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
             title: "Victory",
@@ -71,10 +71,10 @@ export class Sheriff extends Impostor {
           this.owner.murder(this.owner);
         }
 
-        if (this.owner.getLobby().getPlayers().filter(x => x.isImpostor() && !x.isDead()).length == 0) {
-          // ending by vote is the most logical game over reason, if we want to change this later then we can
-          this.owner.getLobby().getHostInstance().endGame(GameOverReason.CrewmatesByVote);
-        }
+        // if (this.owner.getLobby().getPlayers().filter(x => x.isImpostor() && !x.isDead()).length == 0) {
+        //   // ending by vote is the most logical game over reason, if we want to change this later then we can
+        //   this
+        // }
       });
 
       this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
@@ -85,10 +85,10 @@ export class Sheriff extends Impostor {
     return SheriffManager;
   }
 
-  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
+  getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Sheriff",
-      subtitle: `Shoot the <color=#FF1919FF>impostor${(player.getLobby().getPlayers().filter(x => x.isImpostor()).length > 1 ? "s" : "")}</color>`,
+      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : " "}<color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color>`,
       color: [196, 150, 69, 255],
     };
   }

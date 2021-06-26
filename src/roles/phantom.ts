@@ -179,18 +179,6 @@ export class Phantom extends Crewmate {
       this.button?.destroy();
       this.owner.setTasks(new Set());
       // console.log("phantom clicked");
-
-      Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
-        endGameData: new Map(this.owner.getLobby().getPlayers()
-          .map(player => [player, {
-            title: player === this.owner ? "Victory" : "Defeat",
-            subtitle: "The <color=#5454FF>phantom</color> won",
-            color: [84, 84, 255, 255],
-            yourTeam: [this.owner],
-            winSound: WinSoundType.ImpostorWin,
-          }])),
-        intentName: "phantom",
-      });
     });
     await this.button.attach(this.owner);
   }
@@ -199,14 +187,12 @@ export class Phantom extends Crewmate {
     return PhantomManager;
   }
 
-  getAssignmentScreen(player: PlayerInstance): StartGameScreenData {
-    const impostors = player.getLobby().getPlayers().filter(players => players.isImpostor()).length;
-
+  getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       // title: "Phantom",
       title: "Crewmate",
       // subtitle: "Uncomment original intro in production :)",
-      subtitle: `There ${(impostors > 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostors > 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }

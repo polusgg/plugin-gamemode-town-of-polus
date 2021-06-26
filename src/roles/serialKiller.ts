@@ -122,7 +122,7 @@ export class SerialKiller extends Impostor {
 
     if (lobby.getPlayers()
       .filter(player2 => !player2.isDead() && player2 !== this.owner).length <= 0) {
-      endGame.registerEndGameIntent(lobby.getGame()!, {
+      endGame.registerEndGameIntent(lobby.getSafeGame()!, {
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {
             title: player2 === this.owner ? "Victory" : "Defeat",
