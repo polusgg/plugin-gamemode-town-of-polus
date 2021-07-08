@@ -113,13 +113,17 @@ export class Morphling extends Impostor {
         const target = this.morphButton.getTarget(this.owner.getLobby().getOptions().getKillDistance() + 1);
 
         if (target !== undefined) {
-          this.morphButton.setColor([162, 18, 219, 0x7F]);
-          this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png"));
-          this.morphButton.setCurrentTime(5);
+          await Promise.allSettled(
+            [
+              this.morphButton.setColor([162, 18, 219, 0x7F]),
+              this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png")),
+              this.morphButton.setCurrentTime(5),
+            ],
+          );
           this.targetAppearance = PlayerAppearance.save(target);
         }
       } else {
-        this.morphButton.reset(true);
+        await this.morphButton.reset(true);
         this.transformed = true;
         await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
           new PlayerAnimationKeyframe({
@@ -186,7 +190,7 @@ export class Morphling extends Impostor {
       .execute(() => {
         this.ownAppearance?.apply(this.owner);
         this.targetAppearance = undefined;
-        this.morphButton?.setColor([162, 18, 219, 0x7F]);
+        // this.morphButton?.setColor([162, 18, 219, 0x7F]);
         this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
         this.morphButton?.setCurrentTime(5);
       });
