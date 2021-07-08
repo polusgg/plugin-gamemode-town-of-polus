@@ -94,6 +94,13 @@ export class Morphling extends Impostor {
       this.morphButton = undefined;
     });
 
+    this.catch("meeting.ended", event => event.getGame())
+      .execute(() => {
+        if (this.morphButton) {
+          this.morphButton.setCurrentTime(this.morphButton.getMaxTime());
+        }
+      });
+
     Services.get(ServiceType.CoroutineManager)
       .beginCoroutine(this.owner, this.coSaturateMorphlingButton(this.owner, this.morphButton));
 

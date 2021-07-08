@@ -48,6 +48,12 @@ export class Grenadier extends Impostor {
       currentTime: 10,
     }).then(button => {
       this.catch("player.died", event => event.getPlayer()).execute(() => button.destroy());
+
+      this.catch("meeting.ended", event => event.getGame())
+        .execute(() => {
+          button.setCurrentTime(button.getMaxTime());
+        });
+
       button.on("clicked", () => {
         const range = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
         const blindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();

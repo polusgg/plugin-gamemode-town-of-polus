@@ -99,6 +99,10 @@ export class Oracle extends Crewmate {
         .execute(() => {
           button.destroy();
         });
+      this.catch("meeting.ended", event => event.getGame())
+        .execute(() => {
+          button.setCurrentTime(button.getMaxTime());
+        });
       Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
