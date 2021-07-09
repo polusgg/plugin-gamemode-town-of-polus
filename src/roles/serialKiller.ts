@@ -43,7 +43,7 @@ export class SerialKiller extends Impostor {
     this.owner.setTasks(new Set());
 
     this.getImpostorButton()?.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerCooldown).getValue().value);
-    this.setOnClicked(target => this.owner.murder(target));
+    this.setOnClicked(async target => this.owner.murder(target));
     this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
 
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
