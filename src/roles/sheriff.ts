@@ -12,7 +12,6 @@ import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impo
 import { Mutable } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
-import { Oracle } from "./oracle";
 
 export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
@@ -68,7 +67,7 @@ export class Sheriff extends Impostor {
       this.setOnClicked(target => {
         this.owner.murder(target);
 
-        if (target.getMeta<BaseRole>("pgg.api.role").getAlignment() === RoleAlignment.Crewmate) {
+        if (target.getMeta<BaseRole>("pgg.api.role").getAlignment() !== RoleAlignment.Impostor) {
           this.owner.murder(this.owner);
         }
 
@@ -78,7 +77,7 @@ export class Sheriff extends Impostor {
         // }
       });
 
-      this.setTargetSelector(players => players.filter(player => !player.isDead() && !(player.getMeta<BaseRole>("pgg.api.role") instanceof Oracle))[0]);
+      this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
     }
   }
 
