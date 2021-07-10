@@ -12,7 +12,7 @@ import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseMan
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { PlayerAnimationKeyframe } from "@nodepolus/framework/src/protocol/polus/animation/player";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";

@@ -9,7 +9,7 @@ import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseMan
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { PlayerAnimationKeyframe } from "@nodepolus/framework/src/protocol/polus/animation/player";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
