@@ -1,9 +1,8 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
@@ -11,9 +10,9 @@ import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Player } from "@nodepolus/framework/src/player";
-import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
-import { GameState } from "@nodepolus/framework/src/types/enums";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { SetOutlinePacket } from "@nodepolus/framework/src/protocol/polus/packets/rpc/playerControl";
+import { EdgeAlignments, GameState } from "@nodepolus/framework/src/types/enums";
+import { Button } from "@nodepolus/framework/src/protocol/polus/entityWrappers";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 
 const alignmentColors: readonly string[] = [
@@ -38,7 +37,7 @@ export class Oracle extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      owner.getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -88,7 +87,7 @@ export class Oracle extends Crewmate {
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
-    Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.owner.getLobby().spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.OracleCooldown).getValue().value,
       position: new Vector2(2.1, 0.7),

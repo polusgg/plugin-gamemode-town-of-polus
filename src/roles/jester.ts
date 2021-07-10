@@ -5,7 +5,7 @@ import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 
 export class JesterManager extends BaseManager {
@@ -29,7 +29,7 @@ export class Jester extends BaseRole {
     // a vote win can never happen within the time it will take for every connection to load the bundle
     // so i'm not refactoring this to use an onready method
     for (let i = 0; i < connections.length; i++) {
-      Services.get(ServiceType.Resource).load(connections[i], AssetBundle.loadSafeFromCache("TownOfPolus"));
+      owner.getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus"));
     }
 
     if (owner.getConnection() !== undefined) {

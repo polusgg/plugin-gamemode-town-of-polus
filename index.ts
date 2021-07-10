@@ -5,7 +5,7 @@ import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
 import { Jester } from "./src/roles/jester";
 import { Sheriff } from "./src/roles/sheriff";
 import { Snitch } from "./src/roles/snitch";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { Engineer } from "./src/roles/engineer";
@@ -14,7 +14,7 @@ import { Grenadier } from "./src/roles/grenadier";
 import { Oracle } from "./src/roles/oracle";
 import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
-import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { NumberValue } from "@nodepolus/framework/src/protocol/polus/packets/root/setGameOption";
 import { RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { TownOfPolusGameOptionCategories, TownOfPolusGameOptionNames } from "./src/types";
 

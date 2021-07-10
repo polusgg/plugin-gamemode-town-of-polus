@@ -1,21 +1,20 @@
-import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
-import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { TextComponent } from "@nodepolus/framework/src/api/text";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
+import { Button } from "@nodepolus/framework/src/protocol/polus/entityWrappers";
+import { Palette } from "@nodepolus/framework/src/static";
+import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
+import { EdgeAlignments, GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { TextComponent } from "@nodepolus/framework/src/api/text";
-import { GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
-import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
-import { TownOfPolusGameOptions } from "../..";
-import { Palette } from "@nodepolus/framework/src/static";
-import { TownOfPolusGameOptionNames } from "../types";
-import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
+import { Services } from "@polusgg/plugin-polusgg-api/src/services";
+import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
+import { TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -67,7 +66,7 @@ export class Morphling extends Impostor {
     this.transformed = false;
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      owner.getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -78,7 +77,7 @@ export class Morphling extends Impostor {
 
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
-    this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.morphButton = await this.owner.getLobby().spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
       position: new Vector2(2.1, 2.1),

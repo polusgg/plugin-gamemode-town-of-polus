@@ -1,25 +1,25 @@
-import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { PlayerInstance } from "@nodepolus/framework/src/api/player";
+import { Player } from "@nodepolus/framework/src/player";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
+import { Button } from "@nodepolus/framework/src/protocol/polus/entityWrappers";
+import { SetStringPacket } from "@nodepolus/framework/src/protocol/polus/packets/root";
+import { Palette, Tasks } from "@nodepolus/framework/src/static";
+import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
+import { EdgeAlignments, StringLocation } from "@nodepolus/framework/src/types/enums";
+import { WinSoundType } from "@nodepolus/framework/src/types/enums/polus/polusWinSound";
+import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
-import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { Palette, Tasks } from "@nodepolus/framework/src/static";
-import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
+import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
+import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
-import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
-import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PhantomState } from "../types/enums/phantomState";
-import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
-import { Player } from "@nodepolus/framework/src/player";
-import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
-import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -46,7 +46,7 @@ export class Phantom extends Crewmate {
       const promises: Promise<ResourceResponse>[] = [];
 
       for (let i = 0; i < allPlayers.length; i++) {
-        promises.push(Services.get(ServiceType.Resource).load(allPlayers[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
+        allPlayers[i].getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus"));
       }
 
       Promise.allSettled(promises).then(this.onReady.bind(this));
@@ -74,14 +74,14 @@ export class Phantom extends Crewmate {
       // todo make sure dead bodies can be reported (they can't right now!!!)
       // todo stop spawning vanilla among us dead bodies on the client?
 
-      Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
+      event.getPlayer().getLobby().spawnDeadBody({
         color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
         shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
         position: this.owner.getPosition(),
       }, notMurderers);
 
       this.state = PhantomState.Transformed;
-      await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
+      await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", StringLocation.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
       this.setAlignment(RoleAlignment.Neutral);
       this.giveTasks();
@@ -159,7 +159,7 @@ export class Phantom extends Crewmate {
       }),
     ], false);
 
-    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.button = await this.owner.getLobby().spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
       maxTimer: 69,
       position: Vector2.zero(),

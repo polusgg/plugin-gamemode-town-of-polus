@@ -3,13 +3,12 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { GameState } from "@nodepolus/framework/src/types/enums";
+import { EdgeAlignments, GameState } from "@nodepolus/framework/src/types/enums";
 // import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { Button } from "@nodepolus/framework/src/protocol/polus/entityWrappers";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 // import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
@@ -29,7 +28,7 @@ export class Engineer extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      owner.getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -60,7 +59,7 @@ export class Engineer extends Crewmate {
   }
 
   async onReady(): Promise<void> {
-    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.button = await this.owner.getLobby().spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
       maxTimer: 10,
       position: new Vector2(2.1, 0.7),

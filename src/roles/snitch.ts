@@ -1,16 +1,16 @@
-import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
-import { Services } from "@polusgg/plugin-polusgg-api/src/services";
+import { AssetBundle } from "@nodepolus/framework/src/protocol/polus/assets";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { TownOfPolusGameOptions } from "../..";
-import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
-import { TownOfPolusGameOptionNames } from "../types";
+import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
+import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
+import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { Services } from "@polusgg/plugin-polusgg-api/src/services";
+import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
+import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
 
 export class SnitchManager extends BaseManager {
   getId(): string { return "snitch" }
@@ -34,7 +34,7 @@ export class Snitch extends Crewmate {
       const promises: Promise<ResourceResponse>[] = [];
 
       for (let i = 0; i < impostors.length; i++) {
-        promises.push(Services.get(ServiceType.Resource).load(impostors[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
+        promises.push(impostors[i].getConnection()!.loadBundle(AssetBundle.loadSafeFromCache("TownOfPolus")));
       }
 
       Promise.allSettled(promises).then(this.onReady.bind(this));
