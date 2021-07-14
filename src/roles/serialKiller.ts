@@ -97,6 +97,11 @@ export class SerialKiller extends Impostor {
     };
   }
 
+  getDescriptionText(): string {
+    return `<color=#ff547c>Role: Serial Killer
+Kill everyone.</color>`;
+  }
+
   private checkEndCriteria(lobby: LobbyInstance, player?: PlayerInstance): void {
     if (this.unexcluded) {
       return;

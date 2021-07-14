@@ -92,4 +92,10 @@ export class Sheriff extends Impostor {
       color: [196, 150, 69, 255],
     };
   }
+
+  getDescriptionText(): string {
+    return `<color=#c49645>Role: Sheriff
+Finish your task or vote out the imposter.
+You can kill the impostor and neutrals but don't kill crewmates</color>`;
+  }
 }

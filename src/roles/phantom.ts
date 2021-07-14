@@ -189,11 +189,14 @@ export class Phantom extends Crewmate {
 
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
-      // title: "Phantom",
       title: "Crewmate",
-      // subtitle: "Uncomment original intro in production :)",
-      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
+  }
+
+  getDescriptionText(): string {
+    return `<color=#8cffff>Role: Phantom
+Finish your tasks without being seen.</color>`;
   }
 }

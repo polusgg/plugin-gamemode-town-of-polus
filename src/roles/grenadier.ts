@@ -111,4 +111,10 @@ export class Grenadier extends Impostor {
       color: [255, 128, 0, 255],
     };
   }
+
+  getDescriptionText(): string {
+    return `<color=#ff8000>Role: Grenadier
+Sabotage and kill the crewmates
+You can use the flashbangs to blind the other teams.</color>`;
+  }
 }

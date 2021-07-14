@@ -83,4 +83,9 @@ export class Snitch extends Crewmate {
       color: [0, 255, 221, 255],
     };
   }
+
+  getDescriptionText(): string {
+    return `<color=#00ffdd>Role: Snitch
+Finish your tasks to reveal the impostor</color>`;
+  }
 }

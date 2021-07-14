@@ -103,4 +103,10 @@ export class Engineer extends Crewmate {
       color: [142, 158, 157, 255],
     };
   }
+
+  getDescriptionText(): string {
+    return `<color=#8e9e9d>Role: Engineer
+Finish your tasks.
+You can fix 1 sabotage.</color>`;
+  }
 }
