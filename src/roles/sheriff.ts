@@ -88,7 +88,7 @@ export class Sheriff extends Impostor {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Sheriff",
-      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : " "}<color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color>`,
+      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color>`,
       color: [196, 150, 69, 255],
     };
   }
