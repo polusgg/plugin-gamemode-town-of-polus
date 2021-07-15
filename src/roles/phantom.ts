@@ -81,6 +81,20 @@ export class Phantom extends Crewmate {
       }, notMurderers);
 
       this.state = PhantomState.Transformed;
+
+      if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
+        .getValue()
+        .getSelected() === "After Meeting") {
+        await (async (): Promise<void> => new Promise<void>((resolve, reject) => {
+          this.catch("meeting.started", m => m.getGame()).execute(_ => {
+            resolve();
+          });
+          this.catch("game.ended", g => g.getGame()).execute(_ => {
+            resolve();
+          });
+        }))();
+      }
+
       await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
       this.setAlignment(RoleAlignment.Neutral);
