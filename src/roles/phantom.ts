@@ -12,7 +12,7 @@ import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
-import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
+import { Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PhantomState } from "../types/enums/phantomState";
@@ -58,7 +58,7 @@ export class Phantom extends Crewmate {
   onReady(): void {
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.murdered", x => x.getPlayer()).execute(async event => {
+    this.catch("player.murdered", x => x.getPlayer()).execute(async _event => {
       if (this.state !== PhantomState.Alive) {
         if (this.state === PhantomState.Transformed) {
           console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
@@ -66,19 +66,20 @@ export class Phantom extends Crewmate {
 
         return;
       }
+      // todo make sure Prez finishes moving-pgg branch
 
-      const notMurderers = event.getKiller().getLobby().getPlayers()
+      /*const notMurderers = event.getKiller().getLobby().getPlayers()
         .filter(p => p !== event.getKiller())
-        .map(player => player.getSafeConnection());
+        .map(player => player.getSafeConnection());*/
 
       // todo make sure dead bodies can be reported (they can't right now!!!)
       // todo stop spawning vanilla among us dead bodies on the client?
 
-      Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
+      /*Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
         color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
         shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
         position: this.owner.getPosition(),
-      }, notMurderers);
+      }, notMurderers);*/
 
       this.state = PhantomState.Transformed;
 
