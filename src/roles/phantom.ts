@@ -81,20 +81,24 @@ export class Phantom extends Crewmate {
         position: this.owner.getPosition(),
       }, notMurderers);*/
 
-      this.state = PhantomState.Transformed;
+      this.catch("meeting.started", event => event.getCaller()).execute(event => event.cancel());
 
       if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
         .getValue()
         .getSelected() === "After Meeting") {
         await (async (): Promise<void> => new Promise<void>(resolve => {
           this.catch("meeting.started", m => m.getGame()).execute(_ => {
-            resolve();
+            if (!_.isCancelled() && _.getCaller().getId() !== this.owner.getId()) {
+              resolve();
+            }
           });
           this.catch("game.ended", g => g.getGame()).execute(_ => {
             resolve();
           });
         }))();
       }
+
+      this.state = PhantomState.Transformed;
 
       await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
       this.owner.setMeta("pgg.api.targetable", false);
@@ -103,10 +107,6 @@ export class Phantom extends Crewmate {
       this.owner.revive();
       await this.showPhantom();
     });
-
-    this.catch("meeting.started", event => event.getCaller())
-      .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1)
-      .execute(event => event.cancel());
 
     this.catch("meeting.started", event => event.getCaller())
       .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
