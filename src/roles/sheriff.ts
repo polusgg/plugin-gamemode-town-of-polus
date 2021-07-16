@@ -34,7 +34,7 @@ export class Sheriff extends Impostor {
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
-        .filter(player => player.isImpostor() && !player.isDead())
+        .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Neutral) && !player.isDead())
         .length == 0)
       .execute(async event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
@@ -67,7 +67,10 @@ export class Sheriff extends Impostor {
       this.setOnClicked(target => {
         this.owner.murder(target);
 
-        if (target.getMeta<BaseRole>("pgg.api.role").getAlignment() !== RoleAlignment.Impostor) {
+        console.log(this.owner.getName(), "Murdered", target.getName());
+        console.log(target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment());
+
+        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() !== RoleAlignment.Impostor && target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() !== RoleAlignment.Neutral) {
           this.owner.murder(this.owner);
         }
 

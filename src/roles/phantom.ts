@@ -86,7 +86,7 @@ export class Phantom extends Crewmate {
       if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
         .getValue()
         .getSelected() === "After Meeting") {
-        await (async (): Promise<void> => new Promise<void>((resolve, reject) => {
+        await (async (): Promise<void> => new Promise<void>(resolve => {
           this.catch("meeting.started", m => m.getGame()).execute(_ => {
             resolve();
           });

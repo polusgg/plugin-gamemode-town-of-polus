@@ -48,24 +48,40 @@ export class Snitch extends Crewmate {
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
     this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
-      const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length - 1;
+      const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
+
+      console.log("TaskLeftCount", taskLeftCount);
 
       if (taskLeftCount == gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value) {
+        console.log("TLC @ SRT");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
+              console.log("Loading SnitchArrow for", player.getConnection()?.getId());
+
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
               await poi.attach(this.owner);
+
+              this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
+                poi.despawn();
+              });
             }
           });
       } else if (taskLeftCount == 0) {
+        console.log("TLC @ 0");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
+              console.log("Loading ImpostorArrow for", player.getConnection()?.getId());
+
               const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
 
               await poi.attach(player);
+
+              this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
+                poi.despawn();
+              });
             }
           });
       }
