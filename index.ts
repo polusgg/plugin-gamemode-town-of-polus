@@ -26,7 +26,7 @@ export type TownOfPolusGameOptions = {
   /* Grenadier */
   [TownOfPolusGameOptionNames.GrenadierProbability]: NumberValue;
   [TownOfPolusGameOptionNames.GrenadierCooldown]: NumberValue;
-  [TownOfPolusGameOptionNames.GrenadierRange]: NumberValue;
+  // [TownOfPolusGameOptionNames.GrenadierRange]: NumberValue;
   [TownOfPolusGameOptionNames.GrenadierBlindness]: NumberValue;
 
   /* Jester */
@@ -161,7 +161,7 @@ export default class extends BaseMod {
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 15),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 16),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 17),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 17),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 18),
 
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),

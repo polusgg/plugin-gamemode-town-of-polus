@@ -40,8 +40,6 @@ export class SerialKiller extends Impostor {
     const endGame = Services.get(ServiceType.EndGame);
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
 
-    this.owner.setTasks(new Set());
-
     this.getImpostorButton()?.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerCooldown).getValue().value);
     this.setOnClicked(async target => this.owner.murder(target));
     this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
@@ -130,8 +128,8 @@ Kill everyone.</color>`;
       endGame.registerEndGameIntent(lobby.getSafeGame()!, {
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {
-            title: player2 === this.owner ? "Victory" : "Defeat",
-            subtitle: "The serial killer murdered everyone",
+            title: player2 === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+            subtitle: "The <color=#ff547c>Serial Killer</color> murdered everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
             winSound: WinSoundType.ImpostorWin,

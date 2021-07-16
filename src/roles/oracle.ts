@@ -116,6 +116,7 @@ export class Oracle extends Crewmate {
         button.setCountingDown(false);
         this.enchanted = target;
         this.owner.getLobby().sendRpcPacket((this.enchanted as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
+        button.destroy();
       });
     });
 

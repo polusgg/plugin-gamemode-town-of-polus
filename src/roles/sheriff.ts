@@ -64,20 +64,33 @@ export class Sheriff extends Impostor {
     if (button !== undefined) {
       button.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value);
 
-      this.setOnClicked(target => {
+      this.setOnClicked(async target => {
         this.owner.murder(target);
 
         console.log(this.owner.getName(), "Murdered", target.getName());
         console.log(target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment());
 
-        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() !== RoleAlignment.Impostor && target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() !== RoleAlignment.Neutral) {
-          this.owner.murder(this.owner);
-        }
+        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate || (target.getMeta<BaseRole | undefined>("pgg.api.role") === undefined && !target.isImpostor())) {
+          await this.owner.murder(this.owner);
 
-        // if (this.owner.getLobby().getPlayers().filter(x => x.isImpostor() && !x.isDead()).length == 0) {
-        //   // ending by vote is the most logical game over reason, if we want to change this later then we can
-        //   this
-        // }
+          if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
+            console.log("GAME SHOULD BE ENDED");
+
+            Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
+              intentName: "impostorKill",
+              endGameData: new Map(this.owner.getLobby().getPlayers()
+                .map((player, _, players) => [player, {
+                  title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+                  subtitle: "The <color=#C49645FF>Sheriff</color> committed suicide, resulting in a <color=#FF1919FF>Impostor</color> victory",
+                  color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+                  yourTeam: players.filter(sus => sus.isImpostor()),
+                  winSound: WinSoundType.ImpostorWin,
+                }])),
+            });
+          } else {
+            console.log("GAME SHOULD NOT BE ENDED???");
+          }
+        }
       });
 
       this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);

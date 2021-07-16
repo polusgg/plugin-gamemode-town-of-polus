@@ -114,7 +114,7 @@ export class Phantom extends Crewmate {
         endGame.registerEndGameIntent(event.getGame(), {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player as Player, {
-              title: player === this.owner ? "Victory" : "Defeat",
+              title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: "",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
@@ -151,6 +151,8 @@ export class Phantom extends Crewmate {
     if (this.state !== PhantomState.Transformed) {
       return;
     }
+
+    Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
 
     const appearTime = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomAppearTime)
       .getValue().value;
@@ -210,8 +212,13 @@ export class Phantom extends Crewmate {
     };
   }
 
-  getDescriptionText(): string {
+  getRealDescriptionText(): string {
     return `<color=#8cffff>Role: Phantom
 Finish your tasks without being seen.</color>`;
+  }
+
+  getDescriptionText(): string {
+    return `<color=#8cffff>Role: Crewmate (DEBUG: Phantom)
+Finish your tasks.</color>`;
   }
 }

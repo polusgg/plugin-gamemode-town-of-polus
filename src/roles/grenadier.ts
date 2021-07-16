@@ -55,7 +55,8 @@ export class Grenadier extends Impostor {
         });
 
       button.on("clicked", () => {
-        const range = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
+        //gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierRange).getValue();
+        const range = { value: 5.5 };
         const blindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
 
         if (button.getCurrentTime() != 0 || button.isDestroyed()) {

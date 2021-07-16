@@ -66,7 +66,7 @@ export class Jester extends BaseRole {
         endGame.registerEndGameIntent(event.getGame()!, {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player, {
-              title: player === this.owner ? "Victory" : "Defeat",
+              title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
               subtitle: player === this.owner ? "You got voted out" : "The jester was voted out",
               color: [255, 84, 124, 255],
               yourTeam: [this.owner],

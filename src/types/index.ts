@@ -3,7 +3,7 @@ export enum TownOfPolusGameOptionNames {
 
   GrenadierProbability = "<color=#ff8000>Grenadier</color> <color=#e03e3e>[I]</color>",
   GrenadierCooldown = "<color=#ff8000>Grenadier</color> Cooldown",
-  GrenadierRange = "<color=#ff8000>Grenadier</color> Range",
+  // GrenadierRange = "<color=#ff8000>Grenadier</color> Range",
   GrenadierBlindness = "<color=#ff8000>Grenadier</color> Blindness",
 
   JesterProbability = "<color=#ff8cee>Jester</color> [N]",
