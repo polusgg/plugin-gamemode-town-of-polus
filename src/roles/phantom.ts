@@ -115,7 +115,7 @@ export class Phantom extends Crewmate {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player as Player, {
               title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: "",
+              subtitle: "The phantom haunted everyone",
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
               winSound: WinSoundType.ImpostorWin,
@@ -185,7 +185,7 @@ export class Phantom extends Crewmate {
       currentTime: 0,
     }, this.owner.getLobby().getConnections());
     this.button.on("clicked", event => {
-      if (event.connection === this.owner.getSafeConnection()) {
+      if (event.connection === this.owner.getSafeConnection() || !this.button?.getEntity().getCustomNetworkTransform().isAttached()) {
         return;
       }
 
