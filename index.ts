@@ -14,10 +14,14 @@ import { Grenadier } from "./src/roles/grenadier";
 import { Oracle } from "./src/roles/oracle";
 import { Phantom } from "./src/roles/phantom";
 import { SerialKiller } from "./src/roles/serialKiller";
-import { EnumValue, NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { BooleanValue, EnumValue, NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
 import { RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { TownOfPolusGameOptionCategories, TownOfPolusGameOptionNames } from "./src/types";
 import { GameOptionPriority } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsSet";
+import { Locksmith } from "./src/roles/locksmith";
+import { LobbyDefaultOptions } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsService";
+import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
+import { Level } from "@nodepolus/framework/src/types/enums";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -50,6 +54,7 @@ export type TownOfPolusGameOptions = {
   /* Serial Killer */
   [TownOfPolusGameOptionNames.SerialKillerProbability]: NumberValue;
   [TownOfPolusGameOptionNames.SerialKillerCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.SerialKillerMinLobbySize]: NumberValue;
 
   /* Sheriff */
   [TownOfPolusGameOptionNames.SheriffProbability]: NumberValue;
@@ -58,6 +63,9 @@ export type TownOfPolusGameOptions = {
   /* Snitch */
   [TownOfPolusGameOptionNames.SnitchProbability]: NumberValue;
   [TownOfPolusGameOptionNames.SnitchRemainingTasks]: NumberValue;
+
+  /* Locksmith */
+  [TownOfPolusGameOptionNames.LocksmithProbability]: NumberValue;
 };
 
 const pluginMetadata: PluginMetadata = {
@@ -115,7 +123,7 @@ export default class extends BaseMod {
         assignWith: RoleAlignment.Neutral,
       }, {
         role: SerialKiller,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value),
+        playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinLobbySize).getValue().value <= lobby.getPlayers().length ? this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
         assignWith: RoleAlignment.Neutral,
       }, {
         role: Sheriff,
@@ -125,6 +133,10 @@ export default class extends BaseMod {
         role: Snitch,
         playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SnitchProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
+      }, {
+        role: Locksmith,
+        playerCount: lobby.getLevel() === Level.MiraHq ? 0 : this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability).getValue().value),
+        assignWith: RoleAlignment.Crewmate,
       },
     ];
   }
@@ -132,7 +144,7 @@ export default class extends BaseMod {
   async onEnable(lobby: LobbyInstance): Promise<void> {
     await super.onEnable(lobby);
 
-    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions>(lobby);
 
     gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRevealTime, new EnumValue(0, ["A", "B"]));
 
@@ -158,15 +170,20 @@ export default class extends BaseMod {
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 13),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 14),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerMinLobbySize, new NumberValue(6, 1, 4, 15, false, "{0} players"), GameOptionPriority.Normal + 15),
 
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 15),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 16),
-      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 17),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 18),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 16),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 17),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 18),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 19),
 
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
+
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 20),
     ] as any[]);
+
+    gameOptions.on("option.Map.changed", this.handleLevelUpdate);
   }
 
   async onDisable(lobby: LobbyInstance): Promise<void> {
@@ -175,6 +192,16 @@ export default class extends BaseMod {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
 
     await Promise.all(Object.values(TownOfPolusGameOptionNames).map(async option => await gameOptions.deleteOption(option)));
+  }
+
+  private async handleLevelUpdate(newLevel: GameOption<NumberValue | EnumValue | BooleanValue>): Promise<void> {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(newLevel.getLobby());
+
+    if ((newLevel.getValue() as EnumValue).getSelected() === "Mira HQ") {
+      await gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithProbability);
+    } else {
+      await gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 20);
+    }
   }
 
   private resolveOptionPercent(percent: number): number {

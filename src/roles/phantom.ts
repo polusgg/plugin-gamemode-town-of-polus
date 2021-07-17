@@ -7,7 +7,6 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Palette, Tasks } from "@nodepolus/framework/src/static";
-import { SetStringPacket } from "@polusgg/plugin-polusgg-api/src/packets/root";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
@@ -100,7 +99,26 @@ export class Phantom extends Crewmate {
 
       this.state = PhantomState.Transformed;
 
-      await this.owner.getSafeConnection().writeReliable(new SetStringPacket("Complete your tasks and call a meeting", Location.TaskText));
+      async function display(this: Phantom): Promise<void> {
+        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, "Complete your tasks and call a meeting");
+        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "You've become the <color=#8cffff>Phantom</color>!");
+
+        setTimeout(() => {
+          Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "__unset");
+        }, 10000);
+      }
+
+      if (this.owner.getLobby().getMeetingHud() !== undefined) {
+        const watcher = this.catch("meeting.concluded", meeting => meeting.getGame());
+
+        watcher.execute(_ => {
+          display.bind(this)();
+          watcher.destroy();
+        });
+      } else {
+        display.bind(this)();
+      }
+
       this.owner.setMeta("pgg.api.targetable", false);
       this.setAlignment(RoleAlignment.Neutral);
       this.giveTasks();

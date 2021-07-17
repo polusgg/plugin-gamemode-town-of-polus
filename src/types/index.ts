@@ -22,12 +22,15 @@ export enum TownOfPolusGameOptionNames {
 
   SerialKillerProbability = "<color=#ff547c>Serial Killer</color> [N]",
   SerialKillerCooldown = "<color=#ff547c>Serial Killer</color> Cooldown",
+  SerialKillerMinLobbySize = "<color=#ff547c>Serial Killer</color> Minimum Lobby Size",
 
   SheriffProbability = "<color=#c49645>Sheriff</color> <color=#0b6e99>[C]</color>",
   SheriffCooldown = "<color=#c49645>Sheriff</color> Cooldown",
 
   SnitchProbability = "<color=#00ffdd>Snitch</color> <color=#0b6e99>[C]</color>",
   SnitchRemainingTasks = "<color=#00ffdd>Snitch</color> Remaining Tasks",
+
+  LocksmithProbability = "<color=#3d85c6>Locksmith</color> <color=#0b6e99>[C]</color>",
 }
 
 export enum TownOfPolusGameOptionCategories {
