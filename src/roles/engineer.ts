@@ -62,7 +62,7 @@ export class Engineer extends Crewmate {
   async onReady(): Promise<void> {
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-      maxTimer: 10,
+      maxTimer: 0.1,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,
       currentTime: 0,

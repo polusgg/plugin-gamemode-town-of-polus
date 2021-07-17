@@ -27,7 +27,7 @@ export class Sheriff extends Impostor {
   };
 
   constructor(owner: PlayerInstance) {
-    super(owner, PlayerRole.Crewmate);
+    super(owner, PlayerRole.Crewmate, "TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
 
     const endGame = Services.get(ServiceType.EndGame);
 
@@ -57,6 +57,16 @@ export class Sheriff extends Impostor {
     }
   }
 
+  async onReadyImpostor(): Promise<void> {
+    await super.onReadyImpostor();
+
+    if (this.owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Resource).load(this.owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+    } else {
+      this.onReady();
+    }
+  }
+
   onReady(): void {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const button = this.getImpostorButton();
@@ -81,7 +91,7 @@ export class Sheriff extends Impostor {
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-                  subtitle: "The <color=#C49645FF>Sheriff</color> committed suicide, resulting in a <color=#FF1919FF>Impostor</color> victory",
+                  subtitle: "<color=#FF1919FF>Impostors</color> won by <color=#C49645FF>Sheriff</color> misfire",
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
