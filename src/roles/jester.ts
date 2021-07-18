@@ -32,12 +32,6 @@ export class Jester extends BaseRole {
       Services.get(ServiceType.Resource).load(connections[i], AssetBundle.loadSafeFromCache("TownOfPolus"));
     }
 
-    if (owner.getConnection() !== undefined) {
-      const nameService = Services.get(ServiceType.Name);
-
-      nameService.setFor(owner.getSafeConnection(), owner, nameService.getFor(owner.getSafeConnection(), owner));
-    }
-
     const endGame = Services.get(ServiceType.EndGame);
 
     owner.setTasks(new Set());

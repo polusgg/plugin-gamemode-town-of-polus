@@ -27,7 +27,7 @@ export class Sheriff extends Impostor {
   };
 
   constructor(owner: PlayerInstance) {
-    super(owner, PlayerRole.Crewmate, "TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
+    super(owner, PlayerRole.Crewmate);
 
     const endGame = Services.get(ServiceType.EndGame);
 
