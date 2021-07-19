@@ -66,7 +66,7 @@ export class Jester extends BaseRole {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player, {
               title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: player === this.owner ? "You got voted out" : "The jester was voted out",
+              subtitle: player === this.owner ? "You got voted out" : "The <color=#ff8cee>Jester</color> was voted out",
               color: [255, 84, 124, 255],
               yourTeam: [this.owner],
               winSound: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
