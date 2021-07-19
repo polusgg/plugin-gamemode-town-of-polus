@@ -124,7 +124,7 @@ Kill everyone.</color>`;
     console.log("serial killer didn't disappear");
 
     if (lobby.getPlayers()
-      .filter(player2 => !player2.isDead() && player2 !== this.owner).length <= 0) {
+      .filter(player2 => !player2.isDead() && player2 !== this.owner && !player2.getGameDataEntry().isDisconnected()).length <= 0) {
       endGame.registerEndGameIntent(lobby.getSafeGame()!, {
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {
