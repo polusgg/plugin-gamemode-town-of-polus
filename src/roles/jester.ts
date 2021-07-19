@@ -7,6 +7,7 @@ import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { SerialKiller } from "./serialKiller";
 
 export class JesterManager extends BaseManager {
   getId(): string { return "jester" }
@@ -51,7 +52,11 @@ export class Jester extends BaseRole {
       .where(event => event.getExiledPlayer() !== this.owner)
       .execute(event => {
         endGame.unregisterExclusion(event.getGame(), "impostorVote");
-        endGame.unregisterExclusion(event.getGame(), "crewmateVote");
+
+        if (event.getGame().getLobby().getPlayers()
+          .filter(x => x.getMeta<BaseRole>("pgg.api.role") instanceof SerialKiller && !x.isDead() && !x.getGameDataEntry().isDisconnected()).length === 0) {
+          endGame.unregisterExclusion(event.getGame(), "crewmateVote");
+        }
       });
 
     this.catch("meeting.ended", event => event.getGame())
