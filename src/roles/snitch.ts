@@ -1,7 +1,7 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
@@ -52,7 +52,17 @@ export class Snitch extends Crewmate {
 
       console.log("TaskLeftCount", taskLeftCount);
 
-      if (taskLeftCount == gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value) {
+      const SRT = gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value;
+
+      if (taskLeftCount <= SRT && taskLeftCount !== 0) {
+        event.getPlayer().getLobby().getPlayers()
+          .filter(player => player.isImpostor())
+          .forEach(player => {
+            Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> only has <size=120%><b>${taskLeftCount}</b></size> task${taskLeftCount === 1 ? "" : "s"} left, and is about to reveal <color=#ff1919>your role!</color>`);
+          });
+      }
+
+      if (taskLeftCount == SRT) {
         console.log("TLC @ SRT");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
@@ -61,7 +71,7 @@ export class Snitch extends Crewmate {
 
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
 
-              await poi.attach(this.owner);
+              poi.attach(this.owner);
 
               this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
                 poi.despawn();
@@ -76,6 +86,12 @@ export class Snitch extends Crewmate {
               console.log("Loading ImpostorArrow for", player.getConnection()?.getId());
 
               const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
+
+              Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
+
+              setTimeout(() => {
+                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
+              }, 10000);
 
               await poi.attach(player);
 

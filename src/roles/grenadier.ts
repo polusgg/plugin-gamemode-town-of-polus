@@ -25,6 +25,7 @@ export class Grenadier extends Impostor {
     name: "Grenadier",
     alignment: RoleAlignment.Impostor,
   };
+
   private readonly grenadierRange: number = 5.5;
   private readonly grenadierBlindness: NumberValue;
   private readonly grenadierCooldown: NumberValue;
@@ -33,6 +34,7 @@ export class Grenadier extends Impostor {
     super(owner);
 
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
     this.grenadierBlindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
     this.grenadierCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue();
 
@@ -51,7 +53,7 @@ export class Grenadier extends Impostor {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
       maxTimer: this.grenadierCooldown.value,
-      position: new Vector2(2.1, 2.1),
+      position: new Vector2(2.1, 2.0),
       alignment: EdgeAlignments.RightBottom,
       currentTime: 10,
     }).then(button => {
@@ -131,9 +133,12 @@ export class Grenadier extends Impostor {
       const isSaturated = button.isSaturated();
 
       if ((this.owner.getVent() === undefined) === wasInVent) {
-        if (!wasInVent) button.setSaturated(false);
+        if (!wasInVent) {
+          button.setSaturated(false);
+        }
 
         wasInVent = (this.owner.getVent() !== undefined);
+
         while (this.owner.getVent() !== undefined) {
           if (player.isDead()) {
             break;

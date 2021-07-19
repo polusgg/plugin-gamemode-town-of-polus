@@ -203,7 +203,7 @@ export class Phantom extends Crewmate {
       currentTime: 0,
     }, this.owner.getLobby().getConnections());
     this.button.on("clicked", event => {
-      if (event.connection === this.owner.getSafeConnection() || !this.button?.getEntity().getCustomNetworkTransform().isAttached()) {
+      if (event.connection === this.owner.getSafeConnection()) {
         return;
       }
 
