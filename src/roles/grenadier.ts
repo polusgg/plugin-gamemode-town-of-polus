@@ -164,7 +164,7 @@ export class Grenadier extends Impostor {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Grenadier",
-      subtitle: "Use flashbangs to blind the <color=#8CFFFFFF>crewmates</color>",
+      subtitle: "Use the flashbangs to blind the <color=#8CFFFFFF>Crewmates</color>",
       color: [255, 128, 0, 255],
     };
   }
