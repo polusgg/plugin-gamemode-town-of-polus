@@ -147,7 +147,7 @@ export class Oracle extends Crewmate {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Oracle",
-      subtitle: "Enchant a player and reveal their role",
+      subtitle: "Enchant a player and reveal their alignment",
       color: [44, 76, 201, 255],
     };
   }
