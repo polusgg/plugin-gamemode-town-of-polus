@@ -155,6 +155,6 @@ export class Oracle extends Crewmate {
   getDescriptionText(): string {
     return `<color=#2c4cc9>Role: Oracle
 Finish your tasks.
-You can enchant a player and reveal their alignment.</color>`;
+You can enchant a player and reveal\ntheir alignment.</color>`;
   }
 }
