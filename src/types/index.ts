@@ -16,9 +16,9 @@ export enum TownOfPolusGameOptionNames {
   OracleAccuracy = "<color=#2c4cc9>Oracle</color> Accuracy",
 
   PhantomProbability = "<color=#8cffff>Phantom</color> [N]",
-  PhantomRemainingTasks = "<color=#8cffff>Phantom</color> Remaining Tasks",
-  PhantomAppearTime = "<color=#8cffff>Phantom</color> Reappear Time",
-  PhantomRevealTime = "<color=#8cffff>Phantom</color> Reveal Time",
+  PhantomRemainingTasks = "<color=#8cffff>Phantom</color> Tasks",
+  PhantomAppearTime = "<color=#8cffff>Phantom</color> Immunity",
+  PhantomRevealTime = "<color=#8cffff>Phantom</color> Spawn",
 
   SerialKillerProbability = "<color=#ff547c>Serial Killer</color> [N]",
   SerialKillerCooldown = "<color=#ff547c>Serial Killer</color> Cooldown",
