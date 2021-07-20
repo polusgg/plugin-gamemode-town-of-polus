@@ -7,9 +7,12 @@ import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/bas
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { DoorsSystem, AutoDoorsSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
+import { TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
+import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
 
 export class LocksmithManager extends BaseManager {
   getId(): string { return "locksmith" }
@@ -86,14 +89,36 @@ const DOOR_POSITIONS_BY_ID = {
   ],
 } as any as Record<Level, [Vector2, number][]>;
 
+const LOCKSMITH_RANGE_BY_OPTION = new Map<string, number>([
+  ["Short", 0.6],
+  ["Normal", 1],
+  ["Long", 2.5],
+]);
+
 export class Locksmith extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Locksmith",
     alignment: RoleAlignment.Crewmate,
   };
 
+  private readonly lockSmithRange: number;
+  private readonly lockSmithMaxUses: NumberValue;
+  private lockSmithLeftUses: number;
+  private readonly lockSmithCooldown: NumberValue;
+
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
+    this.lockSmithRange = LOCKSMITH_RANGE_BY_OPTION.get(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithRange)
+      .getValue()
+      .getSelected())!;
+    this.lockSmithMaxUses = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithUses).getValue();
+    this.lockSmithLeftUses = this.lockSmithMaxUses.value;
+    this.lockSmithCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithCooldown).getValue();
+
+    this.updateDescriptionText();
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.locksmithOnReady.bind(this));
@@ -107,7 +132,7 @@ export class Locksmith extends Crewmate {
       alignment: EdgeAlignments.RightBottom,
       position: new Vector2(2.1, 0.7),
       currentTime: 0,
-      maxTimer: 1,
+      maxTimer: this.lockSmithCooldown.value,
       isCountingDown: false,
       saturated: false,
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
@@ -115,23 +140,38 @@ export class Locksmith extends Crewmate {
 
     const myDoors = DOOR_POSITIONS_BY_ID[this.owner.getLobby().getLevel()];
 
+    this.catch("meeting.ended", event => event.getGame())
+      .execute(() => {
+        lockpickButton.setCurrentTime(0);
+      });
+
     this.catch("player.position.updated", p => p.getPlayer()).execute(move => {
-      // range in this case is 3
-      const canHighlight = myDoors.filter(([pos]) => move.getNewPosition().distance(pos) < 3).length > 0;
+      if (this.lockSmithLeftUses === 0) {
+        return;
+      }
+
+      const canHighlight = myDoors.filter(([pos]) => move.getNewPosition().distance(pos) < this.lockSmithRange).length > 0;
 
       lockpickButton.setSaturated(canHighlight);
     });
 
     lockpickButton.on("clicked", _ => {
-      const inRange = myDoors.filter(([pos]) => this.owner.getPosition().distance(pos) < 3);
+      const inRange = myDoors.filter(([pos]) => this.owner.getPosition().distance(pos) < this.lockSmithRange);
       const closest = inRange.sort((d1, d2) => d1[0].distance(this.owner.getPosition()) - d2[0].distance(this.owner.getPosition()))[0];
 
-      if ((closest as [Vector2, number] | undefined) === undefined) {
+      if ((closest as [Vector2, number] | undefined) === undefined || this.lockSmithLeftUses === 0 || lockpickButton.getCurrentTime() !== 0) {
         return;
       }
 
       const closestDoorId = closest[1];
 
+      this.lockSmithLeftUses -= 1;
+
+      if (this.lockSmithLeftUses === 0) {
+        lockpickButton.destroy();
+      }
+      this.updateDescriptionText();
+      lockpickButton.reset();
       this.owner.getLobby().getHostInstance().getDoorHandler()
         ?.setOldShipStatus();
 
@@ -160,7 +200,11 @@ export class Locksmith extends Crewmate {
 
   getDescriptionText(): string {
     return `<color=#3d85c6>Role: Locksmith
-Finish your tasks.
-You can pick locks to open or close doors.</color>`;
+Finish your tasks and help crewmates to maintain the doors</color>`;
+  }
+
+  updateDescriptionText(): void {
+    Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, `${this.getDescriptionText()}
+You have ${this.lockSmithLeftUses} uses left`);
   }
 }

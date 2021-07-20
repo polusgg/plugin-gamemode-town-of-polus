@@ -31,6 +31,9 @@ export enum TownOfPolusGameOptionNames {
   SnitchRemainingTasks = "<color=#00ffdd>Snitch</color> Remaining Tasks",
 
   LocksmithProbability = "<color=#3d85c6>Locksmith</color> <color=#0b6e99>[C]</color>",
+  LocksmithCooldown = "<color=#3d85c6>Locksmith</color> Ability Cooldown",
+  LocksmithUses = "<color=#3d85c6>Locksmith</color> Ability Max Uses",
+  LocksmithRange = "<color=#3d85c6>Locksmith</color> Range",
 }
 
 export enum TownOfPolusGameOptionCategories {
