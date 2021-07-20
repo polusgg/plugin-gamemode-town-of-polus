@@ -114,14 +114,14 @@ export class Sheriff extends Impostor {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Sheriff",
-      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color>`,
+      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>Impostor${(impostorCount != 1 ? "s" : "")}</color>`,
       color: [196, 150, 69, 255],
     };
   }
 
   getDescriptionText(): string {
     return `<color=#c49645>Role: Sheriff
-Finish your task or vote out the imposter.
-You can kill the impostor and neutrals but don't kill crewmates</color>`;
+Finish your tasks.
+You can kill the impostor and neutrals but don't kill crewmates.</color>`;
   }
 }
