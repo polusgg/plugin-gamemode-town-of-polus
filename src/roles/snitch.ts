@@ -58,7 +58,7 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .filter(player => player.isImpostor())
           .forEach(player => {
-            Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> only has <size=120%><b>${taskLeftCount}</b></size> task${taskLeftCount === 1 ? "" : "s"} left, and is about to reveal <color=#ff1919>your role!</color>`);
+            Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> only has <size=120%><b>${taskLeftCount}</b></size> task${taskLeftCount == 1 ? "" : "s"} left, and is about to reveal <color=#ff1919>your role!</color>`);
           });
       }
 
@@ -74,6 +74,12 @@ export class Snitch extends Crewmate {
               poi.attach(this.owner);
 
               this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
+                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
+                poi.despawn();
+              });
+
+              this.catch("player.left", event2 => event2.getPlayer()).execute(_ => {
+                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
                 poi.despawn();
               });
             }
@@ -96,6 +102,12 @@ export class Snitch extends Crewmate {
               await poi.attach(player);
 
               this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
+                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
+                poi.despawn();
+              });
+
+              this.catch("player.left", event2 => event2.getPlayer()).execute(_ => {
+                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
                 poi.despawn();
               });
             }
