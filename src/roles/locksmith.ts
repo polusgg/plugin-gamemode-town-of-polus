@@ -193,18 +193,18 @@ export class Locksmith extends Crewmate {
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {
     return {
       title: "Locksmith",
-      subtitle: "Unlock all the doors",
+      subtitle: `You can open or close ${this.lockSmithLeftUses} door${this.lockSmithLeftUses > 1 ? "s" : ""}`,
       color: [61, 133, 198, 255],
     };
   }
 
   getDescriptionText(): string {
     return `<color=#3d85c6>Role: Locksmith
-Finish your tasks and help crewmates to maintain the doors</color>`;
+Finish your tasks.</color>`;
   }
 
   updateDescriptionText(): void {
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, `${this.getDescriptionText()}
-You have ${this.lockSmithLeftUses} uses left`);
+<color=#3d85c6>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses > 1 ? "s" : ""} left.</color>`);
   }
 }
