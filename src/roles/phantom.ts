@@ -133,8 +133,8 @@ export class Phantom extends Crewmate {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player as Player, {
               title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: "The phantom haunted everyone",
-              color: [255, 140, 238, 255],
+              subtitle: "The <color=#8cffff>Phantom</color> haunted everyone",
+              color: [140, 255, 255, 255],
               yourTeam: [this.owner],
               winSound: WinSoundType.ImpostorWin,
             }])),
@@ -225,7 +225,7 @@ export class Phantom extends Crewmate {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>Impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }
