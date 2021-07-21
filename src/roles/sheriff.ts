@@ -38,19 +38,23 @@ export class Sheriff extends Impostor {
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
         .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Neutral) && !player.isDead())
         .length == 0)
-      .execute(async event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
-        endGameData: new Map(event.getPlayer().getLobby().getPlayers()
-          .map(player => [player, {
-            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-            // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
-            subtitle: player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}` : `<color=#C49645FF>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}</color>`,        
-            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
-            yourTeam: event.getPlayer().getLobby().getPlayers()
-              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
-            winSound: WinSoundType.CrewmateWin,
-          }])),
-        intentName: "sheriffKill",
-      }));
+      .execute(async event => {
+        const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
+
+        endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
+          endGameData: new Map(event.getPlayer().getLobby().getPlayers()
+            .map(player => [player, {
+              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
+              subtitle: player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}` : `<color=#C49645FF>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}</color>`,
+              color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+              yourTeam: event.getPlayer().getLobby().getPlayers()
+                .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+              winSound: WinSoundType.CrewmateWin,
+            }])),
+          intentName: "sheriffKill",
+        })
+      });
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
@@ -90,7 +94,7 @@ export class Sheriff extends Impostor {
           await this.owner.murder(this.owner);
 
           if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
-            console.log("GAME SHOULD BE ENDED");
+            const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
 
             Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
               intentName: "impostorKill",
@@ -127,7 +131,6 @@ export class Sheriff extends Impostor {
 
   getDescriptionText(): string {
     return `<color=#c49645>Role: Sheriff
-Finish your tasks.
-You can kill the impostors and neutrals\nbut don't kill crewmates.</color>`;
+Finish your tasks and shoot the impostors.</color>`;
   }
 }

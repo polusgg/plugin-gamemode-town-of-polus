@@ -90,6 +90,6 @@ export class Jester extends BaseRole {
 
   getDescriptionText(): string {
     return `<color=#ff8cee>Role: Jester
-Trick the party into voting you out to win!</color>`;
+Trick everyone into voting you out.</color>`;
   }
 }

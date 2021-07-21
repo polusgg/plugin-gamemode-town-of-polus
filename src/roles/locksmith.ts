@@ -200,7 +200,7 @@ export class Locksmith extends Crewmate {
 
   getDescriptionText(): string {
     return `<color=#3d85c6>Role: Locksmith
-Finish your tasks.</color>`;
+Finish your tasks and open/close doors.</color>`;
   }
 
   updateDescriptionText(): void {
