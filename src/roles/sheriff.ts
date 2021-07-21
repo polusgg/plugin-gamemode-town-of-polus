@@ -91,7 +91,7 @@ export class Sheriff extends Impostor {
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-                  subtitle: "<color=#FF1919FF>Impostors</color> won by <color=#C49645FF>Sheriff</color> misfire",
+                  subtitle: player === this.owner ? "You misfired!" : "<color=#FF1919FF>Impostors</color> won by <color=#C49645FF>Sheriff</color> misfire",
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
@@ -122,6 +122,6 @@ export class Sheriff extends Impostor {
   getDescriptionText(): string {
     return `<color=#c49645>Role: Sheriff
 Finish your tasks.
-You can kill the impostor and neutrals but don't kill crewmates.</color>`;
+You can kill the impostors and neutrals\nbut don't kill crewmates.</color>`;
   }
 }
