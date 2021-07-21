@@ -41,9 +41,9 @@ export class Sheriff extends Impostor {
       .execute(async event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
+            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
             // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
-            subtitle: "<color=#C49645FF>Sheriff</color> killed all <color=#FF1919FF>Impostors</color>",
+            subtitle: player === this.owner ? "You killed all <color=#FF1919FF>Impostors</color>" : "<color=#C49645FF>Sheriff</color> killed all <color=#FF1919FF>Impostors</color>",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
               .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
