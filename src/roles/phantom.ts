@@ -254,14 +254,14 @@ export class Phantom extends Crewmate {
 
   getRealDescriptionText(): string {
     return `<color=#8cffff>Role: Phantom
-Finish your tasks without being seen and
-call the meeting.</color>`;
+Finish your tasks without being seen 
+and call a meeting.</color>`;
   }
 
   getAfterTasksFinishedText(): string {
     return `<color=#8cffff>Role: Phantom
 You've finished your tasks.
-Call the meeting and win.</color>`;
+Call a meeting and win.</color>`;
   }
 
   getDescriptionText(): string {
