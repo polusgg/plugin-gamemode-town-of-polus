@@ -41,13 +41,13 @@ export class Sheriff extends Impostor {
       .execute(async event => endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
         endGameData: new Map(event.getPlayer().getLobby().getPlayers()
           .map(player => [player, {
-            title: "Victory",
+            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "Defeat",
             // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
             subtitle: "<color=#C49645FF>Sheriff</color> killed all <color=#FF1919FF>Impostors</color>",
             color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
             yourTeam: event.getPlayer().getLobby().getPlayers()
-              .filter(sus => !sus.isImpostor()),
-            winSound: WinSoundType.ImpostorWin,
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+            winSound: WinSoundType.CrewmateWin,
           }])),
         intentName: "sheriffKill",
       }));
