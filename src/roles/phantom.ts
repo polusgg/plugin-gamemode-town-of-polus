@@ -126,6 +126,18 @@ export class Phantom extends Crewmate {
       await this.showPhantom();
     });
 
+    this.catch("meeting.started", event => event.getGame())
+      .where(() => this.state === PhantomState.Transformed)
+      .execute(event => {
+        this.unshowPhantom();
+      })
+
+    this.catch("meeting.ended", event => event.getGame())
+      .where(() => this.state === PhantomState.Transformed)
+      .execute(event => {
+        this.showPhantom();
+      })
+
     this.catch("meeting.started", event => event.getCaller())
       .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
       .execute(event => {
@@ -160,8 +172,9 @@ export class Phantom extends Crewmate {
       return;
     }
 
+    this.owner.getGameDataEntry().setDead(true);
     await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
-    this.button?.getEntity().despawn();
+    this.button?.destroy();
     this.button = undefined;
   }
 
@@ -169,6 +182,8 @@ export class Phantom extends Crewmate {
     if (this.state !== PhantomState.Transformed) {
       return;
     }
+
+    this.owner.getGameDataEntry().setDead(false);
 
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
 
