@@ -62,7 +62,7 @@ export class Snitch extends Crewmate {
           });
       }
 
-      if (taskLeftCount == SRT) {
+      if (taskLeftCount == SRT && !this.owner.isDead()) {
         console.log("TLC @ SRT");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
@@ -84,7 +84,7 @@ export class Snitch extends Crewmate {
               });
             }
           });
-      } else if (taskLeftCount == 0) {
+      } else if (taskLeftCount == 0 && !this.owner.isDead()) {
         console.log("TLC @ 0");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {

@@ -21,7 +21,6 @@ import { GameOptionPriority } from "@polusgg/plugin-polusgg-api/src/services/gam
 import { Locksmith } from "./src/roles/locksmith";
 import { LobbyDefaultOptions } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsService";
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
-import { Level } from "@nodepolus/framework/src/types/enums";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -139,7 +138,8 @@ export default class extends BaseMod {
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Locksmith,
-        playerCount: lobby.getLevel() === Level.MiraHq ? 0 : this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability).getValue().value),
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability)?.getValue()?.value ?? 0),
         assignWith: RoleAlignment.Crewmate,
       },
     ];
