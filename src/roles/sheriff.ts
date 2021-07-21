@@ -1,7 +1,7 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
@@ -17,6 +17,8 @@ export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
   getTypeName(): string { return "Sheriff" }
 }
+
+const SHERIFF_DEAD_STRING = "<color=#ff1919>You're dead, finish your tasks.</color>";
 
 // todo not duplicate code for crewmate wins on sheriff!!!!
 
@@ -55,6 +57,10 @@ export class Sheriff extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SHERIFF_DEAD_STRING);
+    });
   }
 
   async onReadyImpostor(): Promise<void> {
