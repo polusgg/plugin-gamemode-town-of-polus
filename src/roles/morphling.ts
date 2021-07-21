@@ -231,8 +231,15 @@ export class Morphling extends Impostor {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Morphling",
-      subtitle: "Transform and deceive the <color=#8CFFFFFF>crewmates</color>",
+      subtitle: "Transform and deceive the <color=#8CFFFFFF>Crewmates</color>",
       color: [162, 18, 219, 255],
     };
+  }
+
+
+ getDescriptionText(): string {
+    return `<color=#a212db>Role: Morphling
+Sabotage and kill the crewmates.
+You can use your special ability to morph into someone else.</color>`;
   }
 }
