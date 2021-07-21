@@ -123,7 +123,7 @@ export class Snitch extends Crewmate {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Snitch",
-      subtitle: `Finish your tasks to reveal the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
+      subtitle: `Finish your tasks to reveal the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}</color>`,
       color: [0, 255, 221, 255],
     };
   }
