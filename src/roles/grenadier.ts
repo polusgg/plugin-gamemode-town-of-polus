@@ -3,7 +3,7 @@ import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/ro
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
@@ -19,6 +19,9 @@ export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
   getTypeName(): string { return "Grenadier" }
 }
+
+const GRENADIER_DEAD_STRING = `<color=#ff8000>Role: Grenadier</color>
+<color=#ff1919>You're dead.</color>`;
 
 export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {
@@ -174,4 +177,9 @@ export class Grenadier extends Impostor {
 Sabotage and kill the crewmates
 Use flashbangs to blind the crewmates.</color>`;
   }
+
+this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, GRENADIER_DEAD_STRING);
+});
+
 }
