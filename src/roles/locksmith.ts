@@ -128,6 +128,10 @@ export class Locksmith extends Crewmate {
     } else {
       this.locksmithOnReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, LOCKSMITH_DEAD_STRING);
+    });
   }
 
   async locksmithOnReady(): Promise<void> {
@@ -210,9 +214,4 @@ Finish your tasks and open/close doors.</color>`;
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, `${this.getDescriptionText()}
 <color=#3d85c6>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses > 1 ? "s" : ""} left.</color>`);
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, LOCKSMITH_DEAD_STRING);
-});
-
 }
