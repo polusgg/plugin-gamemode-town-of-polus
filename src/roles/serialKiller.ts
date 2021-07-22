@@ -37,6 +37,10 @@ export class SerialKiller extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SERIALKILLER_DEAD_STRING);
+    });
   }
 
   onReady(): void {
@@ -141,9 +145,4 @@ Kill everyone.</color>`;
       });
     }
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SERIALKILLER_DEAD_STRING);
-});
-
 }
