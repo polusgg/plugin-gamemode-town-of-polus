@@ -36,6 +36,10 @@ export class Engineer extends Crewmate {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ENGINEER_DEAD_STRING);
+    });
   }
 
   sabotageIsOccurring(): boolean {
@@ -60,6 +64,7 @@ export class Engineer extends Crewmate {
       }
       yield;
     }
+
   }
 
   async onReady(): Promise<void> {
@@ -112,9 +117,5 @@ export class Engineer extends Crewmate {
 Finish your tasks.
 You can fix 1 sabotage.</color>`;
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ENGINEER_DEAD_STRING);
-});
 
 }
