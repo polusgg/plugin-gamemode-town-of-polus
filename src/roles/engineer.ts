@@ -117,5 +117,4 @@ export class Engineer extends Crewmate {
 Finish your tasks.
 You can fix 1 sabotage.</color>`;
   }
-
 }
