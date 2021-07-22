@@ -104,7 +104,8 @@ export class SerialKiller extends Impostor {
 
   getDescriptionText(): string {
     return `<color=#ff547c>Role: Serial Killer
-Kill everyone.</color>`;
+Kill everyone.</color>
+Fake Tasks:`;
   }
 
   private checkEndCriteria(lobby: LobbyInstance, player?: PlayerInstance): void {

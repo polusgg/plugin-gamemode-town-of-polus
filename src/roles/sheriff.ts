@@ -63,7 +63,7 @@ export class Sheriff extends Impostor {
       this.onReady();
     }
 
-    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SHERIFF_DEAD_STRING);
     });
   }

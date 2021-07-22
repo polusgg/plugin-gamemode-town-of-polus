@@ -65,6 +65,13 @@ export class Phantom extends Crewmate {
 
         return;
       }
+
+      this.catch("player.task.completed", x => x.getPlayer()).execute(async event => {
+        if (event.getPlayer().getGameDataEntry().isDoneWithTasks()) {
+          await Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getAfterTasksFinishedText());
+        }
+      });
+
       // todo make sure Prez finishes moving-pgg branch
 
       /*const notMurderers = event.getKiller().getLobby().getPlayers()
@@ -79,8 +86,6 @@ export class Phantom extends Crewmate {
         shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
         position: this.owner.getPosition(),
       }, notMurderers);*/
-
-      this.catch("meeting.started", event => event.getCaller()).execute(event => event.cancel());
 
       if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
         .getValue()
@@ -100,7 +105,7 @@ export class Phantom extends Crewmate {
       this.state = PhantomState.Transformed;
 
       async function display(this: Phantom): Promise<void> {
-        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, "Complete your tasks and call a meeting");
+        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
         await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "You've become the <color=#8cffff>Phantom</color>!");
 
         setTimeout(() => {
@@ -129,14 +134,15 @@ export class Phantom extends Crewmate {
     this.catch("meeting.started", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
       .execute(event => {
-        this.unshowPhantom();
+        if (event.getCaller() === this.owner || event.isCancelled()) event.cancel();
+        else this.unshowPhantom();
       })
 
     this.catch("meeting.ended", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
-      .execute(event => {
+      .execute(_event => {
         this.showPhantom();
-      })
+      });
 
     this.catch("meeting.started", event => event.getCaller())
       .where(event => this.state === PhantomState.Transformed && event.getCaller().getTasks().filter(x => !x[1]).length < 1 && event.getVictim() === undefined)
@@ -218,7 +224,7 @@ export class Phantom extends Crewmate {
       currentTime: 0,
     }, this.owner.getLobby().getConnections());
     this.button.on("clicked", event => {
-      if (event.connection === this.owner.getSafeConnection()) {
+      if (event.connection === this.owner.getSafeConnection() || event.connection.getPlayer()?.isDead()) {
         return;
       }
 
@@ -247,7 +253,14 @@ export class Phantom extends Crewmate {
 
   getRealDescriptionText(): string {
     return `<color=#8cffff>Role: Phantom
-Finish your tasks without being seen.</color>`;
+Finish your tasks without being seen 
+and call a meeting.</color>`;
+  }
+
+  getAfterTasksFinishedText(): string {
+    return `<color=#8cffff>Role: Phantom
+You've finished your tasks.
+Call a meeting and win.</color>`;
   }
 
   getDescriptionText(): string {

@@ -97,6 +97,7 @@ export class Jester extends BaseRole {
 
   getDescriptionText(): string {
     return `<color=#ff8cee>Role: Jester
-Trick everyone into voting you out.</color>`;
+Trick everyone into voting you out.</color>
+Fake Tasks:`;
   }
 }
