@@ -18,7 +18,8 @@ export class SheriffManager extends BaseManager {
   getTypeName(): string { return "Sheriff" }
 }
 
-const SHERIFF_DEAD_STRING = "<color=#ff1919>You're dead, finish your tasks.</color>";
+const SHERIFF_DEAD_STRING = `<color=#c49645>Role: Sheriff</color>
+<color=#ff1919>You're dead, finish your tasks.</color>`;
 
 // todo not duplicate code for crewmate wins on sheriff!!!!
 
