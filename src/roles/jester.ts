@@ -77,6 +77,10 @@ export class Jester extends BaseRole {
           intentName: "jesterVoted",
         });
       });
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, JESTER_DEAD_STRING);
+    });
   }
 
   getManagerType(): typeof BaseManager {
@@ -95,9 +99,4 @@ export class Jester extends BaseRole {
     return `<color=#ff8cee>Role: Jester
 Trick everyone into voting you out.</color>`;
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, JESTER_DEAD_STRING);
-});
-
 }
