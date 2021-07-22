@@ -17,6 +17,9 @@ export class SnitchManager extends BaseManager {
   getTypeName(): string { return "Snitch" }
 }
 
+const SNITCH_DEAD_STRING = `<color=#00ffdd>Role: Snitch</color>
+<color=#ff1919>You're dead, finish your tasks.</color>`;
+
 export class Snitch extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Snitch",
@@ -132,4 +135,9 @@ export class Snitch extends Crewmate {
     return `<color=#00ffdd>Role: Snitch
 Finish your tasks to reveal the impostor.</color>`;
   }
+
+this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SNITCH_DEAD_STRING);
+});
+
 }
