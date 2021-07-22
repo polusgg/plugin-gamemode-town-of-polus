@@ -87,8 +87,6 @@ export class Phantom extends Crewmate {
         position: this.owner.getPosition(),
       }, notMurderers);*/
 
-      this.catch("meeting.started", event => event.getCaller()).execute(event => event.cancel());
-
       if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
         .getValue()
         .getSelected() === "After Meeting") {
@@ -135,9 +133,10 @@ export class Phantom extends Crewmate {
 
     this.catch("meeting.started", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
-      .execute(_event => {
-        this.unshowPhantom();
-      });
+      .execute(event => {
+        if (event.getCaller() === this.owner || event.isCancelled()) event.cancel();
+        else this.unshowPhantom();
+      })
 
     this.catch("meeting.ended", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
