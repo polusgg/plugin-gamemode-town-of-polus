@@ -45,6 +45,10 @@ export class Oracle extends Crewmate {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ORACLE_DEAD_STRING);
+    });
   }
 
   * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
@@ -160,9 +164,4 @@ export class Oracle extends Crewmate {
 Finish your tasks.
 You can enchant a player and reveal\ntheir alignment.</color>`;
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ORACLE_DEAD_STRING);
-});
-
 }
