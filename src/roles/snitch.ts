@@ -44,6 +44,10 @@ export class Snitch extends Crewmate {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SNITCH_DEAD_STRING);
+    });
   }
 
   onReady(): void {
@@ -135,9 +139,4 @@ export class Snitch extends Crewmate {
     return `<color=#00ffdd>Role: Snitch
 Finish your tasks to reveal the impostor.</color>`;
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SNITCH_DEAD_STRING);
-});
-
 }
