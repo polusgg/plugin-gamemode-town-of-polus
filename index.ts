@@ -88,6 +88,8 @@ export default class extends BaseMod {
   constructor() {
     super(pluginMetadata);
 
+    console.log("PGTOP-L");
+
     AssetBundle.load("TownOfPolus").then(_ => {
       this.getLogger().info("Loaded TownOfPolus AssetBundle");
     });
