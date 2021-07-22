@@ -1,7 +1,7 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
@@ -17,6 +17,9 @@ export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
   getTypeName(): string { return "Serial Killer" }
 }
+
+const SERIALKILLER_DEAD_STRING = `<color=#ff547c>Role: Serial Killer</color>
+<color=#ff1919>You're dead.</color>`;
 
 export class SerialKiller extends Impostor {
   protected metadata: RoleMetadata = {
@@ -34,6 +37,10 @@ export class SerialKiller extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SERIALKILLER_DEAD_STRING);
+    });
   }
 
   onReady(): void {

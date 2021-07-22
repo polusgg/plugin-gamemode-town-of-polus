@@ -2,7 +2,7 @@ import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/ro
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
@@ -27,6 +27,9 @@ export class OracleManager extends BaseManager {
   getTypeName(): string { return "Oracle" }
 }
 
+const ORACLE_DEAD_STRING = `<color=#2c4cc9>Role: Oracle</color>
+<color=#ff1919>You're dead, finish your tasks.</color>`;
+
 export class Oracle extends Crewmate {
   public enchanted: PlayerInstance | undefined;
   protected metadata: RoleMetadata = {
@@ -42,6 +45,10 @@ export class Oracle extends Crewmate {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ORACLE_DEAD_STRING);
+    });
   }
 
   * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
