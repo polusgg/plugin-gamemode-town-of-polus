@@ -46,6 +46,11 @@ export class Grenadier extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, GRENADIER_DEAD_STRING);
+    });
+
   }
 
   onReady(): void {
@@ -177,9 +182,5 @@ export class Grenadier extends Impostor {
 Sabotage and kill the crewmates
 Use flashbangs to blind the crewmates.</color>`;
   }
-
-this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, GRENADIER_DEAD_STRING);
-});
 
 }
