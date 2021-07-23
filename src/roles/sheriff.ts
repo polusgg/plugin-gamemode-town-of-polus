@@ -39,10 +39,11 @@ export class Sheriff extends Impostor {
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
         .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Neutral) && !player.isDead())
         .length == 0)
-      .execute(async event => {
+      .execute(event => {
         const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
 
-        await endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
+        if (event.getPlayer().getLobby().getGame() !== undefined) {
+          await endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
             .map(player => [player, {
               title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
@@ -55,6 +56,7 @@ export class Sheriff extends Impostor {
             }])),
           intentName: "sheriffKill",
         });
+        }
       });
 
     this.catch("player.died", e => e.getPlayer()).execute(event => {

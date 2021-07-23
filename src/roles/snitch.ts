@@ -76,9 +76,11 @@ export class Snitch extends Crewmate {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero(), player);
 
-              this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
-                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
-                poi.despawn();
+              this.catch("player.died", event2 => event2.getPlayer().getLobby()).execute(event3 => {
+                if (event3.getPlayer() === this.owner || event3.getPlayer().isImpostor()) {
+                  Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
+                  poi.despawn();
+                }
               });
 
               this.catch("player.left", event2 => event2.getPlayer()).execute(_ => {
@@ -100,9 +102,13 @@ export class Snitch extends Crewmate {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
               }, 10000);
 
-              this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
-                Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
-                poi.despawn();
+              await poi.attach(player);
+
+              this.catch("player.died", event2 => event2.getPlayer().getLobby()).execute(event3 => {
+                if (event3.getPlayer() === this.owner || event3.getPlayer().isImpostor()) {
+                  Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
+                  poi.despawn();
+                }
               });
 
               this.catch("player.left", event2 => event2.getPlayer()).execute(_ => {

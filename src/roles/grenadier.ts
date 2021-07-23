@@ -29,7 +29,7 @@ export class Grenadier extends Impostor {
     alignment: RoleAlignment.Impostor,
   };
 
-  private readonly grenadierRange: number = 5.5;
+  private get grenadierRange(): number { return 5.5 }
   private readonly grenadierBlindness: NumberValue;
   private readonly grenadierCooldown: NumberValue;
 

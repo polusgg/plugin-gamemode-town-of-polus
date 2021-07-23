@@ -5,7 +5,6 @@ import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/bas
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
-import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
@@ -15,12 +14,6 @@ import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/pl
 import { GameState } from "@nodepolus/framework/src/types/enums";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
-
-const alignmentColors: readonly string[] = [
-  "FFFFFFFF",
-  "FF0000FF",
-  "C042FFFF",
-] as const;
 
 export class OracleManager extends BaseManager {
   getId(): string { return "oracle" }
@@ -127,7 +120,7 @@ export class Oracle extends Crewmate {
       });
     });
 
-    this.catch("meeting.started", event => event.getVictim()).execute(event => {
+    this.catch("meeting.started", event => event.getVictim()).execute(_event => {
       if (this.enchanted === undefined) {
         return;
       }
@@ -136,13 +129,7 @@ export class Oracle extends Crewmate {
 
       // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
       if (this.owner.isDead() && !this.enchanted.isDead()) {
-        const alignment = this.enchanted.getMeta<BaseRole>("pgg.api.role").getAlignment();
-        const newName = `<color=#${(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value / 100 <= Math.random()) ? alignmentColors[alignment] : alignmentColors[(alignment + 1) % alignmentColors.length]}>${this.enchanted.getName().toString()}</color>`;
-
-        this.enchanted.getGameDataEntry().setName(newName);
-        this.enchanted.updateGameData();
-        Services.get(ServiceType.Name).setForBatch(event.getGame().getLobby().getConnections()
-          .filter(connection => this.enchanted?.getConnection() !== connection), this.enchanted, newName);
+        // Display role alignment //
       }
     });
   }
