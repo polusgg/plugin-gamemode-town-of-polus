@@ -57,11 +57,11 @@ export class Snitch extends Crewmate {
     this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
       const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
 
-      console.log("TaskLeftCount", taskLeftCount);
+      console.log("task left count", taskLeftCount);
 
-      const SRT = gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value;
+      const remainingTasks = gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value;
 
-      if (taskLeftCount <= SRT && taskLeftCount !== 0) {
+      if (taskLeftCount <= remainingTasks && taskLeftCount !== 0) {
         event.getPlayer().getLobby().getPlayers()
           .filter(player => player.isImpostor())
           .forEach(player => {
@@ -69,16 +69,12 @@ export class Snitch extends Crewmate {
           });
       }
 
-      if (taskLeftCount == SRT && !this.owner.isDead()) {
-        console.log("TLC @ SRT");
+      if (taskLeftCount == remainingTasks && !this.owner.isDead()) {
+        console.log("remaining tasks == task left count");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              console.log("Loading SnitchArrow for", player.getConnection()?.getId());
-
-              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero());
-
-              poi.attach(this.owner);
+              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero(), player);
 
               this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
@@ -92,21 +88,17 @@ export class Snitch extends Crewmate {
             }
           });
       } else if (taskLeftCount == 0 && !this.owner.isDead()) {
-        console.log("TLC @ 0");
+        console.log("task left count is 0");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              console.log("Loading ImpostorArrow for", player.getConnection()?.getId());
-
-              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero());
+              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero(), this.owner);
 
               Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
 
               setTimeout(() => {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
               }, 10000);
-
-              await poi.attach(player);
 
               this.catch("player.died", event2 => event2.getPlayer()).execute(_ => {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
