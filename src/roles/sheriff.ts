@@ -30,7 +30,7 @@ export class Sheriff extends Impostor {
   };
 
   constructor(owner: PlayerInstance) {
-    super(owner, PlayerRole.Crewmate);
+    super(owner, PlayerRole.Crewmate, "TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
 
     const endGame = Services.get(ServiceType.EndGame);
 
@@ -56,12 +56,6 @@ export class Sheriff extends Impostor {
           intentName: "sheriffKill",
         });
       });
-
-    if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
-    } else {
-      this.onReady();
-    }
 
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SHERIFF_DEAD_STRING);
