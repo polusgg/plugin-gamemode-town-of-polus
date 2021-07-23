@@ -96,6 +96,8 @@ export class Engineer extends Crewmate {
       host.getSystemsHandler()!.repairAll(true);
       this.button.getEntity().despawn();
       this.button = undefined;
+
+      Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getDescriptionText(""));
     });
   }
 
@@ -111,9 +113,8 @@ export class Engineer extends Crewmate {
     };
   }
 
-  getDescriptionText(): string {
+  getDescriptionText(extra: string = "\nYou can fix 1 sabotage."): string {
     return `<color=#8e9e9d>Role: Engineer
-Finish your tasks.
-You can fix 1 sabotage.</color>`;
+Finish your tasks.${extra}</color>`;
   }
 }

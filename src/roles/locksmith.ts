@@ -1,7 +1,7 @@
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Vector2 } from "@nodepolus/framework/src/types";
 import { Level, SystemType } from "@nodepolus/framework/src/types/enums";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { Asset, AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
@@ -108,6 +108,7 @@ export class Locksmith extends Crewmate {
   private readonly lockSmithMaxUses: NumberValue;
   private lockSmithLeftUses: number;
   private readonly lockSmithCooldown: NumberValue;
+  private doors: [Vector2, number][] = [];
 
   constructor(owner: PlayerInstance) {
     super(owner);
@@ -135,6 +136,9 @@ export class Locksmith extends Crewmate {
   }
 
   async locksmithOnReady(): Promise<void> {
+    const lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png")
+    const lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png")
+    const lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png")
     const lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       alignment: EdgeAlignments.RightBottom,
       position: new Vector2(2.1, 0.7),
@@ -142,10 +146,10 @@ export class Locksmith extends Crewmate {
       maxTimer: this.lockSmithCooldown.value,
       isCountingDown: false,
       saturated: false,
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
+      asset: lockpickNone,
     });
 
-    const myDoors = DOOR_POSITIONS_BY_ID[this.owner.getLobby().getLevel()];
+    this.doors = DOOR_POSITIONS_BY_ID[this.owner.getLobby().getLevel()];
 
     this.catch("meeting.ended", event => event.getGame())
       .execute(() => {
@@ -157,20 +161,27 @@ export class Locksmith extends Crewmate {
         return;
       }
 
-      const canHighlight = myDoors.filter(([pos]) => move.getNewPosition().distance(pos) < this.lockSmithRange).length > 0;
+      const canHighlight = this.doors.filter(([pos]) => move.getNewPosition().distance(pos) < this.lockSmithRange).length > 0;
+      const closestDoor = this.getClosestDoor();
+      let nextAsset: Asset = lockpickNone;
+      if (closestDoor != undefined) {
+        const currentState = (this.owner.getLobby().getShipStatus()?.getShipStatus()
+          .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoor);
 
-      lockpickButton.setSaturated(canHighlight);
+        lockpickButton.setSaturated(canHighlight);
+        nextAsset = currentState == true ? lockpickOpen : lockpickClose;
+      }
+
+      if (lockpickButton.getEntity().getGraphic().getAsset() !== nextAsset.getId()) {
+        lockpickButton.setAsset(nextAsset);
+      }
     });
 
     lockpickButton.on("clicked", _ => {
-      const inRange = myDoors.filter(([pos]) => this.owner.getPosition().distance(pos) < this.lockSmithRange);
-      const closest = inRange.sort((d1, d2) => d1[0].distance(this.owner.getPosition()) - d2[0].distance(this.owner.getPosition()))[0];
-
-      if ((closest as [Vector2, number] | undefined) === undefined || this.lockSmithLeftUses === 0 || lockpickButton.getCurrentTime() !== 0) {
+      const closestDoorId = this.getClosestDoor();
+      if (closestDoorId === undefined || lockpickButton.getCurrentTime() !== 0) {
         return;
       }
-
-      const closestDoorId = closest[1];
 
       this.lockSmithLeftUses -= 1;
 
@@ -191,6 +202,17 @@ export class Locksmith extends Crewmate {
       this.owner.getLobby().getHostInstance().getDoorHandler()
         ?.sendDataUpdate();
     });
+  }
+
+  getClosestDoor(): number | undefined {
+    const inRange = this.doors.filter(([pos]) => this.owner.getPosition().distance(pos) < this.lockSmithRange);
+    const closest = inRange.sort((d1, d2) => d1[0].distance(this.owner.getPosition()) - d2[0].distance(this.owner.getPosition()))[0];
+
+    if ((closest as [Vector2, number] | undefined) === undefined || this.lockSmithLeftUses === 0) {
+      return undefined;
+    }
+
+    return closest[1];
   }
 
   getManagerType(): typeof LocksmithManager {
