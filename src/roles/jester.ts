@@ -79,7 +79,7 @@ export class Jester extends BaseRole {
       });
 
     this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, JESTER_DEAD_STRING);
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, JESTER_DEAD_STRING);
     });
   }
 

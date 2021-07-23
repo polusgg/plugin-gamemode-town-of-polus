@@ -54,7 +54,7 @@ export class Sheriff extends Impostor {
               winSound: WinSoundType.CrewmateWin,
             }])),
           intentName: "sheriffKill",
-        })
+        });
       });
 
     if (owner.getConnection() !== undefined) {

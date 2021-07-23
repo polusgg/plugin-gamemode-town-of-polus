@@ -236,8 +236,7 @@ export class Morphling extends Impostor {
     };
   }
 
-
- getDescriptionText(): string {
+  getDescriptionText(): string {
     return `<color=#a212db>Role: Morphling
 Sabotage and kill the crewmates.
 You can use your special ability to morph into someone else.</color>`;

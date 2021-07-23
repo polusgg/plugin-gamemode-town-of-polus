@@ -46,7 +46,7 @@ export class Snitch extends Crewmate {
     }
 
     this.catch("player.murdered", e => e.getPlayer()).execute(event => {
-    Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SNITCH_DEAD_STRING);
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SNITCH_DEAD_STRING);
     });
   }
 
