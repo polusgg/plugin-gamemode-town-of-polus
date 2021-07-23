@@ -19,7 +19,8 @@ export class SerialKillerManager extends BaseManager {
 }
 
 const SERIALKILLER_DEAD_STRING = `<color=#ff547c>Role: Serial Killer</color>
-<color=#ff1919>You're dead.</color>`;
+<color=#ff1919>You're dead.</color>
+Fake Tasks:`;
 
 export class SerialKiller extends Impostor {
   protected metadata: RoleMetadata = {

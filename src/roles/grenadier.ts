@@ -21,7 +21,8 @@ export class GrenadierManager extends BaseManager {
 }
 
 const GRENADIER_DEAD_STRING = `<color=#ff8000>Role: Grenadier</color>
-<color=#ff1919>You're dead.</color>`;
+<color=#ff1919>You're dead.</color>
+Fake Tasks:`;
 
 export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {

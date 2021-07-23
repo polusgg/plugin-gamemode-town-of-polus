@@ -15,7 +15,8 @@ export class JesterManager extends BaseManager {
 }
 
 const JESTER_DEAD_STRING = `<color=#ff8cee>Role: Jester</color>
-<color=#ff1919>You're dead.</color>`;
+<color=#ff1919>You're dead.</color>
+Fake Tasks:`;
 
 export class Jester extends BaseRole {
   protected metadata: RoleMetadata = {
