@@ -42,7 +42,7 @@ export class Sheriff extends Impostor {
       .execute(async event => {
         const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
 
-        endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
+        await endGame.registerEndGameIntent(event.getPlayer().getLobby().getSafeGame()!, {
           endGameData: new Map(event.getPlayer().getLobby().getPlayers()
             .map(player => [player, {
               title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
