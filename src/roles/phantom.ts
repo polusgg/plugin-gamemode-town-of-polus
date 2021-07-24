@@ -25,6 +25,12 @@ export class PhantomManager extends BaseManager {
   getTypeName(): string { return "Phantom" }
 }
 
+const CREWMATE_DEAD_STRING = `<color=#8cffff>Role: Crewmate</color>
+<color=#ff1919>You're dead, finish your tasks.</color>`;
+
+const PHANTOM_DEAD_STRING = `<color=#8cffff>Role: Phantom</color>
+<color=#ff1919>You're dead.</color>`;
+
 export class Phantom extends Crewmate {
   public state: PhantomState = PhantomState.Alive;
   protected metadata: RoleMetadata = {
@@ -62,6 +68,8 @@ export class Phantom extends Crewmate {
         if (this.state === PhantomState.Transformed) {
           console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
         }
+
+        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
 
         return;
       }
@@ -240,6 +248,7 @@ export class Phantom extends Crewmate {
       this.owner.updateGameData();
       this.button?.destroy();
       this.owner.setTasks(new Set());
+      Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
     });
     await this.button.attach(this.owner);

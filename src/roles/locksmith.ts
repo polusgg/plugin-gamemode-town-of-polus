@@ -136,9 +136,9 @@ export class Locksmith extends Crewmate {
   }
 
   async locksmithOnReady(): Promise<void> {
-    const lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png")
-    const lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png")
-    const lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png")
+    const lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
+    const lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png");
+    const lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
     const lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       alignment: EdgeAlignments.RightBottom,
       position: new Vector2(2.1, 0.7),
@@ -164,6 +164,7 @@ export class Locksmith extends Crewmate {
       const canHighlight = this.doors.filter(([pos]) => move.getNewPosition().distance(pos) < this.lockSmithRange).length > 0;
       const closestDoor = this.getClosestDoor();
       let nextAsset: Asset = lockpickNone;
+
       if (closestDoor != undefined) {
         const currentState = (this.owner.getLobby().getShipStatus()?.getShipStatus()
           .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoor);
@@ -178,7 +179,12 @@ export class Locksmith extends Crewmate {
     });
 
     lockpickButton.on("clicked", _ => {
+      if (this.owner.isDead()) {
+        return;
+      }
+
       const closestDoorId = this.getClosestDoor();
+
       if (closestDoorId === undefined || lockpickButton.getCurrentTime() !== 0) {
         return;
       }
@@ -194,7 +200,7 @@ export class Locksmith extends Crewmate {
         ?.setOldShipStatus();
 
       const doorSystem = (this.owner.getLobby().getShipStatus()?.getShipStatus()
-        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem)
+        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem);
 
       doorSystem.setDoorState(closestDoorId, !doorSystem.getDoorState(closestDoorId));
 
