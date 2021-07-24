@@ -169,7 +169,7 @@ export class Locksmith extends Crewmate {
           .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoor);
 
         lockpickButton.setSaturated(canHighlight);
-        nextAsset = currentState == true ? lockpickOpen : lockpickClose;
+        nextAsset = currentState == true ? lockpickClose : lockpickOpen;
       }
 
       if (lockpickButton.getEntity().getGraphic().getAsset() !== nextAsset.getId()) {
@@ -193,11 +193,10 @@ export class Locksmith extends Crewmate {
       this.owner.getLobby().getHostInstance().getDoorHandler()
         ?.setOldShipStatus();
 
-      const currentState = (this.owner.getLobby().getShipStatus()?.getShipStatus()
-        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoorId);
+      const doorSystem = (this.owner.getLobby().getShipStatus()?.getShipStatus()
+        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem)
 
-      (this.owner.getLobby().getShipStatus()?.getShipStatus()
-        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).setDoorState(closestDoorId, !currentState);
+      doorSystem.setDoorState(closestDoorId, !doorSystem.getDoorState(closestDoorId));
 
       this.owner.getLobby().getHostInstance().getDoorHandler()
         ?.sendDataUpdate();
