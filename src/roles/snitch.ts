@@ -6,7 +6,6 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { Vector2 } from "@nodepolus/framework/src/types";
 import { TownOfPolusGameOptions } from "../..";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { TownOfPolusGameOptionNames } from "../types";
@@ -74,7 +73,7 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero(), this.owner);
+              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), this.owner.getPosition(), this.owner);
 
               this.catch("player.died", event2 => event2.getPlayer().getLobby()).execute(event3 => {
                 if (event3.getPlayer() === this.owner || event3.getPlayer().isImpostor()) {
@@ -94,15 +93,13 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero(), player);
+              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), player.getPosition(), player);
 
               Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
 
               setTimeout(() => {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
               }, 10000);
-
-              await poi.attach(player);
 
               this.catch("player.died", event2 => event2.getPlayer().getLobby()).execute(event3 => {
                 if (event3.getPlayer() === this.owner || event3.getPlayer().isImpostor()) {
