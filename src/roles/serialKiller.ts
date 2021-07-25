@@ -12,6 +12,7 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
+import { AllowTaskInteractionPacket } from "@polusgg/plugin-polusgg-api/src/packets/root/allowTaskInteractionPacket";
 
 export class SerialKillerManager extends BaseManager {
   getId(): string { return "serial_killer" }
@@ -35,6 +36,7 @@ export class SerialKiller extends Impostor {
 
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));
     } else {
       this.onReady();
     }
