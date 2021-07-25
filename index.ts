@@ -53,7 +53,7 @@ export type TownOfPolusGameOptions = {
   /* Serial Killer */
   [TownOfPolusGameOptionNames.SerialKillerProbability]: NumberValue;
   [TownOfPolusGameOptionNames.SerialKillerCooldown]: NumberValue;
-  [TownOfPolusGameOptionNames.SerialKillerMinLobbySize]: NumberValue;
+  [TownOfPolusGameOptionNames.SerialKillerMinPlayers]: NumberValue;
 
   /* Sheriff */
   [TownOfPolusGameOptionNames.SheriffProbability]: NumberValue;
@@ -125,7 +125,7 @@ export default class extends BaseMod {
         assignWith: RoleAlignment.Neutral,
       }, {
         role: SerialKiller,
-        playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinLobbySize).getValue().value <= lobby.getPlayers().length ? this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
+        playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinPlayers).getValue().value <= lobby.getPlayers().length ? this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
         assignWith: RoleAlignment.Neutral,
       }, {
         role: Sheriff,
@@ -160,7 +160,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 1),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithCooldown, new NumberValue(10, 5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 2),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithCooldown, new NumberValue(1, 1, 1, 60, false, "{0}s"), GameOptionPriority.Normal + 2),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithUses, new NumberValue(2, 1, 1, 10, false, "{0} uses"), GameOptionPriority.Normal + 3),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 4),
 
@@ -183,7 +183,7 @@ export default class extends BaseMod {
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 17),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 18),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerMinLobbySize, new NumberValue(6, 1, 4, 15, false, "{0} players"), GameOptionPriority.Normal + 19),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerMinPlayers, new NumberValue(6, 1, 4, 15, false, "{0} players"), GameOptionPriority.Normal + 19),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 20),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 21),

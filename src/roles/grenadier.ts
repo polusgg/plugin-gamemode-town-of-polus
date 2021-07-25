@@ -20,9 +20,8 @@ export class GrenadierManager extends BaseManager {
   getTypeName(): string { return "Grenadier" }
 }
 
-const GRENADIER_DEAD_STRING = `<color=#ff8000>Role: Grenadier</color>
-<color=#ff1919>You're dead.</color>
-Fake Tasks:`;
+const GRENADIER_DEAD_STRING = `<color=#728F3D>Role: Grenadier</color>
+<color=#ff1919>You're dead.</color>`;
 
 export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {
@@ -173,12 +172,12 @@ export class Grenadier extends Impostor {
     return {
       title: "Grenadier",
       subtitle: "Use the flashbangs to blind the <color=#8CFFFFFF>crewmates</color>",
-      color: [255, 128, 0, 255],
+      color: [114, 143, 61, 255],
     };
   }
 
   getDescriptionText(): string {
-    return `<color=#ff8000>Role: Grenadier
+    return `<color=#728F3D>Role: Grenadier
 Sabotage and kill the crewmates
 Use flashbangs to blind the crewmates.</color>
 Fake Tasks:`;

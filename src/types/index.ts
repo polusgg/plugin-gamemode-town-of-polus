@@ -22,7 +22,7 @@ export enum TownOfPolusGameOptionNames {
 
   SerialKillerProbability = "<color=#ff547c>Serial Killer</color> [N]",
   SerialKillerCooldown = "<color=#ff547c>Serial Killer</color> Cooldown",
-  SerialKillerMinLobbySize = "<color=#ff547c>Serial Killer</color> Minimum Lobby Size",
+  SerialKillerMinPlayers = "<color=#ff547c>Serial Killer</color> Minimum Players",
 
   SheriffProbability = "<color=#c49645>Sheriff</color> <color=#0b6e99>[C]</color>",
   SheriffCooldown = "<color=#c49645>Sheriff</color> Cooldown",

@@ -74,7 +74,7 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero(), player);
+              const poi = await poiManager.spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/SnitchArrow.png"), Vector2.zero(), this.owner);
 
               this.catch("player.died", event2 => event2.getPlayer().getLobby()).execute(event3 => {
                 if (event3.getPlayer() === this.owner || event3.getPlayer().isImpostor()) {
@@ -94,7 +94,7 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero(), this.owner);
+              const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), Vector2.zero(), player);
 
               Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
 
