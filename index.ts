@@ -253,7 +253,7 @@ export default class extends BaseMod {
   private async handleLevelUpdate(newLevel: GameOption<NumberValue | EnumValue | BooleanValue>): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & any>(newLevel.getLobby());
 
-    if ((newLevel.getValue() as EnumValue).getSelected() === "Mira HQ") {
+    if (["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected())) {
       await gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithProbability);
       await gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, `<color=#3d85c67f>Locksmith</color> <color=#0b6e997f>[C]</color><alpha=#7f>`, new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 8);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

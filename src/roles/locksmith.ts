@@ -9,10 +9,12 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { DoorsSystem, AutoDoorsSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
+import { AutoDoorsSystem, DoorsSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
+import { AutoDoorsHandler } from "@nodepolus/framework/src/host/systemHandlers";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
 
 export class LocksmithManager extends BaseManager {
   getId(): string { return "locksmith" }
@@ -119,7 +121,7 @@ export class Locksmith extends Crewmate {
       .getValue()
       .getSelected())!;
     this.lockSmithMaxUses = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithUses).getValue();
-    this.lockSmithLeftUses = this.lockSmithMaxUses.value;
+    this.lockSmithLeftUses = this.lockSmithMaxUses.value + 100;
     this.lockSmithCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithCooldown).getValue();
 
     this.updateDescriptionText();
@@ -196,16 +198,23 @@ export class Locksmith extends Crewmate {
       }
       this.updateDescriptionText();
       lockpickButton.reset();
-      this.owner.getLobby().getHostInstance().getDoorHandler()
-        ?.setOldShipStatus();
-
       const doorSystem = (this.owner.getLobby().getShipStatus()?.getShipStatus()
         .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem);
 
-      doorSystem.setDoorState(closestDoorId, !doorSystem.getDoorState(closestDoorId));
+      if (this.owner.getLobby().getLevel() === Level.TheSkeld || this.owner.getLobby().getLevel() === Level.AprilSkeld) {
+        const doorHandler = this.owner.getLobby().getHostInstance().getDoorHandler() as AutoDoorsHandler;
 
-      this.owner.getLobby().getHostInstance().getDoorHandler()
-        ?.sendDataUpdate();
+        doorHandler.closeDoor(closestDoorId, !doorSystem.getDoorState(closestDoorId));
+        // doorHandler.setSystemTimeout(systemId, 30);
+      } else {
+        this.owner.getLobby().getHostInstance().getDoorHandler()
+          ?.setOldShipStatus();
+
+        doorSystem.setDoorState(closestDoorId, !doorSystem.getDoorState(closestDoorId));
+
+        this.owner.getLobby().getHostInstance().getDoorHandler()
+          ?.sendDataUpdate();
+      }
     });
   }
 
@@ -218,6 +227,14 @@ export class Locksmith extends Crewmate {
     }
 
     return closest[1];
+  }
+
+  onDestroy(_destroyReason: RoleDestroyedReason) {
+    super.onDestroy(_destroyReason);
+
+    if (_destroyReason !== RoleDestroyedReason.Disconnect) {
+
+    }
   }
 
   getManagerType(): typeof LocksmithManager {
