@@ -83,8 +83,6 @@ export class Phantom extends Crewmate {
       this.catch("meeting.vote.added", x => x.getVoter())
         .execute(event => event.cancel());
 
-      // todo make sure Prez finishes moving-pgg branch
-
       /*const notMurderers = event.getKiller().getLobby().getPlayers()
         .filter(p => p !== event.getKiller())
         .map(player => player.getSafeConnection());*/
