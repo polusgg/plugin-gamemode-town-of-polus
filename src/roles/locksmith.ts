@@ -14,7 +14,6 @@ import { AutoDoorsHandler } from "@nodepolus/framework/src/host/systemHandlers";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
-import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
 
 export class LocksmithManager extends BaseManager {
   getId(): string { return "locksmith" }
@@ -92,7 +91,7 @@ const DOOR_POSITIONS_BY_ID = {
     [new Vector2(10.4067, -23.12), 13],
     [new Vector2(8.431496, -27.416), 14],
   ],
-} as any as Record<Level, [Vector2, number][]>;
+} as unknown as Record<Level, [Vector2, number][]>;
 
 const LOCKSMITH_RANGE_BY_OPTION = new Map<string, number>([
   ["Short", 0.6],
@@ -198,6 +197,7 @@ export class Locksmith extends Crewmate {
       }
       this.updateDescriptionText();
       lockpickButton.reset();
+
       const doorSystem = (this.owner.getLobby().getShipStatus()?.getShipStatus()
         .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem);
 
@@ -229,13 +229,13 @@ export class Locksmith extends Crewmate {
     return closest[1];
   }
 
-  onDestroy(_destroyReason: RoleDestroyedReason) {
-    super.onDestroy(_destroyReason);
-
-    if (_destroyReason !== RoleDestroyedReason.Disconnect) {
-
-    }
-  }
+  // onDestroy(_destroyReason: RoleDestroyedReason) {
+  //   super.onDestroy(_destroyReason);
+  //
+  //   if (_destroyReason !== RoleDestroyedReason.Disconnect) {
+  //
+  //   }
+  // }
 
   getManagerType(): typeof LocksmithManager {
     return LocksmithManager;
