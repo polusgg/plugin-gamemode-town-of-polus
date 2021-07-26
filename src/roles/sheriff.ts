@@ -12,6 +12,7 @@ import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impo
 import { Mutable } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
+import { SerialKiller } from "./serialKiller";
 
 export class SheriffManager extends BaseManager {
   getId(): string { return "sheriff" }
@@ -37,7 +38,7 @@ export class Sheriff extends Impostor {
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
-        .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Neutral) && !player.isDead())
+        .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role") instanceof SerialKiller) && !player.isDead())
         .length == 0)
       .execute(async event => {
         const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
