@@ -229,9 +229,9 @@ export class Locksmith extends Crewmate {
     return closest[1];
   }
 
-  onDestroy(_destroyReason: RoleDestroyedReason): void {
-    super.onDestroy(_destroyReason);
-  }
+  // onDestroy(_destroyReason: RoleDestroyedReason): void {
+  //   super.onDestroy(_destroyReason);
+  // }
 
   getManagerType(): typeof LocksmithManager {
     return LocksmithManager;

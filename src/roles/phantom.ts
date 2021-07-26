@@ -113,30 +113,22 @@ export class Phantom extends Crewmate {
 
       this.state = PhantomState.Transformed;
 
-      async function display(this: Phantom): Promise<void> {
-        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
-        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "You've become the <color=#8cffff>Phantom</color>!");
-
-        setTimeout(() => {
-          Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "__unset");
-        }, 10000);
-      }
-
       if (this.owner.getLobby().getMeetingHud() !== undefined) {
         const watcher = this.catch("meeting.concluded", meeting => meeting.getGame());
 
         watcher.execute(_ => {
-          display.bind(this)();
+          this.display();
           watcher.destroy();
         });
       } else {
-        display.bind(this)();
+        this.display();
       }
 
       this.owner.setMeta("pgg.api.targetable", false);
       this.setAlignment(RoleAlignment.Neutral);
       this.giveTasks();
-      this.owner.revive();
+      await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
+      await this.owner.revive();
       await this.showPhantom();
     });
 
@@ -171,6 +163,15 @@ export class Phantom extends Crewmate {
           intentName: "phantomMeeting",
         });
       });
+  }
+
+  async display(): Promise<void> {
+    Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
+    await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "You've become the <color=#8cffff>Phantom</color>!");
+
+    setTimeout(() => {
+      Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "__unset");
+    }, 10000);
   }
 
   giveTasks(): void {
