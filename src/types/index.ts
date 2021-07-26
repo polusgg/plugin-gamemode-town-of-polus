@@ -1,10 +1,10 @@
 export enum TownOfPolusGameOptionNames {
-  EngineerProbability = "<color=#8e9e9d>Engineer</color> <color=#0b6e99>[C]</color>",
+  EngineerProbability = "<color=#F8BF14>Engineer</color> <color=#0b6e99>[C]</color>",
 
-  GrenadierProbability = "<color=#ff8000>Grenadier</color> <color=#e03e3e>[I]</color>",
-  GrenadierCooldown = "<color=#ff8000>Grenadier</color> Cooldown",
-  // GrenadierRange = "<color=#ff8000>Grenadier</color> Range",
-  GrenadierBlindness = "<color=#ff8000>Grenadier</color> Blindness",
+  GrenadierProbability = "<color=#728F3D>Grenadier</color> <color=#e03e3e>[I]</color>",
+  GrenadierCooldown = "<color=#728F3D>Grenadier</color> Cooldown",
+  // GrenadierRange = "<color=#728F3D>Grenadier</color> Range",
+  GrenadierBlindness = "<color=#728F3D>Grenadier</color> Blindness",
 
   JesterProbability = "<color=#ff8cee>Jester</color> [N]",
 

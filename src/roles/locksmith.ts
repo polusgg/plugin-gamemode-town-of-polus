@@ -120,7 +120,7 @@ export class Locksmith extends Crewmate {
       .getValue()
       .getSelected())!;
     this.lockSmithMaxUses = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithUses).getValue();
-    this.lockSmithLeftUses = this.lockSmithMaxUses.value + 100;
+    this.lockSmithLeftUses = this.lockSmithMaxUses.value;
     this.lockSmithCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithCooldown).getValue();
 
     this.updateDescriptionText();
@@ -229,13 +229,9 @@ export class Locksmith extends Crewmate {
     return closest[1];
   }
 
-  // onDestroy(_destroyReason: RoleDestroyedReason) {
-  //   super.onDestroy(_destroyReason);
-  //
-  //   if (_destroyReason !== RoleDestroyedReason.Disconnect) {
-  //
-  //   }
-  // }
+  onDestroy(_destroyReason: RoleDestroyedReason): void {
+    super.onDestroy(_destroyReason);
+  }
 
   getManagerType(): typeof LocksmithManager {
     return LocksmithManager;
