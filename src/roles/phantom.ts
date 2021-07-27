@@ -69,7 +69,7 @@ export class Phantom extends Crewmate {
           console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
         }
 
-        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
+        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
 
         return;
       }
@@ -235,6 +235,7 @@ export class Phantom extends Crewmate {
       alignment: EdgeAlignments.None,
       // isCountingDown: false,
       currentTime: 0,
+      attachedTo: this.owner,
     }, this.owner.getLobby().getConnections());
     this.button.on("clicked", event => {
       if (event.connection === this.owner.getSafeConnection() || event.connection.getPlayer()?.isDead()) {
@@ -250,7 +251,6 @@ export class Phantom extends Crewmate {
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
     });
-    await this.button.attach(this.owner);
   }
 
   getManagerType(): typeof BaseManager {
