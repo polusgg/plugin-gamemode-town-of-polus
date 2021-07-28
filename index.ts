@@ -21,6 +21,7 @@ import { Locksmith, LocksmithManager } from "./src/roles/locksmith";
 import { LobbyDefaultOptions } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsService";
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
+import { Swooper } from "./src/roles/swooper";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -68,6 +69,11 @@ export type TownOfPolusGameOptions = {
   [TownOfPolusGameOptionNames.LocksmithCooldown]: NumberValue;
   [TownOfPolusGameOptionNames.LocksmithUses]: NumberValue;
   [TownOfPolusGameOptionNames.LocksmithRange]: EnumValue;
+
+  /* Swooper */
+  [TownOfPolusGameOptionNames.SwooperProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.SwooperCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.SwooperAbilityDuration]: NumberValue;
 };
 
 const pluginMetadata: PluginMetadata = {
@@ -142,6 +148,10 @@ export default class extends BaseMod {
       }, {
         role: Grenadier,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierProbability).getValue().value),
+        assignWith: RoleAlignment.Impostor,
+      }, {
+        role: Swooper,
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SwooperProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
       }, {
         role: Jester,
@@ -229,6 +239,9 @@ export default class extends BaseMod {
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 24),
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 25),
 
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 24),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperCooldown, new NumberValue(25, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 25),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperAbilityDuration, new NumberValue(10, 2, 4, 30, false, "{0}s"), GameOptionPriority.Normal + 26),
     ] as any[]);
   }
 

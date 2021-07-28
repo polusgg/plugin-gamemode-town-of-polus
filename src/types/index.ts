@@ -1,6 +1,10 @@
 export enum TownOfPolusGameOptionNames {
   EngineerProbability = "<color=#F8BF14>Engineer</color> <color=#0b6e99>[C]</color>",
 
+  SwooperProbability = "<color=#969696>Swooper</color> <color=#e03e3e>[I]</color>",
+  SwooperCooldown = "<color=#969696>Swooper</color> Cooldown",
+  SwooperAbilityDuration = "<color=#969696>Swooper</color> Ability Duration",
+
   GrenadierProbability = "<color=#728F3D>Grenadier</color> <color=#e03e3e>[I]</color>",
   GrenadierCooldown = "<color=#728F3D>Grenadier</color> Cooldown",
   // GrenadierRange = "<color=#728F3D>Grenadier</color> Range",
