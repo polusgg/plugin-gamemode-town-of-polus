@@ -145,6 +145,7 @@ export class Phantom extends Crewmate {
     this.catch("meeting.ended", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
       .execute(_event => {
+        console.log(_event, this);
         this.showPhantom();
       });
 
@@ -247,7 +248,7 @@ export class Phantom extends Crewmate {
       this.owner.getGameDataEntry().setDead(true);
       this.owner.updateGameData();
       this.button?.destroy();
-      this.owner.setTasks(new Set());
+      // this.owner.setTasks(new Set());
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
     });

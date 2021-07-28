@@ -53,7 +53,7 @@ export class Snitch extends Crewmate {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
     const poiManager = Services.get(ServiceType.PointOfInterestManager);
 
-    this.catch("player.task.completed", event => event.getPlayer()).execute(event => {
+    this.catch("player.task.completed", event => event.getPlayer()).where(p => !p.getPlayer().isDead()).execute(event => {
       const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
 
       console.log("task left count", taskLeftCount);
