@@ -15,7 +15,7 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { PoisonerRange } from "../types/enums/poisonerRange";
 import { Palette } from "@nodepolus/framework/src/static";
 
-const COLOR = "#1b963c";
+const COLOR = "#a000fc";
 
 export class PoisonerManager extends BaseManager {
   getId(): string { return "poisoner" }
@@ -186,14 +186,14 @@ export class Poisoner extends Impostor {
     return {
       title: "Poisoner",
       subtitle: `Poison all crewmates to win`,
-      color: [27, 150, 60, 255],
+      color: [160, 0, 252, 255],
     };
   }
 
   getPoisonedText(baseText: string, time: number): string {
-    return `${baseText}
-<color=#1b963c>You have been poisoned and will die in ${time} seconds.
-You can’t call a meeting or report bodies.</color>`;
+    return `${baseText.replace("Fake Tasks:", "")}
+<color=${COLOR}>You have been poisoned and will die in ${time} seconds.
+You can’t call a meeting or report bodies.</color>${baseText.includes("Fake Tasks:") ? "Fake Tasks:\n" : ""}`;
   }
 
   getDescriptionText(): string {
