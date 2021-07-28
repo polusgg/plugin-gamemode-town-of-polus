@@ -56,8 +56,6 @@ export class Snitch extends Crewmate {
     this.catch("player.task.completed", event => event.getPlayer()).where(p => !p.getPlayer().isDead()).execute(event => {
       const taskLeftCount = event.getPlayer().getTasks().filter(task => !task[1]).length;
 
-      console.log("task left count", taskLeftCount);
-
       const remainingTasks = gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks).getValue().value;
 
       if (taskLeftCount <= remainingTasks && taskLeftCount !== 0) {
@@ -69,7 +67,6 @@ export class Snitch extends Crewmate {
       }
 
       if (taskLeftCount == remainingTasks && !this.owner.isDead()) {
-        console.log("remaining tasks == task left count");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
@@ -89,7 +86,6 @@ export class Snitch extends Crewmate {
             }
           });
       } else if (taskLeftCount == 0 && !this.owner.isDead()) {
-        console.log("task left count is 0");
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {

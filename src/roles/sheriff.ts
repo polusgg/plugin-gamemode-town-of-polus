@@ -85,9 +85,6 @@ export class Sheriff extends Impostor {
       this.setOnClicked(async target => {
         this.owner.murder(target);
 
-        console.log(this.owner.getName(), "Murdered", target.getName());
-        console.log(target.getMeta<BaseRole | undefined>("pgg.api.role"));
-
         if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate || (target.getMeta<BaseRole | undefined>("pgg.api.role") === undefined && !target.isImpostor())) {
           await this.owner.murder(this.owner);
 
@@ -105,8 +102,6 @@ export class Sheriff extends Impostor {
                   winSound: WinSoundType.ImpostorWin,
                 }])),
             });
-          } else {
-            console.log("GAME SHOULD NOT BE ENDED???");
           }
         }
       });

@@ -145,7 +145,6 @@ export class Phantom extends Crewmate {
     this.catch("meeting.ended", event => event.getGame())
       .where(() => this.state === PhantomState.Transformed)
       .execute(_event => {
-        console.log(_event, this);
         this.showPhantom();
       });
 

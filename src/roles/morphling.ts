@@ -203,7 +203,6 @@ export class Morphling extends Impostor {
 
     while (true) {
       if (player.isDead()) {
-        console.log("saturation broke out");
         break;
       }
 
@@ -217,7 +216,6 @@ export class Morphling extends Impostor {
       const isSaturated = button.isSaturated();
 
       if ((target === undefined) === isSaturated) {
-        console.log("saturation updated", !isSaturated);
         button.setSaturated(!isSaturated);
       }
       yield;

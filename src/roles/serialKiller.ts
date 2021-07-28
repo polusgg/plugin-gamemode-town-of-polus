@@ -118,10 +118,7 @@ Fake Tasks:`;
 
     const endGame = Services.get(ServiceType.EndGame);
 
-    console.log("sussy criteria cereal killer");
-
     if (player === this.owner) {
-      console.log("excluded?????");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
@@ -131,8 +128,6 @@ Fake Tasks:`;
 
       return;
     }
-
-    console.log("serial killer didn't disappear");
 
     if (lobby.getPlayers()
       .filter(player2 => !player2.isDead() && player2 !== this.owner && !player2.getGameDataEntry().isDisconnected()).length <= 0) {
