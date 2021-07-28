@@ -198,6 +198,7 @@ You can’t call a meeting or report bodies.</color>`;
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Poisoner
-Sabotage and poison the crewmates</color>`;
+Sabotage and poison the crewmates</color>
+Fake Tasks:`;
   }
 }

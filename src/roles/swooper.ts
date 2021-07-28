@@ -149,6 +149,7 @@ export class Swooper extends Impostor {
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Swooper
-Swoop</color>`;
+Swoop</color>
+Fake Tasks:`;
   }
 }
