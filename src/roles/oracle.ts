@@ -1,19 +1,20 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { TownOfPolusGameOptions } from "../..";
+import { getAlignmentSpriteForRole, resolveOptionPercent, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Player } from "@nodepolus/framework/src/player";
 import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
 import { GameState } from "@nodepolus/framework/src/types/enums";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 
 export class OracleManager extends BaseManager {
   getId(): string { return "oracle" }
@@ -39,7 +40,7 @@ export class Oracle extends Crewmate {
       this.onReady();
     }
 
-    this.catch("player.murdered", e => e.getPlayer()).execute(event => {
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, ORACLE_DEAD_STRING);
     });
   }
@@ -129,7 +130,22 @@ export class Oracle extends Crewmate {
 
       // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
       if (this.owner.isDead() && !this.enchanted.isDead()) {
-        // Display role alignment //
+        const realAlignment = getAlignmentSpriteForRole(this.enchanted.getMeta<BaseRole>("pgg.api.role"));
+        const displayCorrectly = resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value);
+
+        if (displayCorrectly === 1) {
+          Services.get(ServiceType.Name).set(this.enchanted, `${realAlignment} ${this.enchanted.getName().toString()}`);
+        } else {
+          let possibilities = [
+            EmojiService.static("crewalign"),
+            EmojiService.static("neutalign"),
+            EmojiService.static("impoalign"),
+          ];
+
+          possibilities = possibilities.filter(p => p !== realAlignment);
+
+          Services.get(ServiceType.Name).set(this.enchanted, `${Math.random() > 0.5 ? possibilities[1] : possibilities[0]} ${this.enchanted.getName().toString()}`);
+        }
       }
     });
   }

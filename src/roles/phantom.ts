@@ -63,13 +63,15 @@ export class Phantom extends Crewmate {
   onReady(): void {
     const endGame = Services.get(ServiceType.EndGame);
 
+    this.catch("player.died", e => e.getPlayer()).execute(_event => {
+      Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
+    });
+
     this.catch("player.murdered", x => x.getPlayer()).execute(async _event => {
       if (this.state !== PhantomState.Alive) {
         if (this.state === PhantomState.Transformed) {
           console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
         }
-
-        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
 
         return;
       }
