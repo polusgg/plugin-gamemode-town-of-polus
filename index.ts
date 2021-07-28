@@ -2,25 +2,25 @@ import { RoleAssignmentData } from "@polusgg/plugin-polusgg-api/src/services/rol
 import { BaseMod } from "@polusgg/plugin-polusgg-api/src/baseMod/baseMod";
 import { PluginMetadata } from "@nodepolus/framework/src/api/plugin";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import { Jester } from "./src/roles/jester";
-import { Sheriff } from "./src/roles/sheriff";
-import { Snitch } from "./src/roles/snitch";
+import { Jester, JesterManager } from "./src/roles/jester";
+import { Sheriff, SheriffManager } from "./src/roles/sheriff";
+import { Snitch, SnitchManager } from "./src/roles/snitch";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { Engineer } from "./src/roles/engineer";
-import { Grenadier } from "./src/roles/grenadier";
-// import { Morphling } from "./src/roles/morphling";
-import { Oracle } from "./src/roles/oracle";
-import { Phantom } from "./src/roles/phantom";
-import { SerialKiller } from "./src/roles/serialKiller";
+import { Engineer, EngineerManager } from "./src/roles/engineer";
+import { Grenadier, GrenadierManager } from "./src/roles/grenadier";
+import { Oracle, OracleManager } from "./src/roles/oracle";
+import { Phantom, PhantomManager } from "./src/roles/phantom";
+import { SerialKiller, SerialKillerManager } from "./src/roles/serialKiller";
 import { BooleanValue, EnumValue, NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
-import { RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { BaseRole, RoleAlignment } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { TownOfPolusGameOptionCategories, TownOfPolusGameOptionNames } from "./src/types";
 import { GameOptionPriority } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsSet";
-import { Locksmith } from "./src/roles/locksmith";
+import { Locksmith, LocksmithManager } from "./src/roles/locksmith";
 import { LobbyDefaultOptions } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsService";
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
+import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -84,6 +84,42 @@ const pluginMetadata: PluginMetadata = {
   website: "https://polus.gg",
 };
 
+const roleEmojis = new Map([
+  [EngineerManager, EmojiService.static("engineer")],
+  [GrenadierManager, EmojiService.static("grenadier")],
+  [JesterManager, EmojiService.static("jester")],
+  [LocksmithManager, EmojiService.static("locksmith")],
+  [OracleManager, EmojiService.static("oracle")],
+  [PhantomManager, EmojiService.static("phantom")],
+  [SerialKillerManager, EmojiService.static("serialkiller")],
+  [SheriffManager, EmojiService.static("sheriff")],
+  [SnitchManager, EmojiService.static("snitch")],
+]);
+
+const alignmentEmojis = new Map([
+  [RoleAlignment.Crewmate, EmojiService.static("crewalign")],
+  [RoleAlignment.Impostor, EmojiService.static("impoalign")],
+  [RoleAlignment.Neutral, EmojiService.static("neutalign")],
+  [RoleAlignment.Other, EmojiService.static("neutalign")],
+]);
+
+export function getSpriteForRole(role: BaseRole): string {
+  return roleEmojis.get(role.getManagerType()) ?? "";
+}
+
+export function getAlignmentSpriteForRole(role: BaseRole): string {
+  return alignmentEmojis.get(role.getAlignment()) ?? "";
+}
+
+export function resolveOptionPercent(percent: number): number {
+  // example input: 230%
+  // split the 230% into 2 + (30%)
+  // floor p/100 = 2
+  // (mod p, 100) / 100 to get 0.3
+  // if Math.random <= 0.3 = 1 : 0
+  return Math.floor(percent / 100) + (Math.random() < ((percent % 100) / 100) ? 1 : 0);
+}
+
 export default class extends BaseMod {
   constructor() {
     super(pluginMetadata);
@@ -101,45 +137,45 @@ export default class extends BaseMod {
     return [
       {
         role: Engineer,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.EngineerProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.EngineerProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Grenadier,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
       }, {
         role: Jester,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       // }, {
       //   role: Morphling,
-      //   playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
+      //   playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
       //   assignWith: RoleAlignment.Impostor,
       }, {
         role: Oracle,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Phantom,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PhantomProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PhantomProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       }, {
         role: SerialKiller,
-        playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinPlayers).getValue().value <= lobby.getPlayers().length ? this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
+        playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinPlayers).getValue().value <= lobby.getPlayers().length ? resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
         assignWith: RoleAlignment.Neutral,
       }, {
         role: Sheriff,
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffProbability).getValue().value),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Snitch,
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SnitchProbability)?.getValue()?.value ?? 0),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SnitchProbability)?.getValue()?.value ?? 0),
         assignWith: RoleAlignment.Crewmate,
       }, {
         role: Locksmith,
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        playerCount: this.resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability)?.getValue()?.value ?? 0),
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability)?.getValue()?.value ?? 0),
         assignWith: RoleAlignment.Crewmate,
       },
     ];
@@ -190,8 +226,8 @@ export default class extends BaseMod {
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 22),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 23),
 
-      // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%")),
-      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s")),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 24),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 25),
 
     ] as any[]);
   }
@@ -261,14 +297,5 @@ export default class extends BaseMod {
       await gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <color=#0b6e997f>[C]</color><alpha=#7f>`);
       await gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 8);
     }
-  }
-
-  private resolveOptionPercent(percent: number): number {
-    // example input: 230%
-    // split the 230% into 2 + (30%)
-    // floor p/100 = 2
-    // (mod p, 100) / 100 to get 0.3
-    // if Math.random <= 0.3 = 1 : 0
-    return Math.floor(percent / 100) + (Math.random() < ((percent % 100) / 100) ? 1 : 0);
   }
 }
