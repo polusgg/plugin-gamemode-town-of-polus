@@ -132,7 +132,7 @@ export class Swooper extends Impostor {
       }),
     ], false);
 
-    this.owner.setMeta("pgg.api.targetable", false);
+    this.owner.setMeta("pgg.api.targetable", true);
   }
 
   getManagerType(): typeof BaseManager {
