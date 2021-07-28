@@ -22,6 +22,7 @@ import { LobbyDefaultOptions } from "@polusgg/plugin-polusgg-api/src/services/ga
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 import { Swooper } from "./src/roles/swooper";
+import { Poisoner } from "./src/roles/poisoner";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -74,6 +75,13 @@ export type TownOfPolusGameOptions = {
   [TownOfPolusGameOptionNames.SwooperProbability]: NumberValue;
   [TownOfPolusGameOptionNames.SwooperCooldown]: NumberValue;
   [TownOfPolusGameOptionNames.SwooperAbilityDuration]: NumberValue;
+
+  /* Poisoner */
+  [TownOfPolusGameOptionNames.PoisonerProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.PoisonerCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.PoisonerRange]: EnumValue;
+  // [TownOfPolusGameOptionNames.PoisonerTargets]: BooleanValue;
+  [TownOfPolusGameOptionNames.PoisonerPoisonDuration]: NumberValue;
 };
 
 const pluginMetadata: PluginMetadata = {
@@ -152,6 +160,10 @@ export default class extends BaseMod {
       }, {
         role: Swooper,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SwooperProbability).getValue().value),
+        assignWith: RoleAlignment.Impostor,
+      }, {
+        role: Poisoner,
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
       }, {
         role: Jester,
@@ -239,9 +251,15 @@ export default class extends BaseMod {
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 24),
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 1, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 25),
 
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 24),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperCooldown, new NumberValue(25, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 25),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperAbilityDuration, new NumberValue(10, 2, 4, 30, false, "{0}s"), GameOptionPriority.Normal + 26),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 26),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperCooldown, new NumberValue(25, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 27),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperAbilityDuration, new NumberValue(10, 2, 4, 30, false, "{0}s"), GameOptionPriority.Normal + 28),
+
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Roles, TownOfPolusGameOptionNames.PoisonerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 29),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerCooldown, new NumberValue(25, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 30),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerPoisonDuration, new NumberValue(15, 5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 30),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerRange, new EnumValue(1, ["Really Short", "Short", "Normal", "Long"]), GameOptionPriority.Normal + 31),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerTargets, new BooleanValue(false), GameOptionPriority.Normal + 32),
     ] as any[]);
   }
 
