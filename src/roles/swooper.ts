@@ -50,7 +50,7 @@ export class Swooper extends Impostor {
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
 
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Swoop.png"),
       maxTimer: cooldown,
       position: new Vector2(2.1, 2.0),
       alignment: EdgeAlignments.RightBottom,
