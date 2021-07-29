@@ -96,7 +96,7 @@ export class Sheriff extends Impostor {
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-                  subtitle: player === this.owner ? `You misfired!` : `The <color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=#C49645FF>Sheriff</color> misfire`,
+                  subtitle: player === this.owner ? `You misfired!` : `The <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=#C49645FF>Sheriff</color> misfire`,
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
