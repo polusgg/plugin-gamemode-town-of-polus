@@ -85,7 +85,7 @@ export class Sheriff extends Impostor {
       this.setOnClicked(async target => {
         await this.owner.murder(target);
 
-        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate || (target.getMeta<BaseRole | undefined>("pgg.api.role") === undefined && !target.isImpostor())) {
+        if (!target.isImpostor()) {
           await this.owner.murder(this.owner);
 
           if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
