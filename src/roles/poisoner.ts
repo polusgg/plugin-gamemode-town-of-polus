@@ -191,9 +191,9 @@ export class Poisoner extends Impostor {
   }
 
   getPoisonedText(baseText: string, time: number): string {
-    return `${baseText.replace("Fake Tasks:", "")}
+    return `${baseText.replace("\nFake Tasks:", "")}
 <color=${COLOR}>You have been poisoned and will die in ${time} seconds.
-You can’t call a meeting or report bodies.</color>${baseText.includes("Fake Tasks:") ? "Fake Tasks:\n" : ""}`;
+You can’t call a meeting or report bodies.</color>${baseText.includes("Fake Tasks:") ? "\nFake Tasks:" : ""}`;
   }
 
   getDescriptionText(): string {
