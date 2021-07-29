@@ -83,7 +83,7 @@ export class Sheriff extends Impostor {
       button.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value);
 
       this.setOnClicked(async target => {
-        this.owner.murder(target);
+        await this.owner.murder(target);
 
         if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate || (target.getMeta<BaseRole | undefined>("pgg.api.role") === undefined && !target.isImpostor())) {
           await this.owner.murder(this.owner);
@@ -91,12 +91,12 @@ export class Sheriff extends Impostor {
           if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
             const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
 
-            Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
+            await Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
               intentName: "impostorKill",
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-                  subtitle: player === this.owner ? `You misfired!` : `The <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=#C49645FF>Sheriff</color> misfire`,
+                  subtitle: player === this.owner ? `You misfired!` : `<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=#C49645FF>Sheriff</color> misfire`,
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
