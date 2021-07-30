@@ -1,7 +1,7 @@
 export enum TownOfPolusGameOptionNames {
   EngineerProbability = "<size=150%><sprite index=7></size> <color=#F8BF14>Engineer</color>",
 
-  SwooperProbability = "<size=150%></size> <color=#969696>Swooper</color>",
+  SwooperProbability = "<size=150%><sprite index=15></size> <color=#969696>Swooper</color>",
   SwooperCooldown = "<color=#969696>Swooper</color> Cooldown",
   SwooperAbilityDuration = "<color=#969696>Swooper</color> Ability Duration",
 

@@ -14,6 +14,7 @@ import { AutoDoorsHandler } from "@nodepolus/framework/src/host/systemHandlers";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 
 export class LocksmithManager extends BaseManager {
   getId(): string { return "locksmith" }
@@ -105,6 +106,11 @@ export class Locksmith extends Crewmate {
     alignment: RoleAlignment.Crewmate,
   };
 
+  private lockpickOpen!: Asset;
+  private lockpickClose!: Asset;
+  private lockpickNone!: Asset;
+  private lockpickButton!: Button;
+
   private readonly lockSmithRange: number;
   private readonly lockSmithMaxUses: NumberValue;
   private lockSmithLeftUses: number;
@@ -133,70 +139,78 @@ export class Locksmith extends Crewmate {
 
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, LOCKSMITH_DEAD_STRING);
+      this.lockpickButton.setSaturated(false);
+      this.lockpickButton.setAsset(this.lockpickNone);
     });
   }
 
+  updateButton(position: Vector2 = this.owner.getPosition()): void {
+    if (this.lockSmithLeftUses === 0 || this.owner.isDead()) {
+      return;
+    }
+
+    const canHighlight = this.doors.filter(([pos]) => position.distance(pos) < this.lockSmithRange).length > 0;
+    const closestDoor = this.getClosestDoor();
+    let nextAsset: Asset = this.lockpickNone;
+
+    if (closestDoor != undefined) {
+      const currentState = (this.owner.getLobby().getShipStatus()?.getShipStatus()
+        .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoor);
+
+      this.lockpickButton.setSaturated(canHighlight);
+      nextAsset = currentState == true ? this.lockpickClose : this.lockpickOpen;
+    }
+
+    if (this.lockpickButton.getEntity().getGraphic().getAsset() !== nextAsset.getId()) {
+      this.lockpickButton.setAsset(nextAsset);
+    }
+  }
+
   async locksmithOnReady(): Promise<void> {
-    const lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
-    const lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png");
-    const lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
-    const lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+    this.lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
+    this.lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png");
+    this.lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
+    this.lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       alignment: EdgeAlignments.RightBottom,
       position: new Vector2(2.1, 0.7),
       currentTime: 0,
       maxTimer: this.lockSmithCooldown.value,
       isCountingDown: false,
       saturated: false,
-      asset: lockpickNone,
+      asset: this.lockpickNone,
     });
 
     this.doors = DOOR_POSITIONS_BY_ID[this.owner.getLobby().getLevel()];
 
     this.catch("meeting.ended", event => event.getGame())
       .execute(() => {
-        lockpickButton.setCurrentTime(0);
+        this.lockpickButton.setCurrentTime(0);
       });
 
     this.catch("player.position.updated", p => p.getPlayer()).execute(move => {
-      if (this.lockSmithLeftUses === 0) {
-        return;
-      }
-
-      const canHighlight = this.doors.filter(([pos]) => move.getNewPosition().distance(pos) < this.lockSmithRange).length > 0;
-      const closestDoor = this.getClosestDoor();
-      let nextAsset: Asset = lockpickNone;
-
-      if (closestDoor != undefined) {
-        const currentState = (this.owner.getLobby().getShipStatus()?.getShipStatus()
-          .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem).getDoorState(closestDoor);
-
-        lockpickButton.setSaturated(canHighlight);
-        nextAsset = currentState == true ? lockpickClose : lockpickOpen;
-      }
-
-      if (lockpickButton.getEntity().getGraphic().getAsset() !== nextAsset.getId()) {
-        lockpickButton.setAsset(nextAsset);
-      }
+      this.updateButton(move.getNewPosition());
     });
 
-    lockpickButton.on("clicked", _ => {
+    this.catch("room.doors.closed", e => e.getGame()).execute(() => { this.updateButton() });
+
+    this.lockpickButton.on("clicked", _ => {
       if (this.owner.isDead()) {
         return;
       }
 
       const closestDoorId = this.getClosestDoor();
 
-      if (closestDoorId === undefined || lockpickButton.getCurrentTime() !== 0) {
+      if (closestDoorId === undefined || this.lockpickButton.getCurrentTime() !== 0) {
         return;
       }
 
       this.lockSmithLeftUses -= 1;
 
       if (this.lockSmithLeftUses === 0) {
-        lockpickButton.destroy();
+        this.lockpickButton.destroy();
       }
       this.updateDescriptionText();
-      lockpickButton.reset();
+      this.lockpickButton.reset();
 
       const doorSystem = (this.owner.getLobby().getShipStatus()?.getShipStatus()
         .getSystemFromType(SystemType.Doors) as DoorsSystem | AutoDoorsSystem);
@@ -215,6 +229,8 @@ export class Locksmith extends Crewmate {
         this.owner.getLobby().getHostInstance().getDoorHandler()
           ?.sendDataUpdate();
       }
+
+      this.updateButton();
     });
   }
 

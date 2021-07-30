@@ -19,6 +19,7 @@ import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { Player } from "@nodepolus/framework/src/player";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
+import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -75,6 +76,10 @@ export class Phantom extends Crewmate {
 
         return;
       }
+
+      Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "impostorVote" });
+      Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "crewmateVote" });
+      Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.ReportButton, false);
 
       this.catch("player.task.completed", x => x.getPlayer()).execute(async event => {
         if (event.getPlayer().getGameDataEntry().isDoneWithTasks()) {
@@ -244,6 +249,9 @@ export class Phantom extends Crewmate {
         return;
       }
 
+      Services.get(ServiceType.EndGame).unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
+      Services.get(ServiceType.EndGame).unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
+
       this.state = PhantomState.Caught;
       this.owner.kill();
       this.owner.getGameDataEntry().setDead(true);
@@ -252,6 +260,8 @@ export class Phantom extends Crewmate {
       // this.owner.setTasks(new Set());
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
+
+      Services.get(ServiceType.EndGame).recalculateEndGame(this.owner.getLobby().getSafeGame());
     });
   }
 

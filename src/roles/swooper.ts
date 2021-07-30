@@ -79,7 +79,7 @@ export class Swooper extends Impostor {
 
         await button.reset();
         await button.setSaturated(false);
-        await button.setCurrentTime(0);
+        await button.setCurrentTime(duration);
         await this.swoop();
         await hudManager.setHudString(this.owner, Location.RoomTracker, `You are <color=${COLOR}>invisible</color> for next ${duration - timeElapsed} second${(duration - timeElapsed) === 1 ? "" : "s"}`);
         timeElapsed += 1;
