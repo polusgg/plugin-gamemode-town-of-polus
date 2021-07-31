@@ -89,6 +89,7 @@ export class Poisoner extends Impostor {
         timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
             await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
+            hudManager.closeHud(target);
             target.kill();
             target.getGameDataEntry().setDead(true);
             target.updateGameData();
