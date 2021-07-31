@@ -42,7 +42,7 @@ class PlayerAppearance {
   }
 
   apply(player: PlayerInstance): void {
-    player.setName(this.name);
+    Services.get(ServiceType.Name).set(player, this.name.toString());
     player.setHat(this.hat);
     player.setPet(this.pet);
     player.setSkin(this.skin);
@@ -81,7 +81,7 @@ export class Morphling extends Impostor {
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
-      position: new Vector2(2.1, 2.1),
+      position: new Vector2(2.1, 2.0),
       alignment: EdgeAlignments.RightBottom,
     });
 
@@ -115,7 +115,7 @@ export class Morphling extends Impostor {
         if (target !== undefined) {
           await Promise.allSettled(
             [
-              this.morphButton.setColor([162, 18, 219, 0x7F]),
+              this.morphButton.setColor(Palette.playerBody()[target.getColor()].dark as any),
               this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png")),
               this.morphButton.setCurrentTime(5),
             ],
@@ -123,7 +123,7 @@ export class Morphling extends Impostor {
           this.targetAppearance = PlayerAppearance.save(target);
         }
       } else {
-        await this.morphButton.reset(true);
+        await this.morphButton.setSaturated(false);
         this.transformed = true;
         await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
           new PlayerAnimationKeyframe({
@@ -149,8 +149,8 @@ export class Morphling extends Impostor {
             hatOpacity: 1,
             petOpacity: 1,
             skinOpacity: 1,
-            primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-            secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+            primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+            secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
           }),
         ], false);
 
@@ -176,11 +176,12 @@ export class Morphling extends Impostor {
               opacity: 1,
               position: Vector2.zero(),
               scale: Vector2.one(),
-              primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-              secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+              primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
+              secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
             }),
           ], false);
           this.transformed = false;
+          await this.morphButton?.reset();
         }, 5000);
       }
     });

@@ -6,7 +6,7 @@ import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impo
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { ServiceType, Location } from "@polusgg/plugin-polusgg-api/src/types/enums";
 
 export class MarkerManager extends BaseManager {
   getId(): string { return "marker" }

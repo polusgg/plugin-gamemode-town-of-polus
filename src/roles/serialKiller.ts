@@ -137,7 +137,7 @@ Fake Tasks:`;
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {
             title: player2 === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-            subtitle: player2 === this.owner ? "You murdered everyone" : "The <color=${COLOR}>Serial Killer</color> murdered everyone",
+            subtitle: player2 === this.owner ? "You murdered everyone" : `The <color=${COLOR}>Serial Killer</color> murdered everyone`,
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
             winSound: WinSoundType.ImpostorWin,

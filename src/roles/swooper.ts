@@ -46,7 +46,6 @@ export class Swooper extends Impostor {
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SWOOPER_DEAD_STRING);
     });
-
   }
 
   async onReady(): Promise<void> {

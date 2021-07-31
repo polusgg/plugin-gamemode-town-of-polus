@@ -14,6 +14,9 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
+import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
+import { Palette } from "@nodepolus/framework/src/static";
 
 export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
@@ -115,6 +118,20 @@ export class Grenadier extends Impostor {
                 position: Vector2.zero(),
               }),
             ]);
+
+          Services.get(ServiceType.Animation)
+            .beginPlayerAnimation(player, [PlayerAnimationField.TertiaryColor], [
+              new PlayerAnimationKeyframe({
+                tertiaryColor: [255, 255, 255, 255],
+                duration: 150,
+                offset: 0,
+              }),
+              new PlayerAnimationKeyframe({
+                tertiaryColor: Palette.playerVisor() as any,
+                duration: 300,
+                offset: 150 + (1000 * blindness.value),
+              }),
+            ], true);
         });
       });
     });
