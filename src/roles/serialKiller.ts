@@ -130,7 +130,7 @@ Fake Tasks:`;
     }
 
     if (lobby.getPlayers()
-      .filter(player2 => !player2.isDead() && player2 !== this.owner && !player2.getGameDataEntry().isDisconnected()).length <= 0) {
+      .filter(player2 => !player2.isDead() && !(player2.getMeta<boolean | undefined>("pgg.countAsDead") ?? false) && player2 !== this.owner && !player2.getGameDataEntry().isDisconnected()).length <= 0) {
       endGame.registerEndGameIntent(lobby.getSafeGame()!, {
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {

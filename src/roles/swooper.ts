@@ -14,6 +14,7 @@ import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/play
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
+import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
 const COLOR = "#969696";
 
@@ -48,6 +49,8 @@ export class Swooper extends Impostor {
     let timer: NodeJS.Timeout;
 
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
+
+    Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.VentButton, false);
 
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Swoop.png"),
