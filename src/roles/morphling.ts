@@ -3,7 +3,7 @@ import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/ro
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
 import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
-import { ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
@@ -21,6 +21,12 @@ export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
   getTypeName(): string { return "Morphling" }
 }
+
+const COLOR = "#a212db";
+
+const MORPHLING_DEAD_STRING = `<color=${COLOR}>Role: Morphling</color>
+<color=#ff1919>You're dead.</color>
+Fake Task:`;
 
 class PlayerAppearance {
   constructor(
@@ -71,6 +77,10 @@ export class Morphling extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, MORPHLING_DEAD_STRING);
+    });
   }
 
   async onReady(): Promise<void> {
@@ -236,8 +246,9 @@ export class Morphling extends Impostor {
   }
 
   getDescriptionText(): string {
-    return `<color=#a212db>Role: Morphling
+    return `<color=${COLOR}>Role: Morphling
 Sabotage and kill the crewmates.
-You can use your special ability to morph into someone else.</color>`;
+You have the ability to morph\ninto someone else.</color>
+Fake Tasks:`;
   }
 }
