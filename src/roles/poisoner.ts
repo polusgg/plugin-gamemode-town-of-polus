@@ -44,6 +44,12 @@ export class Poisoner extends Impostor {
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, POISONER_DEAD_STRING);
     });
+
+    this.catch("meeting.started", e => e.getCaller().getLobby()).execute(event => {
+      if (event.getCaller().getMeta<boolean>("pgg.top.isPoisoned")) {
+        event.cancel();
+      }
+    });
   }
 
   async onReady(): Promise<void> {
@@ -85,11 +91,13 @@ export class Poisoner extends Impostor {
         await button.reset();
         await button.setCurrentTime(button.getMaxTime());
         hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
+        target.setMeta("pgg.top.isPoisoned", true);
 
         timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
             await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
             hudManager.closeHud(target);
+            target.setMeta("pgg.top.isPoisoned", false);
             target.kill();
             target.getGameDataEntry().setDead(true);
             target.updateGameData();
