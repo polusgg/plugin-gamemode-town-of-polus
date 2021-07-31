@@ -16,6 +16,7 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
+import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -85,6 +86,8 @@ export class Morphling extends Impostor {
 
   async onReady(): Promise<void> {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+
+    Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.VentButton, false);
 
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
