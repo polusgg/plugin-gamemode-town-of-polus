@@ -77,8 +77,6 @@ export class Poisoner extends Impostor {
 
       this.catch("player.died", e => e.getPlayer()).execute(() => button.destroy());
 
-      this.catch("meeting.ended", e => e.getGame()).execute(() => button.destroy());
-
       button.on("clicked", async () => {
         const target = button.getTargets(range)
           .filter(x => !x.isImpostor() && !x.isDead() && !x.getMeta<boolean>("pgg.top.isPoisoned"))[0] as PlayerInstance | undefined;
