@@ -20,8 +20,11 @@ export class GrenadierManager extends BaseManager {
   getTypeName(): string { return "Grenadier" }
 }
 
-const GRENADIER_DEAD_STRING = `<color=#728F3D>Role: Grenadier</color>
-<color=#ff1919>You're dead.</color>`;
+const COLOR = "#728F3D";
+
+const GRENADIER_DEAD_STRING = `<color=${COLOR}>Role: Grenadier</color>
+<color=#ff1919>You're dead.</color>
+Fake Task:`;
 
 export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {
@@ -171,14 +174,14 @@ export class Grenadier extends Impostor {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Grenadier",
-      subtitle: "Use the flashbangs to blind the <color=#8CFFFFFF>crewmates</color>",
+      subtitle: "Use the flashbangs to blind the <color=#8CFFFFFF>Crewmates</color>",
       color: [114, 143, 61, 255],
     };
   }
 
   getDescriptionText(): string {
-    return `<color=#728F3D>Role: Grenadier
-Sabotage and kill the crewmates
+    return `<color=${COLOR}>Role: Grenadier
+Sabotage and kill the crewmates.
 Use flashbangs to blind the crewmates.</color>
 Fake Tasks:`;
   }

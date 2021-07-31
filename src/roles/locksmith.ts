@@ -21,7 +21,9 @@ export class LocksmithManager extends BaseManager {
   getTypeName(): string { return "Locksmith" }
 }
 
-const LOCKSMITH_DEAD_STRING = `<color=#3d85c6>Role: Locksmith</color>
+const COLOR = "#3d85c6";
+
+const LOCKSMITH_DEAD_STRING = `<color=${COLOR}>Role: Locksmith</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 const DOOR_POSITIONS_BY_ID = {
@@ -264,12 +266,12 @@ export class Locksmith extends Crewmate {
   }
 
   getDescriptionText(): string {
-    return `<color=#3d85c6>Role: Locksmith
+    return `<color=${COLOR}>Role: Locksmith
 Finish your tasks and open/close doors.</color>`;
   }
 
   updateDescriptionText(): void {
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, `${this.getDescriptionText()}
-<color=#3d85c6>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses > 1 ? "s" : ""} left.</color>`);
+<color=${COLOR}>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses > 1 ? "s" : ""} left.</color>`);
   }
 }

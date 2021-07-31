@@ -19,7 +19,9 @@ export class SheriffManager extends BaseManager {
   getTypeName(): string { return "Sheriff" }
 }
 
-const SHERIFF_DEAD_STRING = `<color=#c49645>Role: Sheriff</color>
+const COLOR = "#c49645";
+
+const SHERIFF_DEAD_STRING = `<color=${COLOR}>Role: Sheriff</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 // todo not duplicate code for crewmate wins on sheriff!!!!
@@ -49,7 +51,7 @@ export class Sheriff extends Impostor {
               .map(player => [player, {
                 title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
                 // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
-                subtitle: player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}` : `<color=#C49645FF>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
+                subtitle: player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}` : `<color=${COLOR}>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
                 color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
                 yourTeam: event.getPlayer().getLobby().getPlayers()
                   .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
@@ -96,7 +98,7 @@ export class Sheriff extends Impostor {
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-                  subtitle: player === this.owner ? `You misfired!` : `<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=#C49645FF>Sheriff</color> misfire`,
+                  subtitle: player === this.owner ? `You misfired!` : `<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color> won by <color=${COLOR}>Sheriff</color> misfire`,
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
@@ -117,13 +119,13 @@ export class Sheriff extends Impostor {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Sheriff",
-      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color>`,
+      subtitle: `Shoot the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>Impostor${(impostorCount != 1 ? "s" : "")}</color>`,
       color: [196, 150, 69, 255],
     };
   }
 
   getDescriptionText(): string {
-    return `<color=#c49645>Role: Sheriff
+    return `<color=${COLOR}>Role: Sheriff
 Finish your tasks and shoot the impostors.</color>`;
   }
 }

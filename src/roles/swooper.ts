@@ -18,6 +18,10 @@ import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
 const COLOR = "#969696";
 
+const SWOOPER_DEAD_STRING = `<color=${COLOR}>Role: Swooper</color>
+<color=#ff1919>You're dead.</color>
+Fake Task:`;
+
 export class SwooperManager extends BaseManager {
   getId(): string { return "swooper" }
   getTypeName(): string { return "Swooper" }
@@ -38,6 +42,11 @@ export class Swooper extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, SWOOPER_DEAD_STRING);
+    });
+
   }
 
   async onReady(): Promise<void> {
@@ -134,14 +143,15 @@ export class Swooper extends Impostor {
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {
     return {
       title: "Swooper",
-      subtitle: `Swoop`,
+      subtitle: `Use the Swoop ability to turn invisible`,
       color: [150, 150, 150, 255],
     };
   }
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Swooper
-Swoop</color>
+Sabotage and kill the crewmates.
+Use the Swoop ability to turn invisible.</color>
 Fake Tasks:`;
   }
 }

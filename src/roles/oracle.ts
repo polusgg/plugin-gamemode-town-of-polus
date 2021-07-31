@@ -21,7 +21,9 @@ export class OracleManager extends BaseManager {
   getTypeName(): string { return "Oracle" }
 }
 
-const ORACLE_DEAD_STRING = `<color=#2c4cc9>Role: Oracle</color>
+const COLOR = "#2c4cc9";
+
+const ORACLE_DEAD_STRING = `<color=${COLOR}>Role: Oracle</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 export class Oracle extends Crewmate {
@@ -163,7 +165,7 @@ export class Oracle extends Crewmate {
   }
 
   getDescriptionText(): string {
-    return `<color=#2c4cc9>Role: Oracle
+    return `<color=${COLOR}>Role: Oracle
 Finish your tasks.
 You can enchant a player and reveal\ntheir alignment.</color>`;
   }

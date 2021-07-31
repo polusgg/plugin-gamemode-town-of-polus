@@ -27,10 +27,12 @@ export class PhantomManager extends BaseManager {
   getTypeName(): string { return "Phantom" }
 }
 
-const CREWMATE_DEAD_STRING = `<color=#8cffff>Role: Crewmate</color>
+const COLOR = "#8cffff";
+
+const CREWMATE_DEAD_STRING = `<color=${COLOR}>Role: Crewmate</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
-const PHANTOM_DEAD_STRING = `<color=#8cffff>Role: Phantom</color>
+const PHANTOM_DEAD_STRING = `<color=${COLOR}>Role: Phantom</color>
 <color=#ff1919>You're dead.</color>`;
 
 export class Phantom extends Crewmate {
@@ -183,7 +185,7 @@ export class Phantom extends Crewmate {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player as Player, {
               title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: player === this.owner ? "You haunted everyone" : "The <color=#8cffff>Phantom</color> haunted everyone",
+              subtitle: player === this.owner ? "You haunted everyone" : `The <color=${COLOR}>Phantom</color> haunted everyone`,
               color: [140, 255, 255, 255],
               yourTeam: [this.owner],
               winSound: WinSoundType.ImpostorWin,
@@ -195,7 +197,7 @@ export class Phantom extends Crewmate {
 
   async display(): Promise<void> {
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
-    await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "You've become the <color=#8cffff>Phantom</color>!");
+    await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, `You've become the <color=${COLOR}>Phantom</color>!`);
 
     setTimeout(() => {
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, "__unset");
@@ -291,25 +293,25 @@ export class Phantom extends Crewmate {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Crewmate",
-      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
+      subtitle: `There ${(impostorCount != 1 ? "are" : "is")} ${impostorCount} <color=#FF1919FF>Impostor${(impostorCount != 1 ? "s" : "")}</color> among us`,
       color: Palette.crewmateBlue(),
     };
   }
 
   getRealDescriptionText(): string {
-    return `<color=#8cffff>Role: Phantom
+    return `<color=${COLOR}>Role: Phantom
 Finish your tasks without being seen 
 and call a meeting.</color>`;
   }
 
   getAfterTasksFinishedText(): string {
-    return `<color=#8cffff>Role: Phantom
+    return `<color=${COLOR}>Role: Phantom
 You've finished your tasks.
 Call a meeting and win.</color>`;
   }
 
   getDescriptionText(): string {
-    return `<color=#8cffff>Role: Crewmate (DEBUG: Phantom)
+    return `<color=${COLOR}>Role: Crewmate (DEBUG: Phantom)
 Finish your tasks.</color>`;
   }
 }

@@ -16,7 +16,9 @@ export class SnitchManager extends BaseManager {
   getTypeName(): string { return "Snitch" }
 }
 
-const SNITCH_DEAD_STRING = `<color=#00ffdd>Role: Snitch</color>
+const COLOR = "#00ffdd";
+
+const SNITCH_DEAD_STRING = `<color=${COLOR}>Role: Snitch</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 export class Snitch extends Crewmate {
@@ -62,7 +64,7 @@ export class Snitch extends Crewmate {
         event.getPlayer().getLobby().getPlayers()
           .filter(player => player.isImpostor())
           .forEach(player => {
-            Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> only has <size=120%><b>${taskLeftCount}</b></size> task${taskLeftCount == 1 ? "" : "s"} left, and is about to reveal <color=#ff1919>your role!</color>`);
+            Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=${COLOR}>Snitch</color> only has <size=120%><b>${taskLeftCount}</b></size> task${taskLeftCount == 1 ? "" : "s"} left, and is about to reveal <color=#ff1919>your role!</color>`);
           });
       }
 
@@ -91,7 +93,7 @@ export class Snitch extends Crewmate {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), player.getPosition(), player);
 
-              Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=#00ffdd>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
+              Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=${COLOR}>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
 
               setTimeout(() => {
                 Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `__unset`);
@@ -121,13 +123,13 @@ export class Snitch extends Crewmate {
   getAssignmentScreen(player: PlayerInstance, impostorCount: number): StartGameScreenData {
     return {
       title: "Snitch",
-      subtitle: `Finish your tasks to reveal the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>impostor${impostorCount != 1 ? "s" : ""}</color>`,
+      subtitle: `Finish your tasks to reveal the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
       color: [0, 255, 221, 255],
     };
   }
 
   getDescriptionText(): string {
-    return `<color=#00ffdd>Role: Snitch
+    return `<color=${COLOR}>Role: Snitch
 Finish your tasks to reveal the impostor.</color>`;
   }
 }

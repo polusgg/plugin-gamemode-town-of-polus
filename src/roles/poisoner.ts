@@ -17,6 +17,10 @@ import { Palette } from "@nodepolus/framework/src/static";
 
 const COLOR = "#a000fc";
 
+const POISONER_DEAD_STRING = `<color=${COLOR}>Role: Poisoner</color>
+<color=#ff1919>You're dead.</color>
+Fake Task:`;
+
 export class PoisonerManager extends BaseManager {
   getId(): string { return "poisoner" }
   getTypeName(): string { return "Poisoner" }
@@ -36,6 +40,10 @@ export class Poisoner extends Impostor {
     } else {
       this.onReady();
     }
+
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, POISONER_DEAD_STRING);
+    });
   }
 
   async onReady(): Promise<void> {

@@ -13,6 +13,12 @@ export class MarkerManager extends BaseManager {
   getTypeName(): string { return "Marker" }
 }
 
+const COLOR = "#85ff7a";
+
+const MARKER_DEAD_STRING = `<color=${COLOR}>Role: Marker</color>
+<color=#ff1919>You're dead.</color>
+Fake Task:`;
+
 export class Marker extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Marker",
@@ -32,6 +38,10 @@ export class Marker extends Impostor {
     }
 
     Promise.all(promises).then(this.onReady.bind(this));
+
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, MARKER_DEAD_STRING);
+    });
   }
 
   onReady(): void {
@@ -70,7 +80,7 @@ export class Marker extends Impostor {
   }
 
   getDescriptionText(): string {
-    return `<color=#85ff7a>Role: Marker
+    return `<color=${COLOR}>Role: Marker
 Mark a player and reveal their location.</color>`;
   }
 }

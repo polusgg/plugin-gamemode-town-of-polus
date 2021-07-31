@@ -19,7 +19,9 @@ export class SerialKillerManager extends BaseManager {
   getTypeName(): string { return "Serial Killer" }
 }
 
-const SERIALKILLER_DEAD_STRING = `<color=#ff547c>Role: Serial Killer</color>
+const COLOR = "#ff547c";
+
+const SERIALKILLER_DEAD_STRING = `<color=${COLOR}>Role: Serial Killer</color>
 <color=#ff1919>You're dead.</color>
 Fake Tasks:`;
 
@@ -106,7 +108,7 @@ export class SerialKiller extends Impostor {
   }
 
   getDescriptionText(): string {
-    return `<color=#ff547c>Role: Serial Killer
+    return `<color=${COLOR}>Role: Serial Killer
 Kill everyone.</color>
 Fake Tasks:`;
   }
@@ -135,7 +137,7 @@ Fake Tasks:`;
         endGameData: new Map(lobby.getPlayers()
           .map(player2 => [player2, {
             title: player2 === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-            subtitle: player2 === this.owner ? "You murdered everyone" : "The <color=#ff547c>Serial Killer</color> murdered everyone",
+            subtitle: player2 === this.owner ? "You murdered everyone" : "The <color=${COLOR}>Serial Killer</color> murdered everyone",
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
             winSound: WinSoundType.ImpostorWin,

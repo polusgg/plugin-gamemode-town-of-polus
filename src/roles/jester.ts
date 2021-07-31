@@ -15,7 +15,9 @@ export class JesterManager extends BaseManager {
   getTypeName(): string { return "Jester" }
 }
 
-const JESTER_DEAD_STRING = `<color=#ff8cee>Role: Jester</color>
+const COLOR = "#ff8cee";
+
+const JESTER_DEAD_STRING = `<color=${COLOR}>Role: Jester</color>
 <color=#ff1919>You're dead.</color>
 Fake Tasks:`;
 
@@ -72,7 +74,7 @@ export class Jester extends BaseRole {
           endGameData: new Map(event.getGame().getLobby().getPlayers()
             .map(player => [player, {
               title: player === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: player === this.owner ? "You got voted out" : "The <color=#ff8cee>Jester</color> was voted out",
+              subtitle: player === this.owner ? "You got voted out" : `The <color=${COLOR}>Jester</color> was voted out`,
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
               winSound: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
@@ -99,7 +101,7 @@ export class Jester extends BaseRole {
   }
 
   getDescriptionText(): string {
-    return `<color=#ff8cee>Role: Jester
+    return `<color=${COLOR}>Role: Jester
 Trick everyone into voting you out.</color>
 Fake Tasks:`;
   }

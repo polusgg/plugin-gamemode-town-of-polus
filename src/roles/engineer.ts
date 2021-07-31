@@ -18,7 +18,9 @@ export class EngineerManager extends BaseManager {
   getTypeName(): string { return "Engineer" }
 }
 
-const ENGINEER_DEAD_STRING = `<color=#F8BF14>Role: Engineer</color>
+const COLOR = "#F8BF14";
+
+const ENGINEER_DEAD_STRING = `<color=${COLOR}>Role: Engineer</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 export class Engineer extends Crewmate {
@@ -114,7 +116,7 @@ export class Engineer extends Crewmate {
   }
 
   getDescriptionText(extra: string = "\nYou can fix 1 sabotage."): string {
-    return `<color=#F8BF14>Role: Engineer
+    return `<color=${COLOR}>Role: Engineer
 Finish your tasks.${extra}</color>`;
   }
 }
