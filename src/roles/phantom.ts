@@ -11,7 +11,7 @@ import { TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
-import { Vector2 } from "@nodepolus/framework/src/types";
+import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PhantomState } from "../types/enums/phantomState";
@@ -20,6 +20,7 @@ import { Player } from "@nodepolus/framework/src/player";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
+import { VanillaWinConditions } from "@polusgg/plugin-polusgg-api/src/services/endGame/vanillaWinConditions";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -75,6 +76,26 @@ export class Phantom extends Crewmate {
         }
 
         return;
+      }
+
+      this.owner.setMeta("pgg.countAsDead", true);
+
+      if (VanillaWinConditions.shouldEndGameImpostors(this.owner.getLobby())) {
+        Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getSafeGame(), {
+          intentName: "impostorKill",
+          endGameData: new Map(this.owner.getLobby().getPlayers().map(p => ([
+            p,
+            {
+              title: p.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
+              color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+              yourTeam: p.getLobby()
+                .getPlayers()
+                .filter(sus => sus.isImpostor()),
+              winSound: WinSoundType.ImpostorWin,
+            },
+          ]))),
+        });
       }
 
       Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "impostorVote" });
@@ -260,8 +281,6 @@ export class Phantom extends Crewmate {
       // this.owner.setTasks(new Set());
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
-
-      Services.get(ServiceType.EndGame).recalculateEndGame(this.owner.getLobby().getSafeGame());
     });
   }
 

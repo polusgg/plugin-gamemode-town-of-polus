@@ -191,7 +191,9 @@ export class Locksmith extends Crewmate {
       this.updateButton(move.getNewPosition());
     });
 
-    this.catch("room.doors.closed", e => e.getGame()).execute(() => { this.updateButton() });
+    this.catch("room.doors.closed", e => e.getGame()).execute(() => { setTimeout(() => { this.updateButton() }, 100) });
+
+    this.catch("room.doors.opened", e => e.getGame()).execute(() => { setTimeout(() => { this.updateButton() }, 100) });
 
     this.lockpickButton.on("clicked", _ => {
       if (this.owner.isDead()) {

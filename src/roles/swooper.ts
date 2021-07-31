@@ -75,27 +75,16 @@ export class Swooper extends Impostor {
           return;
         }
 
-        let timeElapsed = 0;
-
-        await button.reset();
-        await button.setSaturated(false);
-        await button.setCurrentTime(duration);
+        button.reset();
+        button.setSaturated(false);
+        button.setCurrentTime(duration);
         await this.swoop();
-        await hudManager.setHudString(this.owner, Location.RoomTracker, `You are <color=${COLOR}>invisible</color> for next ${duration - timeElapsed} second${(duration - timeElapsed) === 1 ? "" : "s"}`);
-        timeElapsed += 1;
 
-        timer = setInterval(async () => {
-          if (timeElapsed >= duration) {
-            await hudManager.setHudString(this.owner, Location.RoomTracker, "__unset");
-            await this.swoopBack();
-            await button.setCurrentTime(button.getMaxTime());
-            await button.setSaturated(true);
-            clearInterval(timer);
-          } else {
-            await hudManager.setHudString(this.owner, Location.RoomTracker, `You are <color=${COLOR}>invisible</color> for next ${duration - timeElapsed} second${(duration - timeElapsed) === 1 ? "" : "s"}`);
-          }
-          timeElapsed += 1;
-        }, 1000);
+        setTimeout(() => {
+          this.swoopBack();
+          button.setCurrentTime(button.getMaxTime());
+          button.setSaturated(true);
+        }, duration * 1000);
       });
     });
   }
