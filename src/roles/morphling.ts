@@ -93,7 +93,7 @@ export class Morphling extends Impostor {
 
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
-      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue().value,
+      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value,
       position: new Vector2(2.1, 2.0),
       alignment: EdgeAlignments.RightBottom,
     });
@@ -136,7 +136,11 @@ export class Morphling extends Impostor {
           this.targetAppearance = PlayerAppearance.save(target);
         }
       } else {
-        await this.morphButton.setSaturated(false);
+        await Promise.all([
+          this.morphButton.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingDuration).getValue().value),
+          this.morphButton.setCurrentTime(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingDuration).getValue().value),
+          this.morphButton.setSaturated(false),
+        ]);
         this.transformed = true;
         await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
           new PlayerAnimationKeyframe({
@@ -194,8 +198,11 @@ export class Morphling extends Impostor {
             }),
           ], false);
           this.transformed = false;
-          await this.morphButton?.reset();
-        }, 5000);
+          await Promise.all([
+            this.morphButton?.reset(),
+            this.morphButton?.setSaturated(true),
+          ]);
+        }, gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingDuration).getValue().value * 1000);
       }
     });
 

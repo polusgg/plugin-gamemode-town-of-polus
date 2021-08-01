@@ -20,6 +20,7 @@ export enum TownOfPolusGameOptionNames {
 
   MorphlingProbability = "<color=#a212db>Morphling</color>",
   MorphlingCooldown = "<color=#a212db>Morphling</color> Cooldown",
+  MorphlingDuration = "<color=#a212db>Morphling</color> Duration",
 
   OracleProbability = "<size=150%><sprite index=8></size> <color=#2c4cc9>Oracle</color>",
   OracleCooldown = "<color=#2c4cc9>Oracle</color> Cooldown",
