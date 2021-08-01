@@ -149,8 +149,8 @@ export class Morphling extends Impostor {
             hatOpacity: 0,
             petOpacity: 0,
             skinOpacity: 0,
-            primaryColor: [255, 255, 255, 255],
-            secondaryColor: [255, 255, 255, 255],
+            primaryColor: [155, 155, 155, 255],
+            secondaryColor: [155, 155, 155, 255],
           }),
         ], false);
 
@@ -180,8 +180,8 @@ export class Morphling extends Impostor {
               opacity: 0,
               position: Vector2.zero(),
               scale: Vector2.one(),
-              primaryColor: [255, 255, 255, 255],
-              secondaryColor: [255, 255, 255, 255],
+              primaryColor: [155, 155, 155, 255],
+              secondaryColor: [155, 155, 155, 255],
             }),
           ], false);
           this.ownAppearance!.apply(this.owner);
@@ -258,7 +258,7 @@ export class Morphling extends Impostor {
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Morphling
 Sabotage and kill the crewmates.
-You have the ability to morph\ninto someone else.</color>
+You have the ability to morph into\n someone else.</color>
 Fake Tasks:`;
   }
 }
