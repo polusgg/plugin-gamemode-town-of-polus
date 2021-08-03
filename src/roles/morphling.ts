@@ -23,7 +23,7 @@ export class MorphlingManager extends BaseManager {
   getTypeName(): string { return "Morphling" }
 }
 
-const COLOR = "#a212db";
+const COLOR = "#40EB73";
 
 const MORPHLING_DEAD_STRING = `<color=${COLOR}>Role: Morphling</color>
 <color=#ff1919>You're dead.</color>
@@ -251,7 +251,7 @@ export class Morphling extends Impostor {
     return {
       title: "Morphling",
       subtitle: "Transform and deceive the <color=#8CFFFFFF>Crewmates</color>",
-      color: [162, 18, 219, 255],
+      color: [64, 235, 115, 255],
     };
   }
 

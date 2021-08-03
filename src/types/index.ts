@@ -5,11 +5,11 @@ export enum TownOfPolusGameOptionNames {
   SwooperCooldown = "<color=#969696>Swooper</color> Cooldown",
   SwooperAbilityDuration = "<color=#969696>Swooper</color> Ability Duration",
 
-  PoisonerProbability = "<size=150%></size> <color=#1b963c>Poisoner</color>",
-  PoisonerCooldown = "<color=#1b963c>Poisoner</color> Cooldown",
-  PoisonerRange = "<color=#1b963c>Poisoner</color> Range",
-  //PoisonerTargets = "<color=#1b963c>Poisoner</color> Can Poison Multiple Targets in Range",
-  PoisonerPoisonDuration = "<color=#1b963c>Poison</color> Kills After",
+  PoisonerProbability = "<size=150%></size> <color=#a000fc>Poisoner</color>",
+  PoisonerCooldown = "<color=#a000fc>Poisoner</color> Cooldown",
+  PoisonerRange = "<color=#a000fc>Poisoner</color> Range",
+  //PoisonerTargets = "<color=#a000fc>Poisoner</color> Can Poison Multiple Targets in Range",
+  PoisonerPoisonDuration = "<color=#a000fc>Poison</color> Kills After",
 
   GrenadierProbability = "<size=150%><sprite index=5></size> <color=#728F3D>Grenadier</color>",
   GrenadierCooldown = "<color=#728F3D>Grenadier</color> Cooldown",
@@ -18,9 +18,9 @@ export enum TownOfPolusGameOptionNames {
 
   JesterProbability = "<size=150%><sprite index=6></size> <color=#ff8cee>Jester</color>",
 
-  MorphlingProbability = "<color=#a212db>Morphling</color>",
-  MorphlingCooldown = "<color=#a212db>Morphling</color> Cooldown",
-  MorphlingDuration = "<color=#a212db>Morphling</color> Duration",
+  MorphlingProbability = "<color=#40EB73>Morphling</color>",
+  MorphlingCooldown = "<color=#40EB73>Morphling</color> Cooldown",
+  MorphlingDuration = "<color=#40EB73>Morphling</color> Duration",
 
   OracleProbability = "<size=150%><sprite index=8></size> <color=#2c4cc9>Oracle</color>",
   OracleCooldown = "<color=#2c4cc9>Oracle</color> Cooldown",
