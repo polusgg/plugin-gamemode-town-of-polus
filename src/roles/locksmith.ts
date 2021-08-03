@@ -260,7 +260,7 @@ export class Locksmith extends Crewmate {
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {
     return {
       title: "Locksmith",
-      subtitle: `You can open or close ${this.lockSmithLeftUses} door${this.lockSmithLeftUses > 1 ? "s" : ""}`,
+      subtitle: `You can open or close ${this.lockSmithLeftUses} door${this.lockSmithLeftUses == 1 ? "s" : ""}`,
       color: [61, 133, 198, 255],
     };
   }
@@ -272,6 +272,6 @@ Finish your tasks and open/close doors.</color>`;
 
   updateDescriptionText(): void {
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, `${this.getDescriptionText()}
-<color=${COLOR}>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses > 1 ? "s" : ""} left.</color>`);
+<color=${COLOR}>You have ${this.lockSmithLeftUses} use${this.lockSmithLeftUses == 1 ? "s" : ""} left.</color>`);
   }
 }
