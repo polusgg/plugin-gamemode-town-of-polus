@@ -258,7 +258,7 @@ export class Morphling extends Impostor {
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Morphling
 Sabotage and kill the crewmates.
-You have the ability to morph into\n someone else.</color>
+You have the ability to morph into\nsomeone else.</color>
 Fake Tasks:`;
   }
 }
