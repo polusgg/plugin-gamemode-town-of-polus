@@ -9,7 +9,7 @@ export enum TownOfPolusGameOptionNames {
   PoisonerCooldown = "<color=#a000fc>Poisoner</color> Cooldown",
   PoisonerRange = "<color=#a000fc>Poisoner</color> Range",
   //PoisonerTargets = "<color=#a000fc>Poisoner</color> Can Poison Multiple Targets in Range",
-  PoisonerPoisonDuration = "<color=#a000fc>Poison</color> Kills After",
+  PoisonerPoisonDuration = "<color=#a000fc>Poisoner</color> Poison Duration",
 
   GrenadierProbability = "<size=150%><sprite index=5></size> <color=#728F3D>Grenadier</color>",
   GrenadierCooldown = "<color=#728F3D>Grenadier</color> Cooldown",
