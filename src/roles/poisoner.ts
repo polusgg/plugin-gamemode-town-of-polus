@@ -180,7 +180,7 @@ export class Poisoner extends Impostor {
 
         for (let i = 0; i < players.length; i++) {
           if (players[i] === target) {
-            animService.setOutline(players[i], [27, 150, 60, 255], [this.owner.getSafeConnection()]);
+            animService.setOutline(players[i], [160, 0, 252, 255], [this.owner.getSafeConnection()]);
           } else {
             animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
           }
