@@ -71,7 +71,7 @@ export class Oracle extends Crewmate {
       }
 
       if ((target === undefined) === outlined || lastTarget !== target) {
-        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner);
+        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner && !x.isDead());
 
         for (let i = 0; i < players.length; i++) {
           if (players[i] === target) {
@@ -134,6 +134,8 @@ export class Oracle extends Crewmate {
       if (this.owner.isDead() && !this.enchanted.isDead()) {
         const realAlignment = getAlignmentSpriteForRole(this.enchanted.getMeta<BaseRole>("pgg.api.role"));
         const displayCorrectly = resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value);
+
+        console.log("SettingName", realAlignment, displayCorrectly);
 
         if (displayCorrectly === 1) {
           Services.get(ServiceType.Name).set(this.enchanted, `${realAlignment} ${this.enchanted.getName().toString()}`);

@@ -220,6 +220,10 @@ export default class extends BaseMod {
     gameOptions.on("option.Short Tasks.changed", this.handleTaskCountUpdate.bind(this));
     gameOptions.on("option.Common Tasks.changed", this.handleTaskCountUpdate.bind(this));
 
+    setInterval(() => {
+      this.handleTaskCountUpdate({ getLobby() { return lobby } });
+    }, 150);
+
     await Promise.all([
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher),
 
@@ -236,7 +240,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SheriffCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 17),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 4),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 18),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 18),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 5),
 

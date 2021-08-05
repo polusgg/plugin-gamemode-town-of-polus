@@ -95,6 +95,7 @@ export class Phantom extends Crewmate {
                 .getPlayers()
                 .filter(sus => sus.isImpostor()),
               winSound: WinSoundType.ImpostorWin,
+              hasWon: p.isImpostor(),
             },
           ]))),
         });
@@ -189,6 +190,7 @@ export class Phantom extends Crewmate {
               color: [140, 255, 255, 255],
               yourTeam: [this.owner],
               winSound: WinSoundType.ImpostorWin,
+              hasWon: player === this.owner,
             }])),
           intentName: "phantomMeeting",
         });

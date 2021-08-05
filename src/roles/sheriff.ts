@@ -56,6 +56,7 @@ export class Sheriff extends Impostor {
                 yourTeam: event.getPlayer().getLobby().getPlayers()
                   .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
                 winSound: WinSoundType.CrewmateWin,
+                hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
               }])),
             intentName: "sheriffKill",
           });
@@ -87,7 +88,7 @@ export class Sheriff extends Impostor {
       this.setOnClicked(async target => {
         await this.owner.murder(target);
 
-        if (!target.isImpostor()) {
+        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate) {
           await this.owner.murder(this.owner);
 
           if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
@@ -102,6 +103,7 @@ export class Sheriff extends Impostor {
                   color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
                   yourTeam: players.filter(sus => sus.isImpostor()),
                   winSound: WinSoundType.ImpostorWin,
+                  hasWon: player.isImpostor(),
                 }])),
             });
           }

@@ -141,6 +141,7 @@ Fake Tasks:`;
             color: [255, 84, 124, 255],
             yourTeam: [this.owner],
             winSound: WinSoundType.ImpostorWin,
+            hasWon: player2 === this.owner,
           }])),
         intentName: "serialKilledAll",
       });

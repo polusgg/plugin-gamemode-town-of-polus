@@ -78,6 +78,7 @@ export class Jester extends BaseRole {
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
               winSound: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
+              hasWon: player === this.owner,
             }])),
           intentName: "jesterVoted",
         });

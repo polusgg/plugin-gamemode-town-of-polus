@@ -92,7 +92,7 @@ export class Grenadier extends Impostor {
           return;
         }
 
-        button.reset();
+        button.setSaturated(false);
         inRangePlayers.forEach(player => {
           Services.get(ServiceType.Animation)
             .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
@@ -133,6 +133,9 @@ export class Grenadier extends Impostor {
               }),
             ], true);
         });
+        setTimeout(() => {
+          button.reset();
+        }, 450 + (1000 * blindness.value));
       });
     });
   }
