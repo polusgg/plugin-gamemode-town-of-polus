@@ -148,8 +148,6 @@ export default class extends BaseMod {
     //   Services.get(ServiceType.Hud).displayNotification("Warning: This server is running an unstable version of TownOfPolus.\nPlease do not report issues");
     // });
 
-    console.log("TOP-L");
-
     // todo set task strings for all impostor and neutral types
   }
 
