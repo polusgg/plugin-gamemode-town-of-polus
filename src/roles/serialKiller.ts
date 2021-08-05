@@ -56,6 +56,8 @@ export class SerialKiller extends Impostor {
     this.setOnClicked(async target => this.owner.murder(target));
     this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
 
+    this.owner.setVisionModifier(1 / this.owner.getLobby().getOptions().getCrewmateLightModifier() * this.owner.getLobby().getOptions().getImpostorLightModifier());
+
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
       intentName: "impostorDisconnected",
     });
