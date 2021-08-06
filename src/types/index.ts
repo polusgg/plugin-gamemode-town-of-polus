@@ -51,5 +51,5 @@ export enum TownOfPolusGameOptionCategories {
   CrewmateRoles = "<color=#ffffffff>Crewmate Roles",
   NeutralRoles = "<color=#ffffffff>Neutral Roles",
   ImpostorRoles = "<color=#ffffffff>Impostor Roles",
-  Config = "<color=#ffffffff>Role Settings",
+  Config = "Role Settings",
 }
