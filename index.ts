@@ -243,7 +243,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 4),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 18),
 
-      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 5),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 1),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.PhantomProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 6),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 19),
@@ -254,7 +254,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 22),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerMinPlayers, new NumberValue(6, 1, 4, 15, false, "{0} players"), GameOptionPriority.Normal + 23),
 
-      gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 8),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 2),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 24),
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 22),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 25),
@@ -347,6 +347,15 @@ export default class extends BaseMod {
       }
     } catch { }
 
+    if (!this.getEnabled(opt.getLobby())) {
+      await Promise.all([
+        gameOptions.deleteOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks"),
+        gameOptions.deleteOption("<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>"),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
+      ]);
+    }
+
     console.log("[HTC] Recurse", this.taskCountShouldRecurse.get(opt.getLobby()));
 
     this.handlingTaskCount.set(opt.getLobby(), false);
@@ -394,6 +403,19 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithCooldown, new NumberValue(1, 1, 1, 60, false, "{0}s"), GameOptionPriority.Normal + 12),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithUses, new NumberValue(2, 1, 1, 10, false, "{0} uses"), GameOptionPriority.Normal + 13),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 14),
+      ]);
+    }
+
+    if (!this.getEnabled(newLevel.getLobby())) {
+      await Promise.all([
+        gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`),
+        gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Cooldown`),
+        gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Uses`),
+        gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithProbability),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithCooldown),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithUses),
+        gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithRange),
       ]);
     }
 
