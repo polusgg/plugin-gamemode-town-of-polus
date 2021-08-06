@@ -139,6 +139,8 @@ export function resolveOptionPercent(percent: number): number {
 export default class extends BaseMod {
   protected handlingTaskCount: Map<LobbyInstance, boolean> = new Map();
   protected taskCountShouldRecurse: Map<LobbyInstance, boolean> = new Map();
+  protected handlingLevelUpdate: Map<LobbyInstance, boolean> = new Map();
+  protected levelUpdateShouldRecurse: Map<LobbyInstance, boolean> = new Map();
 
   constructor() {
     super(pluginMetadata);
@@ -361,9 +363,6 @@ export default class extends BaseMod {
       this.handleTaskCountUpdate(opt);
     }
   }
-
-  protected handlingLevelUpdate: Map<LobbyInstance, boolean> = new Map();
-  protected levelUpdateShouldRecurse: Map<LobbyInstance, boolean> = new Map();
 
   private async handleLevelUpdate(newLevel: GameOption<NumberValue | EnumValue | BooleanValue>): Promise<void> {
     if (!this.getEnabled(newLevel.getLobby())) {
