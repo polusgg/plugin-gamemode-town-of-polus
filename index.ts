@@ -360,6 +360,8 @@ export default class extends BaseMod {
       return;
     }
 
+    console.log("[HLU] Update", this.handlingLevelUpdate.get(newLevel.getLobby()), (newLevel.getValue() as EnumValue).getSelected());
+
     if (this.handlingLevelUpdate.get(newLevel.getLobby())) {
       this.levelUpdateShouldRecurse.set(newLevel.getLobby(), true);
 
@@ -394,7 +396,9 @@ export default class extends BaseMod {
       ]);
     }
 
-    this.levelUpdateShouldRecurse.set(newLevel.getLobby(), false);
+    console.log("[HLU] Recurse", this.levelUpdateShouldRecurse.get(newLevel.getLobby()));
+
+    this.handlingLevelUpdate.set(newLevel.getLobby(), false);
 
     if (this.levelUpdateShouldRecurse.get(newLevel.getLobby())) {
       this.handleLevelUpdate(gameOptions.getOption("Level"));
