@@ -137,6 +137,9 @@ export function resolveOptionPercent(percent: number): number {
 }
 
 export default class extends BaseMod {
+  protected handlingTaskCount: Map<LobbyInstance, boolean> = new Map();
+  protected taskCountShouldRecurse: Map<LobbyInstance, boolean> = new Map();
+
   constructor() {
     super(pluginMetadata);
 
@@ -287,10 +290,18 @@ export default class extends BaseMod {
     );
   }
 
-  private handleTaskCountUpdate(opt: { getLobby(): LobbyInstance }): void {
+  private async handleTaskCountUpdate(opt: { getLobby(): LobbyInstance }): void {
     if (!this.getEnabled(opt.getLobby())) {
       return;
     }
+
+    if (this.handlingTaskCount.get(opt.getLobby())) {
+      this.taskCountShouldRecurse.set(opt.getLobby(), true);
+
+      return;
+    }
+
+    this.handlingTaskCount.set(opt.getLobby(), true);
 
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions & any>(opt.getLobby());
 
@@ -300,14 +311,18 @@ export default class extends BaseMod {
       if (totalTaskCount >= 3) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks) === undefined) {
-          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 6);
-          gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 7);
+          await Promise.all([
+            gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 6),
+            gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 7),
+          ]);
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (gameOptions.getOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks") !== undefined) {
-          gameOptions.deleteOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks");
-          gameOptions.deleteOption("<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>");
+          await Promise.all([
+            gameOptions.deleteOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks"),
+            gameOptions.deleteOption("<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>"),
+          ]);
         }
 
         const snitchTaskCount = gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks);
@@ -327,26 +342,44 @@ export default class extends BaseMod {
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks) !== undefined) {
-        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks);
-        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability);
+        await Promise.all([
+          gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
+          gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
+        ]);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (gameOptions.getOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks") === undefined) {
-        gameOptions.createOption(TownOfPolusGameOptionCategories.Config, "<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 7);
-        gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 6);
+        await Promise.all([
+          gameOptions.createOption(TownOfPolusGameOptionCategories.Config, "<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 7),
+          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 6),
+        ]);
       }
     } catch {}
+
+    if (this.taskCountShouldRecurse.get(opt.getLobby())) {
+      this.handleTaskCountUpdate(opt);
+    }
   }
+
+  protected handlingLevelUpdate: Map<LobbyInstance, boolean> = new Map();
+  protected levelUpdateShouldRecurse: Map<LobbyInstance, boolean> = new Map();
 
   private async handleLevelUpdate(newLevel: GameOption<NumberValue | EnumValue | BooleanValue>): Promise<void> {
     if (!this.getEnabled(newLevel.getLobby())) {
       return;
     }
 
-    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & any>(newLevel.getLobby());
+    if (this.handlingLevelUpdate.get(newLevel.getLobby())) {
+      this.levelUpdateShouldRecurse.set(newLevel.getLobby(), true);
 
-    if (["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected())) {
+      return;
+    }
+
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions & any>(newLevel.getLobby());
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected()) && gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability) !== undefined) {
       await Promise.all([
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithProbability),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithCooldown),
@@ -373,6 +406,10 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithUses, new NumberValue(2, 1, 1, 10, false, "{0} uses"), GameOptionPriority.Normal + 12),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 13),
       ]);
+    }
+
+    if (this.levelUpdateShouldRecurse.get(newLevel.getLobby())) {
+      this.handleLevelUpdate(gameOptions.getOption("Level"));
     }
   }
 }
