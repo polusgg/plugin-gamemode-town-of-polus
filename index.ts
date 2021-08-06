@@ -277,7 +277,7 @@ export default class extends BaseMod {
 
     setTimeout(() => {
       this.handleTaskCountUpdate({ getLobby() { return lobby } });
-      this.handleLevelUpdate(gameOptions.getOption("Level"));
+      this.handleLevelUpdate(gameOptions.getOption("Map"));
     }, 150);
   }
 
@@ -402,7 +402,7 @@ export default class extends BaseMod {
     this.handlingLevelUpdate.set(newLevel.getLobby(), false);
 
     if (this.levelUpdateShouldRecurse.get(newLevel.getLobby())) {
-      this.handleLevelUpdate(gameOptions.getOption("Level"));
+      this.handleLevelUpdate(gameOptions.getOption("Map"));
     }
   }
 }
