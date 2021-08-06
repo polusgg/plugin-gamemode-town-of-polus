@@ -383,7 +383,7 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 14),
       ]);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (gameOptions.getOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`) !== undefined) {
+    } else if (!(["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected())) && gameOptions.getOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`) !== undefined) {
       await Promise.all([
         gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Cooldown`),
