@@ -11,6 +11,7 @@ import { GameState } from "@nodepolus/framework/src/types/enums";
 // import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { getSpriteForRole } from "../..";
 // import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
 export class EngineerManager extends BaseManager {
@@ -34,6 +35,8 @@ export class Engineer extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();

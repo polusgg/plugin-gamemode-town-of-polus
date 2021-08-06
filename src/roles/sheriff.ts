@@ -5,7 +5,7 @@ import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enu
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
@@ -36,6 +36,8 @@ export class Sheriff extends Impostor {
     super(owner, PlayerRole.Crewmate, "TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
 
     const endGame = Services.get(ServiceType.EndGame);
+
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()
@@ -94,8 +96,10 @@ export class Sheriff extends Impostor {
           if ((this.owner.getLobby().getHostInstance() as unknown as { shouldEndGame(): boolean }).shouldEndGame()) {
             const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
 
+            console.trace("Registering sheriff misfire event");
+
             await Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
-              intentName: "impostorKill",
+              intentName: "sheriffMisfire",
               endGameData: new Map(this.owner.getLobby().getPlayers()
                 .map((player, _, players) => [player, {
                   title: player.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",

@@ -12,7 +12,7 @@ import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impo
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
@@ -38,6 +38,8 @@ export class Swooper extends Impostor {
     await super.onReadyImpostor();
 
     if (this.owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(this.owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();

@@ -220,10 +220,6 @@ export default class extends BaseMod {
     gameOptions.on("option.Short Tasks.changed", this.handleTaskCountUpdate.bind(this));
     gameOptions.on("option.Common Tasks.changed", this.handleTaskCountUpdate.bind(this));
 
-    setInterval(() => {
-      this.handleTaskCountUpdate({ getLobby() { return lobby } });
-    }, 150);
-
     await Promise.all([
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher),
 
@@ -273,6 +269,10 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SwooperAbilityDuration, new NumberValue(10, 2, 4, 30, false, "{0}s"), GameOptionPriority.Normal + 33),
 
     ] as any[]);
+
+    setTimeout(() => {
+      this.handleTaskCountUpdate({ getLobby() { return lobby } });
+    }, 150);
   }
 
   async onDisable(lobby: LobbyInstance): Promise<void> {

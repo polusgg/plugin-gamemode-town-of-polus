@@ -1,13 +1,13 @@
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { shuffleArrayClone } from "@nodepolus/framework/src/util/shuffle";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Palette, Tasks } from "@nodepolus/framework/src/static";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
@@ -48,6 +48,8 @@ export class Phantom extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       const allPlayers = owner.getLobby().getRealPlayers();
 
       allPlayers.push(owner);
@@ -158,8 +160,29 @@ export class Phantom extends Crewmate {
       this.owner.setMeta("pgg.api.targetable", false);
       this.setAlignment(RoleAlignment.Neutral);
       this.giveTasks();
-      await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
-      await this.owner.revive();
+
+      if (this.owner.getLobby().getPlayers()
+        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
+        .filter(player => !player.getLobby().getGameData()?.getGameData()
+          .getSafePlayer(player.getId())
+          .isDoneWithTasks(),
+        ).length == 0) {
+        endGame.registerEndGameIntent(this.owner.getLobby().getGame()!, {
+          endGameData: new Map(this.owner.getLobby().getPlayers()
+            .map(player => [player, {
+              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks\n<size=50%>(The impostor killed a phantom in crew form, resetting their tasks. All other crewmates were finished with their tasks)</size>",
+              color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+              yourTeam: this.owner.getLobby().getPlayers()
+                .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+              winSound: WinSoundType.CrewmateWin,
+              hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
+            }])),
+          intentName: "crewmateTasks",
+        });
+      }
+      Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
+      this.owner.revive();
       await this.showPhantom();
     });
 

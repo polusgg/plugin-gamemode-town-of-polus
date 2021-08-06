@@ -7,7 +7,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Vector2 } from "@nodepolus/framework/src/types";
-import { getAlignmentSpriteForRole, resolveOptionPercent, TownOfPolusGameOptions } from "../..";
+import { getAlignmentSpriteForRole, getSpriteForRole, resolveOptionPercent, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Player } from "@nodepolus/framework/src/player";
 import { SetOutlinePacket } from "@polusgg/plugin-polusgg-api/src/packets/rpc/playerControl/setOutline";
@@ -37,6 +37,8 @@ export class Oracle extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();

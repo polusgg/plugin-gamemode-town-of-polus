@@ -10,10 +10,11 @@ import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edge
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { PoisonerRange } from "../types/enums/poisonerRange";
 import { Palette } from "@nodepolus/framework/src/static";
+import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 
 const COLOR = "#a000fc";
 
@@ -36,6 +37,8 @@ export class Poisoner extends Impostor {
     await super.onReadyImpostor();
 
     if (this.owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(this.owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
@@ -90,6 +93,7 @@ export class Poisoner extends Impostor {
         await button.setCurrentTime(button.getMaxTime());
         hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
         target.setMeta("pgg.top.isPoisoned", true);
+        Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.ReportButton, false);
 
         timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {

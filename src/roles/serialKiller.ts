@@ -7,7 +7,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
@@ -37,6 +37,8 @@ export class SerialKiller extends Impostor {
     super(owner, PlayerRole.Crewmate);
 
     if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
       owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));
     } else {
@@ -56,8 +58,6 @@ export class SerialKiller extends Impostor {
     this.setOnClicked(async target => this.owner.murder(target));
     this.setTargetSelector(players => players.filter(player => !player.isDead())[0]);
 
-    this.owner.setVisionModifier(1 / this.owner.getLobby().getOptions().getCrewmateLightModifier() * this.owner.getLobby().getOptions().getImpostorLightModifier());
-
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
       intentName: "impostorDisconnected",
     });
@@ -75,6 +75,10 @@ export class SerialKiller extends Impostor {
     });
 
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+      intentName: "sheriffMisfire",
+    });
+
+    endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
       intentName: "sheriffKill",
     });
 
@@ -89,6 +93,24 @@ export class SerialKiller extends Impostor {
 
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
+
+    this.catch("meeting.ended", event => event.getGame()).execute(event => {
+      if (event.getGame().getLobby().getPlayers()
+        .filter(p => !p.isDead() && !p.getGameDataEntry().isDisconnected()).length === 1) {
+        endGame.registerEndGameIntent(event.getGame().getLobby().getSafeGame()!, {
+          endGameData: new Map(event.getGame().getLobby().getPlayers()
+            .map(player2 => [player2, {
+              title: player2 === this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: player2 === this.owner ? "You voted everyone out" : `The <color=${COLOR}>Serial Killer</color> voted the last player out`,
+              color: [255, 84, 124, 255],
+              yourTeam: [this.owner],
+              winSound: WinSoundType.ImpostorWin,
+              hasWon: player2 === this.owner,
+            }])),
+          intentName: "serialKilledAll",
+        });
+      }
+    });
   }
 
   onDestroy(destroyReason: RoleDestroyedReason): void {

@@ -11,7 +11,7 @@ import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enu
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { AutoDoorsSystem, DoorsSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { AutoDoorsHandler } from "@nodepolus/framework/src/host/systemHandlers";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGameOption";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
@@ -134,6 +134,8 @@ export class Locksmith extends Crewmate {
     this.updateDescriptionText();
 
     if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.locksmithOnReady.bind(this));
     } else {
       this.locksmithOnReady();

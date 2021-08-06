@@ -9,6 +9,7 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { SerialKiller } from "./serialKiller";
 import { AllowTaskInteractionPacket } from "@polusgg/plugin-polusgg-api/src/packets/root/allowTaskInteractionPacket";
+import { getSpriteForRole } from "../..";
 
 export class JesterManager extends BaseManager {
   getId(): string { return "jester" }
@@ -29,6 +30,8 @@ export class Jester extends BaseRole {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner, PlayerRole.Crewmate);
     owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));
