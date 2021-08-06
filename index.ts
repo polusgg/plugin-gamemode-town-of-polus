@@ -277,6 +277,7 @@ export default class extends BaseMod {
 
     setTimeout(() => {
       this.handleTaskCountUpdate({ getLobby() { return lobby } });
+      this.handleLevelUpdate(gameOptions.getOption("Level"));
     }, 150);
   }
 
