@@ -292,7 +292,7 @@ export default class extends BaseMod {
     );
   }
 
-  private async handleTaskCountUpdate(opt: { getLobby(): LobbyInstance }): void {
+  private async handleTaskCountUpdate(opt: { getLobby(): LobbyInstance }): Promise<void> {
     if (!this.getEnabled(opt.getLobby())) {
       return;
     }
@@ -357,7 +357,9 @@ export default class extends BaseMod {
           gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 4),
         ]);
       }
-    } catch {}
+    } catch { }
+
+    this.handlingTaskCount.set(opt.getLobby(), false);
 
     if (this.taskCountShouldRecurse.get(opt.getLobby())) {
       this.handleTaskCountUpdate(opt);
@@ -406,6 +408,8 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 13),
       ]);
     }
+
+    this.levelUpdateShouldRecurse.set(newLevel.getLobby(), false);
 
     if (this.levelUpdateShouldRecurse.get(newLevel.getLobby())) {
       this.handleLevelUpdate(gameOptions.getOption("Level"));
