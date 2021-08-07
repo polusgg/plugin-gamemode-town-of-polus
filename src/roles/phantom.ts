@@ -57,7 +57,7 @@ export class Phantom extends Crewmate {
       const promises: Promise<ResourceResponse>[] = [];
 
       for (let i = 0; i < allPlayers.length; i++) {
-        promises.push(Services.get(ServiceType.Resource).load(allPlayers[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")));
+        promises.push(Services.get(ServiceType.Resource).load(allPlayers[i].getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")));
       }
 
       Promise.allSettled(promises).then(this.onReady.bind(this));
@@ -284,7 +284,7 @@ export class Phantom extends Crewmate {
     ], false);
 
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
       maxTimer: 69,
       position: Vector2.zero(),
       alignment: EdgeAlignments.None,

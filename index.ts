@@ -145,7 +145,7 @@ export default class extends BaseMod {
   constructor() {
     super(pluginMetadata);
 
-    AssetBundle.load("TownOfPolus").then(_ => {
+    AssetBundle.load("TownOfPolus/TownOfPolus").then(_ => {
       this.getLogger().info("Loaded TownOfPolus AssetBundle");
     });
 

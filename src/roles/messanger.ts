@@ -34,7 +34,7 @@ export class Marker extends Impostor {
     for (let i = 0; i < connections.length; i++) {
       const connection = connections[i];
 
-      promises.push(Services.get(ServiceType.Resource).load(connection, AssetBundle.loadSafeFromCache("TownOfPolus")));
+      promises.push(Services.get(ServiceType.Resource).load(connection, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")));
     }
 
     Promise.all(promises).then(this.onReady.bind(this));
@@ -67,8 +67,8 @@ export class Marker extends Impostor {
   }
 
   async mark(player: PlayerInstance): Promise<void> {
-    await Services.get(ServiceType.PointOfInterestManager).spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), player.getPosition(), player);
-    await Services.get(ServiceType.PointOfInterestManager).spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), this.owner.getPosition(), this.owner);
+    await Services.get(ServiceType.PointOfInterestManager).spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), player.getPosition(), player);
+    await Services.get(ServiceType.PointOfInterestManager).spawnPointOfInterest(player.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), this.owner.getPosition(), this.owner);
   }
 
   getAssignmentScreen(_player: PlayerInstance, _impostorCount: number): StartGameScreenData {

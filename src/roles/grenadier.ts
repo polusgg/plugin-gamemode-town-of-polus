@@ -50,7 +50,7 @@ export class Grenadier extends Impostor {
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -66,7 +66,7 @@ export class Grenadier extends Impostor {
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
 
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
       maxTimer: this.grenadierCooldown.value,
       position: new Vector2(2.1, 2.0),
       alignment: EdgeAlignments.RightBottom,

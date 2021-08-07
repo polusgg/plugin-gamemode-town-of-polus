@@ -37,7 +37,7 @@ export class Engineer extends Crewmate {
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -73,7 +73,7 @@ export class Engineer extends Crewmate {
 
   async onReady(): Promise<void> {
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
       maxTimer: 0.1,
       position: new Vector2(2.1, 0.7),
       alignment: EdgeAlignments.RightBottom,

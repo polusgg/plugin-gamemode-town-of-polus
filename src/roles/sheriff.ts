@@ -33,7 +33,7 @@ export class Sheriff extends Impostor {
   };
 
   constructor(owner: PlayerInstance) {
-    super(owner, PlayerRole.Crewmate, "TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
+    super(owner, PlayerRole.Crewmate, "TownOfPolus/TownOfPolus", "Assets/Mods/TownOfPolus/Shoot.png");
 
     const endGame = Services.get(ServiceType.EndGame);
 
@@ -74,7 +74,7 @@ export class Sheriff extends Impostor {
     await super.onReadyImpostor();
 
     if (this.owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(this.owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(this.owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }

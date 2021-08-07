@@ -39,7 +39,7 @@ export class SerialKiller extends Impostor {
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
       owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));
     } else {
       this.onReady();

@@ -41,7 +41,7 @@ export class Jester extends BaseRole {
     // a vote win can never happen within the time it will take for every connection to load the bundle
     // so i'm not refactoring this to use an onready method
     for (let i = 0; i < connections.length; i++) {
-      Services.get(ServiceType.Resource).load(connections[i], AssetBundle.loadSafeFromCache("TownOfPolus"));
+      Services.get(ServiceType.Resource).load(connections[i], AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus"));
     }
 
     const endGame = Services.get(ServiceType.EndGame);
@@ -80,8 +80,8 @@ export class Jester extends BaseRole {
               subtitle: player === this.owner ? "You got voted out" : `The <color=${COLOR}>Jester</color> was voted out`,
               color: [255, 140, 238, 255],
               yourTeam: [this.owner],
-              winSound: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
               hasWon: player === this.owner,
+              winSound: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/JesterSfx.mp3"),
             }])),
           intentName: "jesterVoted",
         });

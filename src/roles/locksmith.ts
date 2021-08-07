@@ -136,7 +136,7 @@ export class Locksmith extends Crewmate {
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.locksmithOnReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.locksmithOnReady.bind(this));
     } else {
       this.locksmithOnReady();
     }
@@ -171,9 +171,9 @@ export class Locksmith extends Crewmate {
   }
 
   async locksmithOnReady(): Promise<void> {
-    this.lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
-    this.lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png");
-    this.lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
+    this.lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
+    this.lockpickClose = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Close.png");
+    this.lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
     this.lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       alignment: EdgeAlignments.RightBottom,
       position: new Vector2(2.1, 0.7),

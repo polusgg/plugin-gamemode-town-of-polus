@@ -76,7 +76,7 @@ export class Morphling extends Impostor {
     if (owner.getConnection() !== undefined) {
       Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
 
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus")).then(this.onReady.bind(this));
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -94,7 +94,7 @@ export class Morphling extends Impostor {
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value,
       currentTime: gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value,
       position: new Vector2(2.1, 2.0),
@@ -132,7 +132,7 @@ export class Morphling extends Impostor {
           await Promise.allSettled(
             [
               this.morphButton.setColor(Palette.playerBody()[target.getColor()].dark as any),
-              this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png")),
+              this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png")),
               this.morphButton.setCurrentTime(5),
             ],
           );
@@ -216,7 +216,7 @@ export class Morphling extends Impostor {
         this.ownAppearance?.apply(this.owner);
         this.targetAppearance = undefined;
         // this.morphButton?.setColor([162, 18, 219, 0x7F]);
-        this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
+        this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
         this.morphButton?.setCurrentTime(5);
         delete this.timeout;
       });
