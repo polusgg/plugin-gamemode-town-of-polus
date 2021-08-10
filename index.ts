@@ -298,8 +298,6 @@ export default class extends BaseMod {
       return;
     }
 
-    console.log("[HTC] Update", this.handlingTaskCount.get(opt.getLobby()));
-
     if (this.handlingTaskCount.get(opt.getLobby())) {
       this.taskCountShouldRecurse.set(opt.getLobby(), true);
 
@@ -356,8 +354,6 @@ export default class extends BaseMod {
       ]);
     }
 
-    console.log("[HTC] Recurse", this.taskCountShouldRecurse.get(opt.getLobby()));
-
     this.handlingTaskCount.set(opt.getLobby(), false);
 
     if (this.taskCountShouldRecurse.get(opt.getLobby())) {
@@ -369,8 +365,6 @@ export default class extends BaseMod {
     if (!this.getEnabled(newLevel.getLobby())) {
       return;
     }
-
-    console.log("[HLU] Update", this.handlingLevelUpdate.get(newLevel.getLobby()), (newLevel.getValue() as EnumValue).getSelected());
 
     if (this.handlingLevelUpdate.get(newLevel.getLobby())) {
       this.levelUpdateShouldRecurse.set(newLevel.getLobby(), true);
@@ -418,8 +412,6 @@ export default class extends BaseMod {
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithRange),
       ]);
     }
-
-    console.log("[HLU] Recurse", this.levelUpdateShouldRecurse.get(newLevel.getLobby()));
 
     this.handlingLevelUpdate.set(newLevel.getLobby(), false);
 
