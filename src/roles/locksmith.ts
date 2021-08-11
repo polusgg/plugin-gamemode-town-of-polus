@@ -176,7 +176,7 @@ export class Locksmith extends Crewmate {
     this.lockpickNone = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/None.png");
     this.lockpickButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       alignment: EdgeAlignments.RightBottom,
-      position: new Vector2(2.1, 0.7),
+      position: new Vector2(-2.1, -0.7),
       currentTime: 0,
       maxTimer: this.lockSmithCooldown.value,
       isCountingDown: false,

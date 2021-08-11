@@ -68,7 +68,7 @@ export class Grenadier extends Impostor {
     Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
       maxTimer: this.grenadierCooldown.value,
-      position: new Vector2(2.1, 2.0),
+      position: new Vector2(-2.1, -2.0),
       alignment: EdgeAlignments.RightBottom,
       currentTime: 10,
     }).then(button => {

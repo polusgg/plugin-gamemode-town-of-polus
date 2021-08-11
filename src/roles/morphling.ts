@@ -97,7 +97,7 @@ export class Morphling extends Impostor {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),
       maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value,
       currentTime: gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value,
-      position: new Vector2(2.1, 2.0),
+      position: new Vector2(-2.1, -2.0),
       alignment: EdgeAlignments.RightBottom,
     });
 

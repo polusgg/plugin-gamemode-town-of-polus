@@ -65,7 +65,7 @@ export class Swooper extends Impostor {
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Swoop.png"),
       maxTimer: cooldown,
-      position: new Vector2(2.1, 2.0),
+      position: new Vector2(-2.1, -2.0),
       alignment: EdgeAlignments.RightBottom,
       currentTime: cooldown,
     }).then(async button => {
