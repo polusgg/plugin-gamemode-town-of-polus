@@ -88,7 +88,7 @@ export class Sheriff extends Impostor {
       button.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffCooldown).getValue().value);
 
       this.setOnClicked(async target => {
-        await this.owner.murder(target);
+        this.owner.murder(target);
 
         if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate) {
           await this.owner.murder(this.owner);

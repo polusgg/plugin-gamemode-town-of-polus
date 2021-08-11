@@ -91,6 +91,8 @@ export class Morphling extends Impostor {
 
     Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.VentButton, false);
 
+    this.setOutlineColor([64, 235, 115]);
+
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {

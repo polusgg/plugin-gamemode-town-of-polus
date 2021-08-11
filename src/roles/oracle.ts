@@ -73,10 +73,10 @@ export class Oracle extends Crewmate {
       }
 
       if ((target === undefined) === outlined || lastTarget !== target) {
-        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner && !x.isDead());
+        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner);
 
         for (let i = 0; i < players.length; i++) {
-          if (players[i] === target) {
+          if (players[i] === target && !players[i].isDead()) {
             animService.setOutline(players[i], [44, 76, 201, 255], [this.owner.getSafeConnection()]);
           } else {
             animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
@@ -120,7 +120,7 @@ export class Oracle extends Crewmate {
 
         button.setCountingDown(false);
         this.enchanted = target;
-        this.owner.getLobby().sendRpcPacket((this.enchanted as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [255, 140, 238, 255]), [this.owner.getSafeConnection()]);
+        this.owner.getLobby().sendRpcPacket((this.enchanted as Player).getEntity().getPlayerControl(), new SetOutlinePacket(true, [44, 76, 201, 255]), [this.owner.getSafeConnection()]);
         button.destroy();
       });
     });

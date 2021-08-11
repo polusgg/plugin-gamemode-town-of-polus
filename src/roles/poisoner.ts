@@ -7,9 +7,8 @@ import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
-import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
+import { PlayerRole } from "@nodepolus/framework/src/types/enums";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { TownOfPolusGameOptionNames } from "../types";
 import { PoisonerRange } from "../types/enums/poisonerRange";
@@ -34,6 +33,8 @@ export class Poisoner extends Impostor {
   };
 
   async onReadyImpostor(): Promise<void> {
+    this.setOutlineColor([160, 0, 252]);
+
     await super.onReadyImpostor();
 
     if (this.owner.getConnection() !== undefined) {
@@ -76,8 +77,6 @@ export class Poisoner extends Impostor {
       alignment: EdgeAlignments.RightBottom,
       currentTime: 15,
     }).then(button => {
-      Services.get(ServiceType.CoroutineManager).beginCoroutine(this.owner, this.coSaturatePoisonerButton(this.owner, button));
-
       this.catch("player.died", e => e.getPlayer()).execute(() => button.destroy());
 
       button.on("clicked", async () => {
@@ -98,18 +97,25 @@ export class Poisoner extends Impostor {
         timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
             await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
-            hudManager.closeHud(target);
-            target.setMeta("pgg.top.isPoisoned", false);
-            target.kill();
-            target.getGameDataEntry().setDead(true);
-            target.updateGameData();
-            bodyManager.spawn(target.getLobby(), {
-              color: Palette.playerBody(target.getColor()).dark as Mutable<[number, number, number, number]>,
-              shadowColor: Palette.playerBody(target.getColor()).light as Mutable<[number, number, number, number]>,
-              position: new Vector2(target.getPosition().getX(), target.getPosition().getY()),
-              playerId: target.getId(),
-            });
+
+            if (!target.isDead()) {
+              hudManager.closeHud(target);
+              target.setMeta("pgg.top.isPoisoned", false);
+              target.kill();
+              target.getGameDataEntry().setDead(true);
+              target.updateGameData();
+              bodyManager.spawn(target.getLobby(), {
+                color: Palette.playerBody(target.getColor()).dark as Mutable<[number, number, number, number]>,
+                shadowColor: Palette.playerBody(target.getColor()).light as Mutable<[number, number, number, number]>,
+                position: new Vector2(target.getPosition().getX() * -1, target.getPosition().getY() * -1),
+                playerId: target.getId(),
+              });
+            }
+
             clearInterval(timer);
+          } else if (target.isDead()) {
+            clearInterval(timer);
+            await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
           } else {
             await hudManager.setHudString(target, Location.TaskText, this.getPoisonedText(target.getMeta<BaseRole>("pgg.api.role").getDescriptionText(), poisonDuration - timeElapsed));
           }
@@ -117,84 +123,6 @@ export class Poisoner extends Impostor {
         }, 1000);
       });
     });
-  }
-
-  * coSaturatePoisonerButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
-    if (player.getLobby()
-      .getGameState() !== GameState.Started) {
-      yield;
-    }
-
-    const animService = Services.get(ServiceType.Animation);
-    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
-    const range = PoisonerRange[gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerRange).getValue().getSelected()];
-    let outlined = false;
-    let lastTarget: PlayerInstance | undefined;
-    let wasInVent = false;
-
-    while (true) {
-    //todo break out on custom predicate
-      if (player.isDead()) {
-        break;
-      }
-
-      const targets = button.getTargets(range)
-        .filter(x => !x.isImpostor() && !x.isDead() && !x.getMeta<boolean>("pgg.top.isPoisoned"));
-      const target = targets[0] as PlayerInstance | undefined;
-
-      const isSaturated = button.isSaturated();
-
-      //#region vent checks
-      if ((this.owner.getVent() === undefined) === wasInVent) {
-        if (!wasInVent) {
-          button.setSaturated(false);
-        }
-
-        if (!wasInVent) {
-          const players = this.owner.getLobby()
-            .getPlayers()
-            .filter(x => x !== this.owner);
-
-          for (let i = 0; i < players.length; i++) {
-            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
-          }
-        }
-
-        wasInVent = (this.owner.getVent() !== undefined);
-
-        while (this.owner.getVent() !== undefined) {
-          if (player.isDead()) {
-            break;
-          }
-
-          yield;
-        }
-        continue;
-      }
-      //#endregion
-
-      if ((target === undefined) === isSaturated) {
-        button.setSaturated(!isSaturated);
-      }
-
-      if ((target === undefined) === outlined || lastTarget !== target) {
-        const players = this.owner.getLobby()
-          .getPlayers()
-          .filter(x => x !== this.owner);
-
-        for (let i = 0; i < players.length; i++) {
-          if (players[i] === target) {
-            animService.setOutline(players[i], [160, 0, 252, 255], [this.owner.getSafeConnection()]);
-          } else {
-            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
-          }
-        }
-
-        lastTarget = target;
-        outlined = !outlined;
-      }
-      yield;
-    }
   }
 
   getManagerType(): typeof BaseManager {
