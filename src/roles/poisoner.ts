@@ -106,7 +106,7 @@ export class Poisoner extends Impostor {
             bodyManager.spawn(target.getLobby(), {
               color: Palette.playerBody(target.getColor()).dark as Mutable<[number, number, number, number]>,
               shadowColor: Palette.playerBody(target.getColor()).light as Mutable<[number, number, number, number]>,
-              position: new Vector2(target.getPosition().getX() * -1, target.getPosition().getY() * -1),
+              position: new Vector2(target.getPosition().getX(), target.getPosition().getY()),
               playerId: target.getId(),
             });
             clearInterval(timer);
