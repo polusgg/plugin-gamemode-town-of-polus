@@ -221,8 +221,11 @@ export class Phantom extends Crewmate {
   }
 
   async display(): Promise<void> {
-    Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
-    await Services.get(ServiceType.Hud).setHudString(this.owner, Location.RoomTracker, `You've become the <color=${COLOR}>Phantom</color>!`);
+    const hud = Services.get(ServiceType.Hud);
+
+    await hud.setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
+    await hud.setHudString(this.owner, Location.RoomTracker, `You've become the Phantom!`);
+    await hud.setHudString(this.owner, Location.MeetingButtonHudText, `You're the <color=${COLOR}>Phantom</color>.\nFinish your tasks!`);
     await this.owner.setRemainingEmergencies(1);
 
     setTimeout(() => {
