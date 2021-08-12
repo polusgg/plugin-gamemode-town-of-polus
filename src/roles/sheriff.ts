@@ -42,7 +42,7 @@ export class Sheriff extends Impostor {
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()
         // player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor
-        .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role") instanceof SerialKiller) && !player.isDead())
+        .filter(player => (player.isImpostor() || player.getMeta<BaseRole | undefined>("pgg.api.role") instanceof SerialKiller) && !player.isDead() && !player.getGameDataEntry().isDisconnected())
         .length == 0)
       .execute(async event => {
         const impostorCount = this.owner.getLobby().getPlayers().filter(player => player.isImpostor()).length;
