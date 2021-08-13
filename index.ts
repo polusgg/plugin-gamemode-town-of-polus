@@ -340,7 +340,7 @@ export default class extends BaseMod {
           gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
           gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
           gameOptions.createOption(TownOfPolusGameOptionCategories.Config, "<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 18),
-          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 4),
+          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11> </size><color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 4),
         ]);
       }
     } catch { }
@@ -381,7 +381,7 @@ export default class extends BaseMod {
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithCooldown),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithUses),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithRange),
-        gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, `<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 1),
+        gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, `<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 1),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Cooldown`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 12),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Uses`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 13),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 14),
