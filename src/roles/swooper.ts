@@ -103,7 +103,7 @@ export class Swooper extends Impostor {
   }
 
   async swoop(): Promise<void> {
-    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
+    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.NameOpacity], [
       new PlayerAnimationKeyframe({
         offset: 0,
         duration: 50,
@@ -112,7 +112,7 @@ export class Swooper extends Impostor {
       }),
     ], false, this.owner.getLobby().getConnections().filter(c => c !== this.owner.getSafeConnection()));
 
-    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
+    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.NameOpacity], [
       new PlayerAnimationKeyframe({
         offset: 0,
         duration: 80,
