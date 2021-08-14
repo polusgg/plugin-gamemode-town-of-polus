@@ -96,9 +96,11 @@ export class Poisoner extends Impostor {
 
         timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
-            await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
+            clearInterval(timer);
 
-            if (!target.isDead()) {
+            if (target.getLobby().getGame() !== undefined) {
+              await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
+
               hudManager.closeHud(target);
               target.setMeta("pgg.top.isPoisoned", false);
               target.kill();
@@ -107,11 +109,11 @@ export class Poisoner extends Impostor {
               bodyManager.spawn(target.getLobby(), {
                 color: Palette.playerBody(target.getColor()).dark as Mutable<[number, number, number, number]>,
                 shadowColor: Palette.playerBody(target.getColor()).light as Mutable<[number, number, number, number]>,
-                position: new Vector2(target.getPosition().getX() * -1, target.getPosition().getY() * -1),
+                position: target.getPosition(),
                 playerId: target.getId(),
               });
             }
-
+          } else if (target.getLobby().getGame() === undefined) {
             clearInterval(timer);
           } else if (target.isDead()) {
             clearInterval(timer);

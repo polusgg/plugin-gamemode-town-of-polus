@@ -278,7 +278,7 @@ export default class extends BaseMod {
     setTimeout(() => {
       this.handleTaskCountUpdate({ getLobby() { return lobby } });
       this.handleLevelUpdate(gameOptions.getOption("Map"));
-    }, 150);
+    }, 250);
   }
 
   async onDisable(lobby: LobbyInstance): Promise<void> {

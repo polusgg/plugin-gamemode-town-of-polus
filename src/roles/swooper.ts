@@ -109,6 +109,7 @@ export class Swooper extends Impostor {
         duration: 50,
         opacity: 0,
         petOpacity: 0,
+        nameOpacity: 0,
       }),
     ], false, this.owner.getLobby().getConnections().filter(c => c !== this.owner.getSafeConnection()));
 
@@ -118,6 +119,7 @@ export class Swooper extends Impostor {
         duration: 80,
         opacity: 0.3,
         petOpacity: 0.3,
+        nameOpacity: 0.3,
       }),
     ], false, [this.owner.getSafeConnection()]);
 
@@ -125,12 +127,13 @@ export class Swooper extends Impostor {
   }
 
   async swoopBack(): Promise<void> {
-    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
+    await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.NameOpacity], [
       new PlayerAnimationKeyframe({
         offset: 0,
         duration: 80,
         opacity: 1,
         petOpacity: 1,
+        nameOpacity: 1,
       }),
     ], false);
 
