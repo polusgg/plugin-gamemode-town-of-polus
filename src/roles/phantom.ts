@@ -21,6 +21,7 @@ import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crew
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { VanillaWinConditions } from "@polusgg/plugin-polusgg-api/src/services/endGame/vanillaWinConditions";
+import { DeathReason } from "@nodepolus/framework/src/types/enums";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -69,121 +70,16 @@ export class Phantom extends Crewmate {
   onReady(): void {
     const endGame = Services.get(ServiceType.EndGame);
 
-    this.catch("player.died", e => e.getPlayer()).execute(_event => {
-      Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
+    this.catch("player.died", e => e.getPlayer()).execute(async event => {
+      if (event.getReason() === DeathReason.Unknown) {
+        await this.handleMurder();
+      } else {
+        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
+      }
     });
 
     this.catch("player.murdered", x => x.getPlayer()).where(e => e.getPlayer() !== e.getKiller()).execute(async _event => {
-      if (this.state !== PhantomState.Alive) {
-        if (this.state === PhantomState.Transformed) {
-          console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
-        }
-
-        return;
-      }
-
-      this.owner.setMeta("pgg.countAsDead", true);
-
-      if (VanillaWinConditions.shouldEndGameImpostors(this.owner.getLobby())) {
-        Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getSafeGame(), {
-          intentName: "impostorKill",
-          endGameData: new Map(this.owner.getLobby().getPlayers().map(p => ([
-            p,
-            {
-              title: p.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
-              color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
-              yourTeam: p.getLobby()
-                .getPlayers()
-                .filter(sus => sus.isImpostor()),
-              winSound: WinSoundType.ImpostorWin,
-              hasWon: p.isImpostor(),
-            },
-          ]))),
-        });
-      }
-
-      Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "impostorVote" });
-      Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "crewmateVote" });
-      Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.ReportButton, false);
-
-      this.catch("player.task.completed", x => x.getPlayer()).execute(async event => {
-        if (event.getPlayer().getGameDataEntry().isDoneWithTasks()) {
-          await Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getAfterTasksFinishedText());
-        }
-      });
-
-      this.catch("meeting.vote.added", x => x.getVoter())
-        .execute(event => event.cancel());
-
-      /*const notMurderers = event.getKiller().getLobby().getPlayers()
-        .filter(p => p !== event.getKiller())
-        .map(player => player.getSafeConnection());*/
-
-      // todo make sure dead bodies can be reported (they can't right now!!!)
-      // todo stop spawning vanilla among us dead bodies on the client?
-
-      /*Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
-        color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
-        shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
-        position: this.owner.getPosition(),
-      }, notMurderers);*/
-
-      if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
-        .getValue()
-        .getSelected() === "After Meeting") {
-        await (async (): Promise<void> => new Promise<void>(resolve => {
-          this.catch("meeting.started", m => m.getGame()).execute(_ => {
-            if (!_.isCancelled() && _.getCaller().getId() !== this.owner.getId()) {
-              resolve();
-            }
-          });
-          this.catch("game.ended", g => g.getGame()).execute(_ => {
-            resolve();
-          });
-        }))();
-      }
-
-      this.state = PhantomState.Transformed;
-
-      if (this.owner.getLobby().getMeetingHud() !== undefined) {
-        const watcher = this.catch("meeting.concluded", meeting => meeting.getGame());
-
-        watcher.execute(_ => {
-          this.display();
-          watcher.destroy();
-        });
-      } else {
-        this.display();
-      }
-
-      this.owner.setMeta("pgg.api.targetable", false);
-      this.setAlignment(RoleAlignment.Neutral);
-      this.giveTasks();
-
-      if (this.owner.getLobby().getPlayers()
-        .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
-        .filter(player => !player.getLobby().getGameData()?.getGameData()
-          .getSafePlayer(player.getId())
-          .isDoneWithTasks(),
-        ).length == 0) {
-        endGame.registerEndGameIntent(this.owner.getLobby().getGame()!, {
-          endGameData: new Map(this.owner.getLobby().getPlayers()
-            .map(player => [player, {
-              title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
-              subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks\n<size=50%>(The impostor killed a phantom in crew form, resetting their tasks. All other crewmates were finished with their tasks)</size>",
-              color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
-              yourTeam: this.owner.getLobby().getPlayers()
-                .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
-              winSound: WinSoundType.CrewmateWin,
-              hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
-            }])),
-          intentName: "crewmateTasks",
-        });
-      }
-      Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
-      this.owner.revive();
-      await this.showPhantom();
+      await this.handleMurder();
     });
 
     this.catch("meeting.started", event => event.getGame())
@@ -243,6 +139,119 @@ export class Phantom extends Crewmate {
     );
 
     this.owner.setTasks(new Set(tasks));
+  }
+
+  async handleMurder(): Promise<void> {
+    if (this.state !== PhantomState.Alive) {
+      if (this.state === PhantomState.Transformed) {
+        console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
+      }
+
+      return;
+    }
+
+    this.owner.setMeta("pgg.countAsDead", true);
+
+    if (VanillaWinConditions.shouldEndGameImpostors(this.owner.getLobby())) {
+      Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getSafeGame(), {
+        intentName: "impostorKill",
+        endGameData: new Map(this.owner.getLobby().getPlayers().map(p => ([
+          p,
+          {
+            title: p.isImpostor() ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+            subtitle: "<color=#FF1919FF>Impostors</color> won by kills",
+            color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+            yourTeam: p.getLobby()
+              .getPlayers()
+              .filter(sus => sus.isImpostor()),
+            winSound: WinSoundType.ImpostorWin,
+            hasWon: p.isImpostor(),
+          },
+        ]))),
+      });
+    }
+
+    Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "impostorVote" });
+    Services.get(ServiceType.EndGame).registerExclusion(this.owner.getLobby().getSafeGame(), { intentName: "crewmateVote" });
+    Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.ReportButton, false);
+
+    this.catch("player.task.completed", x => x.getPlayer()).execute(async event => {
+      if (event.getPlayer().getGameDataEntry().isDoneWithTasks()) {
+        await Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getAfterTasksFinishedText());
+      }
+    });
+
+    this.catch("meeting.vote.added", x => x.getVoter())
+      .execute(event => event.cancel());
+
+    /*const notMurderers = event.getKiller().getLobby().getPlayers()
+      .filter(p => p !== event.getKiller())
+      .map(player => player.getSafeConnection());*/
+
+    // todo make sure dead bodies can be reported (they can't right now!!!)
+    // todo stop spawning vanilla among us dead bodies on the client?
+
+    /*Services.get(ServiceType.DeadBody).spawn(event.getPlayer().getLobby(), {
+      color: Palette.playerBody(this.owner.getColor()).dark as Mutable<[number, number, number, number]>,
+      shadowColor: Palette.playerBody(this.owner.getColor()).light as Mutable<[number, number, number, number]>,
+      position: this.owner.getPosition(),
+    }, notMurderers);*/
+
+    if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
+      .getValue()
+      .getSelected() === "After Meeting") {
+      await (async (): Promise<void> => new Promise<void>(resolve => {
+        this.catch("meeting.started", m => m.getGame()).execute(_ => {
+          if (!_.isCancelled() && _.getCaller().getId() !== this.owner.getId()) {
+            resolve();
+          }
+        });
+        this.catch("game.ended", g => g.getGame()).execute(_ => {
+          resolve();
+        });
+      }))();
+    }
+
+    this.state = PhantomState.Transformed;
+
+    if (this.owner.getLobby().getMeetingHud() !== undefined) {
+      const watcher = this.catch("meeting.concluded", meeting => meeting.getGame());
+
+      watcher.execute(_ => {
+        this.display();
+        watcher.destroy();
+      });
+    } else {
+      this.display();
+    }
+
+    this.owner.setMeta("pgg.api.targetable", false);
+    this.setAlignment(RoleAlignment.Neutral);
+    this.giveTasks();
+
+    if (this.owner.getLobby().getPlayers()
+      .filter(player => player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate)
+      .filter(player => !player.getLobby().getGameData()?.getGameData()
+        .getSafePlayer(player.getId())
+        .isDoneWithTasks(),
+      ).length == 0) {
+      Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
+        endGameData: new Map(this.owner.getLobby().getPlayers()
+          .map(player => [player, {
+            title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+            subtitle: "<color=#8CFFFFFF>Crewmates</color> won by tasks\n<size=50%>(The impostor killed a phantom in crew form, resetting their tasks. All other crewmates were finished with their tasks)</size>",
+            color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
+            yourTeam: this.owner.getLobby().getPlayers()
+              .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+            winSound: WinSoundType.CrewmateWin,
+            hasWon: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
+          }])),
+        intentName: "crewmateTasks",
+      });
+    }
+    Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
+    this.owner.revive();
+    await this.showPhantom();
   }
 
   async unshowPhantom(): Promise<void> {
