@@ -37,7 +37,7 @@ export class Sheriff extends Impostor {
 
     const endGame = Services.get(ServiceType.EndGame);
 
-    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .where(event => event.getPlayer().getLobby().getPlayers()

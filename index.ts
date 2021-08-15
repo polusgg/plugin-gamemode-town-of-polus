@@ -21,9 +21,11 @@ import { Locksmith, LocksmithManager } from "./src/roles/locksmith";
 import { LobbyDefaultOptions, vanillaGameOptions } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOptionsService";
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
-import { Swooper } from "./src/roles/swooper";
+import { Swooper, SwooperManager } from "./src/roles/swooper";
 import { Poisoner } from "./src/roles/poisoner";
-import { Morphling } from "./src/roles/morphling";
+import { Morphling, MorphlingManager } from "./src/roles/morphling";
+import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -101,6 +103,8 @@ const pluginMetadata: PluginMetadata = {
 };
 
 const roleEmojis = new Map([
+  [CrewmateManager, EmojiService.static("crewmate")],
+  [ImpostorManager, EmojiService.static("impostor")],
   [EngineerManager, EmojiService.static("engineer")],
   [GrenadierManager, EmojiService.static("grenadier")],
   [JesterManager, EmojiService.static("jester")],
@@ -110,6 +114,8 @@ const roleEmojis = new Map([
   [SerialKillerManager, EmojiService.static("serialkiller")],
   [SheriffManager, EmojiService.static("sheriff")],
   [SnitchManager, EmojiService.static("snitch")],
+  [SwooperManager, EmojiService.static("swooper")],
+  [MorphlingManager, EmojiService.static("morphling")],
 ]);
 
 const alignmentEmojis = new Map([

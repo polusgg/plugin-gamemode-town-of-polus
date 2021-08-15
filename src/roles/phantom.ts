@@ -22,6 +22,7 @@ import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSou
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { VanillaWinConditions } from "@polusgg/plugin-polusgg-api/src/services/endGame/vanillaWinConditions";
 import { DeathReason } from "@nodepolus/framework/src/types/enums";
+import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 
 export class PhantomManager extends BaseManager {
   getId(): string { return "phantom" }
@@ -49,7 +50,7 @@ export class Phantom extends Crewmate {
     super(owner);
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${EmojiService.static("crewmate")} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
       const allPlayers = owner.getLobby().getRealPlayers();
 
@@ -213,6 +214,7 @@ export class Phantom extends Crewmate {
     }
 
     this.state = PhantomState.Transformed;
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
     if (this.owner.getLobby().getMeetingHud() !== undefined) {
       const watcher = this.catch("meeting.concluded", meeting => meeting.getGame());

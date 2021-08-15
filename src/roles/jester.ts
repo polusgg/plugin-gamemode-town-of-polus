@@ -31,7 +31,7 @@ export class Jester extends BaseRole {
   constructor(owner: PlayerInstance) {
     super(owner);
 
-    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
     Services.get(ServiceType.RoleManager).setBaseRole(this.owner, PlayerRole.Crewmate);
     owner.getSafeConnection().writeReliable(new AllowTaskInteractionPacket(false));

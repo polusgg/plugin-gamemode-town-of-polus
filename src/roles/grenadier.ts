@@ -48,7 +48,7 @@ export class Grenadier extends Impostor {
     this.grenadierCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue();
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${this.owner.getName().toString()}`);
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
@@ -84,7 +84,9 @@ export class Grenadier extends Impostor {
       button.on("clicked", () => {
         const blindness = this.grenadierBlindness;
 
-        if (button.getCurrentTime() != 0 || !button.isSaturated() || button.isDestroyed()) {
+        console.log(button.getEntity().getClickBehaviour());
+
+        if (button.getCurrentTime() != 0 || !button.isSaturated() || button.isDestroyed() || button.getCurrentTime() !== 0) {
           return;
         }
 
@@ -94,7 +96,8 @@ export class Grenadier extends Impostor {
           return;
         }
 
-        button.setSaturated(false);
+        button.stopCountingDown();
+        button.setCurrentTime(button.getMaxTime());
         inRangePlayers.forEach(player => {
           Services.get(ServiceType.Animation)
             .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
@@ -155,6 +158,10 @@ export class Grenadier extends Impostor {
     let wasInVent = false;
 
     while (true) {
+      if (button.isCountingDown()) {
+        yield;
+      }
+
       //todo break out on custom predicate
       if (player.isDead()) {
         break;

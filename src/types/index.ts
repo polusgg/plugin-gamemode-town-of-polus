@@ -18,7 +18,7 @@ export enum TownOfPolusGameOptionNames {
 
   JesterProbability = "<size=150%><sprite index=6> </size><color=#ff8cee>Jester</color>",
 
-  MorphlingProbability = "<color=#40EB73>Morphling</color>",
+  MorphlingProbability = "<size=150%><sprite index=21> </size><color=#40EB73>Morphling</color>",
   MorphlingCooldown = "<color=#40EB73>Morphling</color> Cooldown",
   MorphlingDuration = "<color=#40EB73>Morphling</color> Duration",
 
