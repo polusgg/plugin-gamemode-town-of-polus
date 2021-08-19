@@ -148,7 +148,7 @@ export class Morphling extends Impostor {
         if (target !== undefined) {
           await Promise.allSettled(
             [
-              this.morphButton.setColor(Palette.playerBody()[target.getColor()].dark as any),
+              this.morphButton.setColor(Palette.playerBody()[target.getColor()].light as any),
               this.morphButton.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Morph.png")),
               this.morphButton.setCurrentTime(5),
             ],
@@ -186,8 +186,8 @@ export class Morphling extends Impostor {
             hatOpacity: 1,
             petOpacity: 1,
             skinOpacity: 1,
-            primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-            secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+            primaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+            secondaryColor: Palette.playerBody()[this.targetAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
           }),
         ], false);
 
@@ -213,8 +213,8 @@ export class Morphling extends Impostor {
               opacity: 1,
               position: Vector2.zero(),
               scale: Vector2.one(),
-              primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
-              secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+              primaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].light as Mutable<[number, number, number, number]>,
+              secondaryColor: Palette.playerBody()[this.ownAppearance!.color as PlayerColor].dark as Mutable<[number, number, number, number]>,
             }),
           ], false);
           this.transformed = false;
