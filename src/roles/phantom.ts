@@ -76,7 +76,7 @@ export class Phantom extends Crewmate {
       if (event.getReason() === DeathReason.Unknown) {
         await this.handleMurder();
       } else {
-        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
+        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, CREWMATE_DEAD_STRING);
       }
     });
 
@@ -90,6 +90,7 @@ export class Phantom extends Crewmate {
         if (event.getCaller() === this.owner || event.isCancelled()) {
           event.cancel();
         } else {
+          event.getMeetingHud().getMeetingHud().getPlayerState(this.owner.getId())!.setDead(true);
           this.unshowPhantom();
         }
       });
@@ -262,7 +263,6 @@ export class Phantom extends Crewmate {
       return;
     }
 
-    this.owner.getGameDataEntry().setDead(true);
     await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
     this.button?.destroy();
     this.button = undefined;
@@ -272,8 +272,6 @@ export class Phantom extends Crewmate {
     if (this.state !== PhantomState.Transformed) {
       return;
     }
-
-    this.owner.getGameDataEntry().setDead(false);
 
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
 
