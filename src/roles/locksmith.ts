@@ -106,6 +106,7 @@ export class Locksmith extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Locksmith",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   private lockpickOpen!: Asset;

@@ -31,6 +31,7 @@ export class Oracle extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Oracle",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {

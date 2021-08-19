@@ -33,6 +33,7 @@ export class Grenadier extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Grenadier",
     alignment: RoleAlignment.Impostor,
+    preventBaseEmoji: true,
   };
 
   private get grenadierRange(): number { return 5.5 }
@@ -48,8 +49,6 @@ export class Grenadier extends Impostor {
     this.grenadierCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue();
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
-
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
@@ -61,6 +60,8 @@ export class Grenadier extends Impostor {
   }
 
   onReady(): void {
+    Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+
     const roleManager = Services.get(ServiceType.RoleManager);
 
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);

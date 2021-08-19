@@ -30,6 +30,7 @@ export class Poisoner extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Poisoner",
     alignment: RoleAlignment.Impostor,
+    preventBaseEmoji: true,
   };
 
   async onReadyImpostor(): Promise<void> {

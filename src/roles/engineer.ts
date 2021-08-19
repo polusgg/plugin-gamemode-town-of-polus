@@ -29,6 +29,7 @@ export class Engineer extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Engineer",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {

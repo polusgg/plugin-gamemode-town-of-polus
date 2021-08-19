@@ -25,6 +25,7 @@ export class Snitch extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Snitch",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {

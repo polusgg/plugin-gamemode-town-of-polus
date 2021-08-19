@@ -23,6 +23,7 @@ export class Marker extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Marker",
     alignment: RoleAlignment.Impostor,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {

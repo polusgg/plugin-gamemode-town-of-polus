@@ -42,6 +42,7 @@ export class Phantom extends Crewmate {
   protected metadata: RoleMetadata = {
     name: "Phantom",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   private button: Button | undefined;

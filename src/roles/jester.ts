@@ -26,6 +26,7 @@ export class Jester extends BaseRole {
   protected metadata: RoleMetadata = {
     name: "Jester",
     alignment: RoleAlignment.Neutral,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {

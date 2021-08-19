@@ -32,6 +32,7 @@ export class Swooper extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Swooper",
     alignment: RoleAlignment.Impostor,
+    preventBaseEmoji: true,
   };
 
   async onReadyImpostor(): Promise<void> {

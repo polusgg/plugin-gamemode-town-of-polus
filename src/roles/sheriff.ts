@@ -30,6 +30,7 @@ export class Sheriff extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Sheriff",
     alignment: RoleAlignment.Crewmate,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {
@@ -111,6 +112,20 @@ export class Sheriff extends Impostor {
                 }])),
             });
           }
+        }
+
+        if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Phantom") {
+          await Services.get(ServiceType.DeadBody).spawn(target.getLobby(), {
+            color: Palette.playerBody(target.getColor()).light as any,
+            shadowColor: Palette.playerBody(target.getColor()).dark as any,
+            position: target.getPosition(),
+          });
+
+          await Services.get(ServiceType.DeadBody).spawn(this.owner.getLobby(), {
+            color: Palette.playerBody(this.owner.getColor()).light as any,
+            shadowColor: Palette.playerBody(this.owner.getColor()).dark as any,
+            position: this.owner.getPosition(),
+          });
         }
       });
 

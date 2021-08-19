@@ -1,22 +1,22 @@
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
+import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
+import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
+import { ConnectionInfo, Mutable, Vector2 } from "@nodepolus/framework/src/types";
+import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
+import { GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
+import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { TextComponent } from "@nodepolus/framework/src/api/text";
-import { GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
-import { Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
-import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
-import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
-import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
+import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -31,7 +31,7 @@ Fake Task:`;
 
 class PlayerAppearance {
   constructor(
-    public name: TextComponent,
+    public names: [ConnectionInfo, string][],
     public hat: number,
     public pet: number,
     public skin: number,
@@ -39,8 +39,13 @@ class PlayerAppearance {
   ) {}
 
   static save(player: PlayerInstance): PlayerAppearance {
+    const nameService = Services.get(ServiceType.Name);
+
     return new PlayerAppearance(
-      player.getName(),
+      player.getLobby().getRealPlayers().map(subplayer => ([
+        subplayer.getSafeConnection().getConnectionInfo(),
+        nameService.getFor(subplayer.getSafeConnection(), player),
+      ])),
       player.getHat(),
       player.getPet(),
       player.getSkin(),
@@ -49,7 +54,19 @@ class PlayerAppearance {
   }
 
   apply(player: PlayerInstance): void {
-    Services.get(ServiceType.Name).set(player, this.name.toString());
+    const nameService = Services.get(ServiceType.Name);
+
+    for (let i = 0; i < this.names.length; i++) {
+      const name = this.names[i];
+      const connection = player.getLobby().getServer().getConnection(name[0]);
+
+      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Morphling" && connection === player.getConnection()) {
+        nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`);
+      } else {
+        nameService.setFor(connection, player, name[1]);
+      }
+    }
+
     player.setHat(this.hat);
     player.setPet(this.pet);
     player.setSkin(this.skin);
@@ -67,6 +84,7 @@ export class Morphling extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Morphling",
     alignment: RoleAlignment.Impostor,
+    preventBaseEmoji: true,
   };
 
   constructor(owner: PlayerInstance) {
@@ -74,8 +92,6 @@ export class Morphling extends Impostor {
     this.transformed = false;
 
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
-
       Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
@@ -92,7 +108,6 @@ export class Morphling extends Impostor {
     Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.VentButton, false);
 
     this.setOutlineColor([64, 235, 115]);
-
     this.ownAppearance = PlayerAppearance.save(this.owner);
 
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
@@ -206,7 +221,7 @@ export class Morphling extends Impostor {
           await Promise.all([
             this.morphButton?.setMaxTime(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value),
             this.morphButton?.setCurrentTime(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingCooldown).getValue().value),
-            this.morphButton?.setSaturated(false),
+            this.morphButton?.setSaturated(true),
           ]);
         }, gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingDuration).getValue().value * 1000);
       }
@@ -233,6 +248,8 @@ export class Morphling extends Impostor {
         this.morphButton?.setCurrentTime(5);
         delete this.timeout;
       });
+
+    await Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
   }
 
   * coSaturateMorphlingButton(player: PlayerInstance, button: Button): Generator<void, void, number> {

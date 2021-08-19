@@ -29,6 +29,7 @@ export class SerialKiller extends Impostor {
   protected metadata: RoleMetadata = {
     name: "Serial Killer",
     alignment: RoleAlignment.Neutral,
+    preventBaseEmoji: true,
   };
 
   private unexcluded = false;
