@@ -1,7 +1,7 @@
 {
   "name": "@polusgg/plugin-gamemode-town-of-polus",
   "np-plugin": true,
-  "version": "1.0.1-37",
+  "version": "1.0.1-38",
   "description": "Polus.gg Town of Polus gamemode plugin for NodePolus",
   "repository": {
     "type": "git",
