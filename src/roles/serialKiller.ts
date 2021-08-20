@@ -114,7 +114,7 @@ export class SerialKiller extends Impostor {
     });
   }
 
-  onDestroy(destroyReason: RoleDestroyedReason): void {
+  async onDestroy(destroyReason: RoleDestroyedReason): Promise<void> {
     if (this.owner.getLobby().getGameState() === GameState.Started && destroyReason === RoleDestroyedReason.Disconnect) {
       this.checkEndCriteria(this.owner.getLobby(), this.owner);
     }
