@@ -17,6 +17,7 @@ import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
+import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -53,23 +54,26 @@ class PlayerAppearance {
     );
   }
 
-  apply(player: PlayerInstance): void {
+  async apply(player: PlayerInstance): Promise<void> {
     const nameService = Services.get(ServiceType.Name);
+    const promises: Promise<void>[] = []
 
     for (let i = 0; i < this.names.length; i++) {
       const name = this.names[i];
       const connection = player.getLobby().getServer().getConnection(name[0]);
 
-      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Morphling" && connection === player.getConnection()) {
-        nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`);
+      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === Morphling.name && connection === player.getConnection()) {
+        promises.push(nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`));
       } else {
-        nameService.setFor(connection, player, name[1]);
+        promises.push(nameService.setFor(connection, player, name[1]));
       }
     }
 
-    player.setHat(this.hat);
-    player.setPet(this.pet);
-    player.setSkin(this.skin);
+    promises.push(player.setHat(this.hat));
+    promises.push(player.setPet(this.pet));
+    promises.push(player.setSkin(this.skin));
+
+    await Promise.all(promises);
     // player.setColor(this.color);
   }
 }
@@ -82,7 +86,7 @@ export class Morphling extends Impostor {
   public morphButton: Button | undefined;
 
   protected metadata: RoleMetadata = {
-    name: "Morphling",
+    name: Morphling.name,
     alignment: RoleAlignment.Impostor,
     preventBaseEmoji: true,
   };
@@ -178,7 +182,7 @@ export class Morphling extends Impostor {
           return;
         }
 
-        this.targetAppearance.apply(this.owner);
+        await this.targetAppearance.apply(this.owner);
         await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
           new PlayerAnimationKeyframe({
             offset: 0,
@@ -204,7 +208,7 @@ export class Morphling extends Impostor {
               secondaryColor: [155, 155, 155, 255],
             }),
           ], false);
-          this.ownAppearance!.apply(this.owner);
+          await this.ownAppearance!.apply(this.owner);
           await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.PrimaryColor, PlayerAnimationField.SecondaryColor], [
             new PlayerAnimationKeyframe({
               angle: 0,
@@ -238,18 +242,24 @@ export class Morphling extends Impostor {
         delete this.timeout;
       });
 
-    this.catch("game.ended", event => event.getGame())
-      .where(() => !this.owner.isDead())
-      .execute(() => {
-        this.ownAppearance?.apply(this.owner);
-        this.targetAppearance = undefined;
-        // this.morphButton?.setColor([162, 18, 219, 0x7F]);
-        this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
-        this.morphButton?.setCurrentTime(5);
-        delete this.timeout;
-      });
+    // this.catch("game.ended", event => event.getGame())
+    //   .where(event => !this.owner.isDead() && event.getReason() === 0x07 as GameOverReason)
+    //   .execute(async () => {
+    //     // this.targetAppearance = undefined;
+    //     // this.morphButton?.setColor([162, 18, 219, 0x7F]);
+    //     // this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
+    //     // this.morphButton?.setCurrentTime(5);
+    //   });
 
     await Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+  }
+
+  async onDestroy(_destroyReason: RoleDestroyedReason): Promise<void> {
+    if (RoleDestroyedReason.GameEnded) {
+      await this.ownAppearance?.apply(this.owner);
+      delete this.timeout;
+    }
+    await super.onDestroy(_destroyReason);
   }
 
   * coSaturateMorphlingButton(player: PlayerInstance, button: Button): Generator<void, void, number> {

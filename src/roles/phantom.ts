@@ -252,9 +252,11 @@ export class Phantom extends Crewmate {
           }])),
         intentName: "crewmateTasks",
       });
+
+      return;
     }
-    Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
-    this.owner.revive();
+    await Services.get(ServiceType.Animation).setOpacity(this.owner, 0);
+    await this.owner.revive();
     await this.showPhantom();
   }
 
