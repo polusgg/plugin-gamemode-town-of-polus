@@ -1,7 +1,8 @@
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
-import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
+import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { Impostor } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
@@ -16,8 +17,6 @@ import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
-import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
-import { RoleDestroyedReason } from "@polusgg/plugin-polusgg-api/src/types/enums/roleDestroyedReason";
 
 export class MorphlingManager extends BaseManager {
   getId(): string { return "morphling" }
@@ -56,13 +55,13 @@ class PlayerAppearance {
 
   async apply(player: PlayerInstance): Promise<void> {
     const nameService = Services.get(ServiceType.Name);
-    const promises: Promise<void>[] = []
+    const promises: Promise<void>[] = [];
 
     for (let i = 0; i < this.names.length; i++) {
       const name = this.names[i];
       const connection = player.getLobby().getServer().getConnection(name[0]);
 
-      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === Morphling.name && connection === player.getConnection()) {
+      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Morphling" && connection === player.getConnection()) {
         promises.push(nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`));
       } else {
         promises.push(nameService.setFor(connection, player, name[1]));
@@ -242,25 +241,17 @@ export class Morphling extends Impostor {
         delete this.timeout;
       });
 
-    // this.catch("game.ended", event => event.getGame())
-    //   .where(event => !this.owner.isDead() && event.getReason() === 0x07 as GameOverReason)
-    //   .execute(async () => {
-    //     // this.targetAppearance = undefined;
-    //     // this.morphButton?.setColor([162, 18, 219, 0x7F]);
-    //     // this.morphButton?.setAsset(AssetBundle.loadSafeFromCache("TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"));
-    //     // this.morphButton?.setCurrentTime(5);
-    //   });
-
     await Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
   }
 
-  async onDestroy(_destroyReason: RoleDestroyedReason): Promise<void> {
-    if (RoleDestroyedReason.GameEnded) {
-      await this.ownAppearance?.apply(this.owner);
-      delete this.timeout;
-    }
-    await super.onDestroy(_destroyReason);
-  }
+  // async onDestroy(destroyReason: RoleDestroyedReason): Promise<void> {
+  //   if (destroyReason == RoleDestroyedReason.GameEnded) {
+  //     await this.ownAppearance?.apply(this.owner);
+  //     delete this.timeout;
+  //   }
+
+  //   await super.onDestroy(destroyReason);
+  // }
 
   * coSaturateMorphlingButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
     if (player.getLobby().getGameState() !== GameState.Started) {

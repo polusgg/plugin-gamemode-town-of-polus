@@ -160,6 +160,20 @@ export default class extends BaseMod {
     // });
 
     // todo set task strings for all impostor and neutral types
+
+    Services.get(ServiceType.EndGame).on("beforeGameEnd", async game => {
+      const players = game.getLobby().getPlayers();
+
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        const role = player.getMeta<BaseRole>("pgg.api.role");
+
+        if (role instanceof Morphling) {
+          delete role.timeout;
+          await role.ownAppearance!.apply(role.owner);
+        }
+      }
+    });
   }
 
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] {
@@ -381,7 +395,7 @@ export default class extends BaseMod {
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions & any>(newLevel.getLobby());
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected()) && gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability) !== undefined) {
+    if ((newLevel.getValue() as EnumValue).index < 2 && gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability) !== undefined) {
       await Promise.all([
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithProbability),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.LocksmithCooldown),
@@ -393,9 +407,9 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 14),
       ]);
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (!(["Mira HQ", "The Skeld", "dlekS ehT"].includes((newLevel.getValue() as EnumValue).getSelected())) && gameOptions.getOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`) !== undefined) {
+    } else if ((newLevel.getValue() as EnumValue).index >= 2 && gameOptions.getOption(`<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`) !== undefined) {
       await Promise.all([
-        gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`),
+        gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Cooldown`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Uses`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`),
@@ -408,7 +422,7 @@ export default class extends BaseMod {
 
     if (!this.getEnabled(newLevel.getLobby())) {
       await Promise.all([
-        gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f></size> <color=#3d85c67f>Locksmith</color><alpha=#7f>`),
+        gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Cooldown`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Uses`),
         gameOptions.deleteOption(`<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`),
