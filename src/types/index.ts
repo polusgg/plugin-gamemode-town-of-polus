@@ -45,6 +45,9 @@ export enum TownOfPolusGameOptionNames {
   LocksmithCooldown = "<color=#3d85c6>Locksmith</color> Cooldown",
   LocksmithUses = "<color=#3d85c6>Locksmith</color> Uses",
   LocksmithRange = "<color=#3d85c6>Locksmith</color> Range",
+
+  ImperviousProbability = "<color=#2d7531>Impervious</color>",
+  ImperviousCooldown = "<color=#2d7531>Impervious</color> Cooldown",
 }
 
 export enum TownOfPolusGameOptionCategories {
