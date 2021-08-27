@@ -89,6 +89,10 @@ export class Impervious extends Crewmate {
       yield;
     }
 
+    const animService = Services.get(ServiceType.Animation);
+    let outlined = false;
+    let lastTarget: PlayerInstance | undefined;
+
     while (true) {
       if (player.isDead()) {
         break;
@@ -108,6 +112,21 @@ export class Impervious extends Crewmate {
 
       if ((target === undefined) === isSaturated) {
         button.setSaturated(!isSaturated);
+      }
+
+      if ((target === undefined) === outlined || lastTarget !== target) {
+        const players = this.owner.getLobby().getPlayers().filter(x => x !== this.owner);
+
+        for (let i = 0; i < players.length; i++) {
+          if (players[i] === target && !players[i].isDead()) {
+            animService.setOutline(players[i], [45, 117, 49, 255], [this.owner.getSafeConnection()]);
+          } else {
+            animService.clearOutlineFor(players[i], this.owner.getSafeConnection());
+          }
+        }
+
+        lastTarget = target;
+        outlined = !outlined;
       }
 
       yield;
