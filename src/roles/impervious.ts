@@ -121,13 +121,13 @@ export class Impervious extends Crewmate {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Impervious",
-      subtitle: "Protect one of your fellow Crewmates",
+      subtitle: "Enchant one of your fellow Crewmates",
       color: [45, 117, 49, 255],
     };
   }
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Impervious
-Protect one of your fellow crewmates.</color>`;
+Enchant one of your fellow crewmates, to protect them.</color>`;
   }
 }

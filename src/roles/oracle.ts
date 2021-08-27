@@ -164,7 +164,7 @@ export class Oracle extends Crewmate {
   getAssignmentScreen(_player: PlayerInstance): StartGameScreenData {
     return {
       title: "Oracle",
-      subtitle: "Enchant a player and reveal their alignment",
+      subtitle: "Predict a player alignment",
       color: [44, 76, 201, 255],
     };
   }
@@ -172,6 +172,6 @@ export class Oracle extends Crewmate {
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Oracle
 Finish your tasks.
-You can enchant a player. Their alignment\nwill be revealed when your body is found.</color>`;
+You can predict a player alignment. It will be\nrevealed if your body is found.</color>`;
   }
 }
