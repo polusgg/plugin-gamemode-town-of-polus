@@ -26,7 +26,7 @@ import { Poisoner } from "./src/roles/poisoner";
 import { Morphling, MorphlingManager } from "./src/roles/morphling";
 import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { Impervious } from "./src/roles/impervious";
+import { Impervious, ImperviousManager } from "./src/roles/impervious";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -121,6 +121,7 @@ const roleEmojis = new Map([
   [SnitchManager, EmojiService.static("snitch")],
   [SwooperManager, EmojiService.static("swooper")],
   [MorphlingManager, EmojiService.static("morphling")],
+  [ImperviousManager, EmojiService.static("impervious")],
 ]);
 
 const alignmentEmojis = new Map([

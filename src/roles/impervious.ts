@@ -128,6 +128,6 @@ export class Impervious extends Crewmate {
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Impervious
-Enchant one of your fellow crewmates, to protect them.</color>`;
+Enchant one of your fellow crewmates,\nto protect them.</color>`;
   }
 }
