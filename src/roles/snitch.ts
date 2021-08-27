@@ -6,7 +6,7 @@ import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { BaseRole } from "@polusgg/plugin-polusgg-api/src/baseRole";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
+import { getAlignmentSpriteForRole, getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { ResourceResponse } from "@polusgg/plugin-polusgg-api/src/types";
 import { TownOfPolusGameOptionNames } from "../types";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
@@ -95,7 +95,9 @@ export class Snitch extends Crewmate {
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
               const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), player.getPosition(), player);
+              const realAlignment = getAlignmentSpriteForRole(player.getMeta<BaseRole>("pgg.api.role"));
 
+              Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), player, `${realAlignment} ${player.getName().toString()}`);
               Services.get(ServiceType.Hud).setHudString(player, Location.RoomTracker, `The <color=${COLOR}>Snitch</color> has finished their tasks and revealed <color=#ff1919>your role!</color>`);
 
               setTimeout(() => {
