@@ -28,7 +28,7 @@ export class Impervious extends Crewmate {
 
   protected metadata: RoleMetadata = {
     name: "Impervious",
-    alignment: RoleAlignment.Neutral,
+    alignment: RoleAlignment.Crewmate,
     preventBaseEmoji: true,
   };
 
