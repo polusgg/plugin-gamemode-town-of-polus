@@ -65,7 +65,6 @@ export class Poisoner extends Impostor {
     const cooldown = gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerCooldown).getValue().value;
     const poisonDuration = gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerPoisonDuration).getValue().value;
     const range = PoisonerRange[gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerRange).getValue().getSelected()];
-    let timer: NodeJS.Timeout;
 
     roleManager.setBaseRole(this.owner, PlayerRole.Impostor);
 
@@ -96,7 +95,7 @@ export class Poisoner extends Impostor {
         Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.ReportButton, false);
         Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, false);
 
-        timer = setInterval(async () => {
+        const timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
             clearInterval(timer);
 

@@ -124,7 +124,7 @@ export class Phantom extends Crewmate {
 
     await hud.setHudString(this.owner, Location.TaskText, this.getRealDescriptionText());
     await hud.setHudString(this.owner, Location.RoomTracker, `You've become the <color=${COLOR}>Phantom</color>!`);
-    await hud.setHudString(this.owner, Location.MeetingButtonHudText, `You're the <color=${COLOR}>Phantom</color>.\nFinish your tasks!`);
+    await hud.setHudString(this.owner, Location.MeetingButtonHudText, `You're the <color=${COLOR}>Phantom</color>.\n\nFinish your tasks!`);
     await this.owner.setRemainingEmergencies(1);
 
     setTimeout(() => {
@@ -181,6 +181,7 @@ export class Phantom extends Crewmate {
     this.catch("player.task.completed", x => x.getPlayer()).execute(async event => {
       if (event.getPlayer().getGameDataEntry().isDoneWithTasks()) {
         await Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getAfterTasksFinishedText());
+        await Services.get(ServiceType.Hud).setHudString(this.owner, Location.MeetingButtonHudText, `<size=90%>You've finished your tasks.\n\nCall a meeting and win!</size>`);
       }
     });
 

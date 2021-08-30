@@ -14,7 +14,7 @@ import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 
@@ -112,6 +112,7 @@ export class Morphling extends Impostor {
 
     this.setOutlineColor([64, 235, 115]);
     this.ownAppearance = PlayerAppearance.save(this.owner);
+    this.ownAppearance.apply(this.owner);
 
     this.morphButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Sample.png"),

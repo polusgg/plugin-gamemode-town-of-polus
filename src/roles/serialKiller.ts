@@ -64,6 +64,10 @@ export class SerialKiller extends Impostor {
     });
 
     endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+      intentName: "crewmateSabotage",
+    });
+
+    endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
       intentName: "crewmateVote",
     });
 
@@ -114,6 +118,7 @@ export class SerialKiller extends Impostor {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async onDestroy(destroyReason: RoleDestroyedReason): Promise<void> {
     if (this.owner.getLobby().getGameState() === GameState.Started && destroyReason === RoleDestroyedReason.Disconnect) {
       this.checkEndCriteria(this.owner.getLobby(), this.owner);
@@ -147,6 +152,7 @@ Fake Tasks:`;
 
     if (player === this.owner) {
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorDisconnected");
+      endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateSabotage");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "crewmateVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorVote");
       endGame.unregisterExclusion(this.owner.getLobby().getSafeGame(), "impostorKill");
