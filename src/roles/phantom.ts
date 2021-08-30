@@ -32,10 +32,10 @@ export class PhantomManager extends BaseManager {
 const COLOR = "#8cffff";
 
 const CREWMATE_DEAD_STRING = `<color=${COLOR}>Role: Crewmate</color>
-<color=#ff1919>You're dead, finish your tasks.</color>`;
+<color=#ff1919>You've been caught, finish your tasks.</color>`;
 
 const PHANTOM_DEAD_STRING = `<color=${COLOR}>Role: Phantom</color>
-<color=#ff1919>You're dead.</color>`;
+<color=#ff1919>You've been caught.</color>`;
 
 export class Phantom extends Crewmate {
   public state: PhantomState = PhantomState.Alive;
@@ -346,6 +346,12 @@ and call a meeting.</color>`;
   }
 
   getAfterTasksFinishedText(): string {
+    if (this.state === PhantomState.Caught) {
+      return `<color=${COLOR}>Role: Phantom
+You've finished your tasks, but you cannot win.</color>
+<color=#ff1919>You've been caught.</color>`
+    }
+
     return `<color=${COLOR}>Role: Phantom
 You've finished your tasks.
 Call a meeting and win.</color>`;
