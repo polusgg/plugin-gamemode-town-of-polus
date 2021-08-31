@@ -364,9 +364,8 @@ and call a meeting.</color>`;
 
   getAfterTasksFinishedText(): string {
     if (this.state === PhantomState.Caught) {
-      return `<color=${COLOR}>Role: Phantom
-You've finished your tasks, but you cannot win.</color>
-<color=#ff1919>You've been caught.</color>`
+      return `<color=${COLOR}>Role: Phantom</color>
+<color=#ff1919>You've been caught.</color>`;
     }
 
     return `<color=${COLOR}>Role: Phantom

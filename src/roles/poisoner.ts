@@ -72,7 +72,7 @@ export class Poisoner extends Impostor {
     (this.owner.getMeta<BaseRole>("pgg.api.role") as Impostor).getImpostorButton()?.destroy();
 
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Throw.png"),
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Poison.png"),
       maxTimer: cooldown,
       position: new Vector2(-2.1, -0.7),
       alignment: EdgeAlignments.RightBottom,
