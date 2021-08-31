@@ -22,7 +22,7 @@ import { LobbyDefaultOptions, vanillaGameOptions } from "@polusgg/plugin-polusgg
 import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions/gameOption";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 import { Swooper, SwooperManager } from "./src/roles/swooper";
-import { Poisoner } from "./src/roles/poisoner";
+import { Poisoner, PoisonerManager } from "./src/roles/poisoner";
 import { Morphling, MorphlingManager } from "./src/roles/morphling";
 import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
@@ -122,6 +122,7 @@ const roleEmojis = new Map([
   [SwooperManager, EmojiService.static("swooper")],
   [MorphlingManager, EmojiService.static("morphling")],
   [ImperviousManager, EmojiService.static("impervious")],
+  [PoisonerManager, EmojiService.static("poisoner")],
 ]);
 
 const alignmentEmojis = new Map([
@@ -159,7 +160,6 @@ export default class extends BaseMod {
 
     AssetBundle.load("TownOfPolus/TownOfPolus").then(_ => {
       this.getLogger().info("Loaded TownOfPolus AssetBundle");
-      console.log(_.getContents());
     });
 
     // this.server.on("player.joined", _ => {
