@@ -159,7 +159,6 @@ export default class extends BaseMod {
 
     AssetBundle.load("TownOfPolus/TownOfPolus").then(_ => {
       this.getLogger().info("Loaded TownOfPolus AssetBundle");
-      console.log(_.getContents());
     });
 
     // this.server.on("player.joined", _ => {
