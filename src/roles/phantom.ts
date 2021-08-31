@@ -297,7 +297,7 @@ export class Phantom extends Crewmate {
         opacity: 0.05,
         petOpacity: 0,
       }),
-    ], false);
+    ], false, this.owner.getLobby().getConnections().filter(conn => conn !== this.owner.getConnection()));
 
     await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
       new PlayerAnimationKeyframe({
@@ -311,7 +311,7 @@ export class Phantom extends Crewmate {
         duration: appearTime === 0
           ? 1
           : 1000 * appearTime,
-        opacity: 0.4,
+        opacity: 0.3,
         petOpacity: 0,
       }),
     ], false, [ this.owner.getConnection()! ]);
