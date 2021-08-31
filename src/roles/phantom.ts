@@ -299,6 +299,23 @@ export class Phantom extends Crewmate {
       }),
     ], false);
 
+    await await Services.get(ServiceType.Animation).beginPlayerAnimation(this.owner, [PlayerAnimationField.Opacity, PlayerAnimationField.SkinOpacity, PlayerAnimationField.HatOpacity, PlayerAnimationField.PetOpacity], [
+      new PlayerAnimationKeyframe({
+        offset: 0,
+        duration: 0,
+        opacity: 0,
+        petOpacity: 0,
+      }),
+      new PlayerAnimationKeyframe({
+        offset: 5000,
+        duration: appearTime === 0
+          ? 1
+          : 1000 * appearTime,
+        opacity: 0.4,
+        petOpacity: 0,
+      }),
+    ], false, [ this.owner.getConnection()! ]);
+
     this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/PhantomButton.png"),
       maxTimer: 69,
