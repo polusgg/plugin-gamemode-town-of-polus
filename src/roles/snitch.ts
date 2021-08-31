@@ -91,6 +91,8 @@ export class Snitch extends Crewmate {
             }
           });
       } else if (taskLeftCount == 0 && !this.owner.isDead()) {
+        Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getAfterTasksFinishedText());
+
         event.getPlayer().getLobby().getPlayers()
           .forEach(async player => {
             if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
@@ -131,6 +133,11 @@ export class Snitch extends Crewmate {
       subtitle: `Finish your tasks to reveal the ${impostorCount != 1 ? `${impostorCount} ` : ""}<color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
       color: [0, 255, 221, 255],
     };
+  }
+
+  getAfterTasksFinishedText(): string {
+    return `<color=${COLOR}>Role: Snitch
+You've finished your tasks, follow the red\narrows to locate the impostors.</color>`
   }
 
   getDescriptionText(): string {
