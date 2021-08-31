@@ -241,7 +241,9 @@ export class Morphling extends Impostor {
         delete this.timeout;
       });
 
-    await Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+    setTimeout(() => {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+    }, 5000);
   }
 
   // async onDestroy(destroyReason: RoleDestroyedReason): Promise<void> {
