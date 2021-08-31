@@ -137,11 +137,11 @@ export class Snitch extends Crewmate {
 
   getAfterTasksFinishedText(): string {
     return `<color=${COLOR}>Role: Snitch
-You've finished your tasks, follow the red\narrows to locate the impostors.</color>`
+You've finished your tasks, find\nthe impostors.</color>`;
   }
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Snitch
-Finish your tasks to reveal the impostor.</color>`;
+Finish your tasks to reveal the impostors.</color>`;
   }
 }
