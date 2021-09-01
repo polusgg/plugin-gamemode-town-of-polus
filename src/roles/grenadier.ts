@@ -2,9 +2,9 @@ import { CameraAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/service
 import { StartGameScreenData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { EdgeAlignments } from "@polusgg/plugin-polusgg-api/src/types/enums/edgeAlignment";
 import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseManager";
-import { RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
+import { BaseRole, RoleAlignment, RoleMetadata } from "@polusgg/plugin-polusgg-api/src/baseRole/baseRole";
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
-import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
+import { AssetBundle, AudioAsset } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
 import { GameState, PlayerRole } from "@nodepolus/framework/src/types/enums";
@@ -17,6 +17,8 @@ import { NumberValue } from "@polusgg/plugin-polusgg-api/src/packets/root/setGam
 import { PlayerAnimationField } from "@polusgg/plugin-polusgg-api/src/types/playerAnimationFields";
 import { PlayerAnimationKeyframe } from "@polusgg/plugin-polusgg-api/src/services/animation/keyframes/player";
 import { Palette } from "@nodepolus/framework/src/static";
+import { SoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/soundType";
+import { AudioAssetDeclaration } from "@polusgg/plugin-polusgg-api/src/types/assetBundleDeclaration";
 
 export class GrenadierManager extends BaseManager {
   getId(): string { return "grenadier" }
@@ -48,8 +50,9 @@ export class Grenadier extends Impostor {
     this.grenadierBlindness = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierBlindness).getValue();
     this.grenadierCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.GrenadierCooldown).getValue();
 
+    const resourceService = Services.get(ServiceType.Resource);
     if (owner.getConnection() !== undefined) {
-      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
+      resourceService.load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
     } else {
       this.onReady();
     }
@@ -57,6 +60,13 @@ export class Grenadier extends Impostor {
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, GRENADIER_DEAD_STRING);
     });
+    
+    for (const player of this.owner.getLobby().getPlayers()) {
+      const roleName = player.getMeta<BaseRole|undefined>("pgg.api.role")?.getName();
+      if (roleName === "crewmate" || roleName === "impostor") {
+        resourceService.load(player.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus"));
+      }
+    }
   }
 
   onReady(): void {
@@ -85,8 +95,6 @@ export class Grenadier extends Impostor {
       button.on("clicked", () => {
         const blindness = this.grenadierBlindness;
 
-        console.log(button.getEntity().getClickBehaviour());
-
         if (button.getCurrentTime() != 0 || !button.isSaturated() || button.isDestroyed() || button.getCurrentTime() !== 0) {
           return;
         }
@@ -97,9 +105,31 @@ export class Grenadier extends Impostor {
           return;
         }
 
+        const topAssetBundle = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus");
+        const flashbangAsset = topAssetBundle.getSafeAsset("Assets/Mods/TownOfPolus/FlashbangSfx.mp3");
+        const flashbangSfxAsset = new AudioAsset(flashbangAsset.getBundle(), flashbangAsset.getDeclaration() as AudioAssetDeclaration);
+        
+        Services.get(ServiceType.SoundManager)
+          .playSound(this.owner.getConnection()!, new AudioAsset(
+            topAssetBundle,
+            flashbangSfxAsset.getDeclaration()
+          ), {
+            position: this.owner.getPosition(),
+            soundType: SoundType.Sfx
+          });
+
         button.stopCountingDown();
         button.setCurrentTime(button.getMaxTime());
         inRangePlayers.forEach(player => {
+          Services.get(ServiceType.SoundManager)
+            .playSound(player.getConnection()!, new AudioAsset(
+              topAssetBundle,
+              flashbangSfxAsset.getDeclaration()
+            ), {
+              position: player.getPosition(),
+              soundType: SoundType.Sfx
+            });
+
           Services.get(ServiceType.Animation)
             .beginCameraAnimation(player.getConnection()!, Services.get(ServiceType.CameraManager).getController(player), [
               new CameraAnimationKeyframe({
