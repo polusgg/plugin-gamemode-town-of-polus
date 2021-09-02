@@ -14,7 +14,7 @@ import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { TownOfPolusGameOptions } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 
