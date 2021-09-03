@@ -343,6 +343,8 @@ export class Phantom extends Crewmate {
       Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, PHANTOM_DEAD_STRING);
       // console.log("phantom clicked");
     });
+
+    Services.get(ServiceType.Hud).setHudVisibility(this.owner, HudItem.ReportButton, false);
   }
 
   getManagerType(): typeof BaseManager {
