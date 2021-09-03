@@ -90,10 +90,12 @@ export class Poisoner extends Impostor {
 
         await button.reset();
         await button.setCurrentTime(button.getMaxTime());
-        hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
         target.setMeta("pgg.top.isPoisoned", true);
+        hudManager.setHudString(target, Location.TaskText, this.getPoisonedText(target.getMeta<BaseRole>("pgg.api.role").getDescriptionText(), poisonDuration - timeElapsed));
         Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.ReportButton, false);
         Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, false);
+
+        timeElapsed += 1;
 
         const timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
