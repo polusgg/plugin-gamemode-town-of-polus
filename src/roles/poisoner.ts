@@ -113,6 +113,10 @@ export class Poisoner extends Impostor {
                 position: target.getPosition(),
                 playerId: target.getId(),
               });
+
+              if (target.getMeta<BaseRole>("pgg.api.role").getName() === "Phantom") {
+                Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, true);
+              }
             }
           } else if (target.getLobby().getGame() === undefined) {
             clearInterval(timer);
