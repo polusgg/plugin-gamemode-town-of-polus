@@ -70,6 +70,20 @@ export class Poisoner extends Impostor {
 
     (this.owner.getMeta<BaseRole>("pgg.api.role") as Impostor).getImpostorButton()?.destroy();
 
+    await this.catch("meeting.started", ev => ev.getMeetingHud())
+      .execute(async ev => {
+        for (const player of ev.getGame().getLobby().getPlayers()) {
+          if (player.getMeta<boolean>("pgg.top.isPoisoned")) {
+            await hudManager.setHudString(player, Location.TaskText, player.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
+        
+            player.setMeta("pgg.top.isPoisoned", false);
+            await player.kill();
+            player.getGameDataEntry().setDead(true);
+            await player.updateGameData();
+          }
+        }
+      });
+
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Poison.png"),
       maxTimer: cooldown,
@@ -100,10 +114,10 @@ export class Poisoner extends Impostor {
         const timer = setInterval(async () => {
           if (timeElapsed >= poisonDuration) {
             clearInterval(timer);
-
+            
             if (target.getLobby().getGame() !== undefined) {
               await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
-
+          
               hudManager.closeHud(target);
               target.setMeta("pgg.top.isPoisoned", false);
               target.kill();
@@ -115,7 +129,7 @@ export class Poisoner extends Impostor {
                 position: target.getPosition(),
                 playerId: target.getId(),
               });
-
+          
               if (target.getMeta<BaseRole>("pgg.api.role").getName() === "Phantom") {
                 Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, true);
               }
