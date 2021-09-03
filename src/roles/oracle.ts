@@ -142,6 +142,7 @@ export class Oracle extends Crewmate {
 
         if (displayCorrectly === 1) {
           Services.get(ServiceType.Name).set(this.enchanted, `${realAlignment} ${this.enchanted.getName().toString()}`);
+          Services.get(ServiceType.Name).setFor([ this.enchanted.getConnection()! ], this.enchanted, `${realAlignment} ${getSpriteForRole(this.enchanted.getMeta<BaseRole>("pgg.api.role"))} ${this.enchanted.getName().toString()}`);
         } else {
           let possibilities = [
             EmojiService.static("crewalign"),
