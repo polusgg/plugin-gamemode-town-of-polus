@@ -377,7 +377,8 @@ Call a meeting and win.</color>`;
   }
 
   getDescriptionText(): string {
-    return `<color=${COLOR}>Role: Crewmate (DEBUG: Phantom)
+    //return `<color=${COLOR}>Role: Crewmate (DEBUG: Phantom)
+    return `<color=${COLOR}>Role: Crewmate
 Finish your tasks.</color>`;
   }
 }
