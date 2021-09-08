@@ -26,7 +26,7 @@ import { Poisoner, PoisonerManager } from "./src/roles/poisoner";
 import { Morphling, MorphlingManager } from "./src/roles/morphling";
 import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
-import { Impervious, ImperviousManager } from "./src/roles/impervious";
+//import { Impervious, ImperviousManager } from "./src/roles/impervious";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -121,7 +121,7 @@ const roleEmojis = new Map([
   [SnitchManager, EmojiService.static("snitch")],
   [SwooperManager, EmojiService.static("swooper")],
   [MorphlingManager, EmojiService.static("morphling")],
-  [ImperviousManager, EmojiService.static("impervious")],
+  //[ImperviousManager, EmojiService.static("impervious")],
   [PoisonerManager, EmojiService.static("poisoner")],
 ]);
 
@@ -237,11 +237,12 @@ export default class extends BaseMod {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability)?.getValue()?.value ?? 0),
         assignWith: RoleAlignment.Crewmate,
-      }, {
-        role: Impervious,
-        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.ImperviousProbability).getValue().value),
-        assignWith: RoleAlignment.Crewmate,
-      },
+      }, 
+      //{
+      //  role: Impervious,
+      //  playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.ImperviousProbability).getValue().value),
+      //  assignWith: RoleAlignment.Crewmate,
+      //},
     ];
   }
 
@@ -259,7 +260,7 @@ export default class extends BaseMod {
     await Promise.all([
       //Crewmate Role Probability
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.ImperviousProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 1),
+      //gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.ImperviousProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 1),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 2),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.OracleProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 3),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SheriffProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 4),
@@ -277,7 +278,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 23),
 
       //Crewmate Role Options
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.ImperviousCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 30),
+      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.ImperviousCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 30),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 31),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithUses, new NumberValue(2, 1, 1, 10, false, "{0} uses"), GameOptionPriority.Normal + 32),
