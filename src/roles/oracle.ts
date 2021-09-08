@@ -173,6 +173,6 @@ export class Oracle extends Crewmate {
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: Oracle
 Finish your tasks.
-You can predict a player alignment. It will be\nrevealed if your body is found.</color>`;
+You can predict a player alignment. It\nwill be revealed if your body is found.</color>`;
   }
 }
