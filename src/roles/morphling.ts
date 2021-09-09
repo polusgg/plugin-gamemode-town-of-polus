@@ -14,7 +14,7 @@ import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
 import { Services } from "@polusgg/plugin-polusgg-api/src/services";
-import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptions } from "../..";
 import { Palette } from "@nodepolus/framework/src/static";
 import { TownOfPolusGameOptionNames } from "../types";
 
@@ -241,10 +241,6 @@ export class Morphling extends Impostor {
         this.morphButton?.setCurrentTime(5);
         delete this.timeout;
       });
-
-    setTimeout(() => {
-      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
-    }, 5000);
   }
 
   // async onDestroy(destroyReason: RoleDestroyedReason): Promise<void> {
