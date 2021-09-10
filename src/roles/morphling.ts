@@ -59,12 +59,14 @@ class PlayerAppearance {
 
     for (let i = 0; i < this.names.length; i++) {
       const name = this.names[i];
-      const connection = player.getLobby().getServer().getConnection(name[0]);
+      const connection = player.getLobby().getServer().getConnections().get(name[0].toString());
 
-      if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Morphling" && connection === player.getConnection()) {
-        promises.push(nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`));
-      } else {
-        promises.push(nameService.setFor(connection, player, name[1]));
+      if (connection) {
+        if (player.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Morphling" && connection === player.getConnection()) {
+          promises.push(nameService.setFor(connection, player, `${EmojiService.static("morphling")} ${name[1]}`));
+        } else {
+          promises.push(nameService.setFor(connection, player, name[1]));
+        }
       }
     }
 
