@@ -23,7 +23,7 @@ import { GameOption } from "@polusgg/plugin-polusgg-api/src/services/gameOptions
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 import { Swooper, SwooperManager } from "./src/roles/swooper";
 //import { Poisoner, PoisonerManager } from "./src/roles/poisoner";
-//import { Morphling, MorphlingManager } from "./src/roles/morphling";
+import { Morphling, MorphlingManager } from "./src/roles/morphling";
 import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 //import { Impervious, ImperviousManager } from "./src/roles/impervious";
@@ -42,9 +42,9 @@ export type TownOfPolusGameOptions = {
   [TownOfPolusGameOptionNames.JesterProbability]: NumberValue;
 
   /* Morphling */
-  //[TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
-  //[TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
-  //[TownOfPolusGameOptionNames.MorphlingDuration]: NumberValue;
+  [TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
+  [TownOfPolusGameOptionNames.MorphlingDuration]: NumberValue;
 
   /* Oracle */
   [TownOfPolusGameOptionNames.OracleProbability]: NumberValue;
@@ -120,7 +120,7 @@ const roleEmojis = new Map([
   [SheriffManager, EmojiService.static("sheriff")],
   [SnitchManager, EmojiService.static("snitch")],
   [SwooperManager, EmojiService.static("swooper")],
-  //[MorphlingManager, EmojiService.static("morphling")],
+  [MorphlingManager, EmojiService.static("morphling")],
   //[ImperviousManager, EmojiService.static("impervious")],
   //[PoisonerManager, EmojiService.static("poisoner")],
 ]);
@@ -168,19 +168,19 @@ export default class extends BaseMod {
 
     // todo set task strings for all impostor and neutral types
 
-    // Services.get(ServiceType.EndGame).on("beforeGameEnd", async game => {
-    //   const players = game.getLobby().getPlayers();
+    Services.get(ServiceType.EndGame).on("beforeGameEnd", async game => {
+      const players = game.getLobby().getPlayers();
 
-    //   for (let i = 0; i < players.length; i++) {
-    //     const player = players[i];
-    //     const role = player.getMeta<BaseRole>("pgg.api.role");
+      for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        const role = player.getMeta<BaseRole>("pgg.api.role");
 
-    //     if (role instanceof Morphling) {
-    //       delete role.timeout;
-    //       await role.ownAppearance!.apply(role.owner);
-    //     }
-    //   }
-    // });
+        if (role instanceof Morphling) {
+          delete role.timeout;
+          await role.ownAppearance!.apply(role.owner);
+        }
+      }
+    });
   }
 
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] {
@@ -209,13 +209,11 @@ export default class extends BaseMod {
         role: Jester,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
-      }, 
-      //{
-      //  role: Morphling,
-      //  playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
-      //  assignWith: RoleAlignment.Impostor,
-      //}, 
-      {
+      }, {
+        role: Morphling,
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
+        assignWith: RoleAlignment.Impostor,
+      }, {
         role: Oracle,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
@@ -277,7 +275,7 @@ export default class extends BaseMod {
 
       //Impostor Role Probability
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 20),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 21),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.MorphlingProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 21),
       //gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.PoisonerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 22),
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 23),
 
@@ -308,8 +306,8 @@ export default class extends BaseMod {
       // gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierRange, new NumberValue(4, 0.5, 0.5, 10, false, "{0} units"), GameOptionPriority.Normal + 71),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.GrenadierBlindness, new NumberValue(5, 0.5, 0.5, 15, false, "{0}s"), GameOptionPriority.Normal + 72),
 
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 73),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingDuration, new NumberValue(10, 1, 5, 30, false, "{0}s"), GameOptionPriority.Normal + 74),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 73),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MorphlingDuration, new NumberValue(10, 1, 5, 30, false, "{0}s"), GameOptionPriority.Normal + 74),
 
       //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 75),
       //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PoisonerPoisonDuration, new NumberValue(15, 5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 76),
