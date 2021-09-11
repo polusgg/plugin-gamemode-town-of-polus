@@ -70,12 +70,13 @@ export class Poisoner extends Impostor {
 
     (this.owner.getMeta<BaseRole>("pgg.api.role") as Impostor).getImpostorButton()?.destroy();
 
-    await this.catch("meeting.started", ev => ev.getMeetingHud())
+    await this.catch("meeting.started", ev => ev.getMeetingHud(), true)
       .execute(async ev => {
         for (const player of ev.getGame().getLobby().getPlayers()) {
           if (player.getMeta<boolean>("pgg.top.isPoisoned")) {
             await hudManager.setHudString(player, Location.TaskText, player.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
         
+            ev.getMeetingHud().getMeetingHud().getPlayerState(player.getId())?.setDead(true);
             player.setMeta("pgg.top.isPoisoned", false);
             await player.kill();
             player.getGameDataEntry().setDead(true);
