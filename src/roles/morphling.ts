@@ -9,7 +9,7 @@ import { BaseManager } from "@polusgg/plugin-polusgg-api/src/baseManager/baseMan
 import { Location, ServiceType } from "@polusgg/plugin-polusgg-api/src/types/enums";
 import { ConnectionInfo, Mutable, Vector2 } from "@nodepolus/framework/src/types";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
-import { GameState, PlayerColor } from "@nodepolus/framework/src/types/enums";
+import { GameState, PlayerColor, SetCosmeticReason } from "@nodepolus/framework/src/types/enums";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { AssetBundle } from "@polusgg/plugin-polusgg-api/src/assets";
 import { PlayerInstance } from "@nodepolus/framework/src/api/player";
@@ -70,9 +70,9 @@ class PlayerAppearance {
       }
     }
 
-    promises.push(player.setHat(this.hat));
-    promises.push(player.setPet(this.pet));
-    promises.push(player.setSkin(this.skin));
+    promises.push(player.setHat(this.hat, SetCosmeticReason.ServerRequest));
+    promises.push(player.setPet(this.pet, SetCosmeticReason.ServerRequest));
+    promises.push(player.setSkin(this.skin, SetCosmeticReason.ServerRequest));
 
     await Promise.all(promises);
     // player.setColor(this.color);
