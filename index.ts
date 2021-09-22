@@ -26,6 +26,11 @@ import { Poisoner, PoisonerManager } from "./src/roles/poisoner";
 import { Morphling, MorphlingManager } from "./src/roles/morphling";
 import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
+import { ChatMessageCreated } from "@polusgg/plugin-polusgg-api/src/services/chat/events/chatMessageCreated";
+import { ChatMessageAlign, SetChatMessagePacket } from "@polusgg/plugin-polusgg-api/src/packets/root/setChatMessage";
+import { Color } from "@nodepolus/framework/src/types";
+import { Palette } from "@nodepolus/framework/src/static";
+import { PhantomState } from "./src/types/enums/phantomState";
 //import { Impervious, ImperviousManager } from "./src/roles/impervious";
 
 export type TownOfPolusGameOptions = {
@@ -149,6 +154,24 @@ export function resolveOptionPercent(percent: number): number {
   return Math.floor(percent / 100) + (Math.random() < ((percent % 100) / 100) ? 1 : 0);
 }
 
+function generateByLength(len: number) {
+  let out = "";
+  for (let i = 0; i < len; i++) {
+      out += Math.random() > 0.5 ? "O" : "o";
+  }
+  return out;
+}
+
+function generatePhantomOoOoos(str: string) {
+  return str
+    .split(" ")
+    .map(x => {
+      const randomVariation = Math.random() * 2;
+      return generateByLength(Math.max(1, x.length - randomVariation));
+    })
+    .join(" ");
+}
+
 export default class extends BaseMod {
   protected handlingTaskCount: Map<LobbyInstance, boolean> = new Map();
   protected taskCountShouldRecurse: Map<LobbyInstance, boolean> = new Map();
@@ -181,6 +204,93 @@ export default class extends BaseMod {
         }
       }
     });
+
+    Services.get(ServiceType.Chat).on("chatCreated", async (event: ChatMessageCreated) => {
+      const senderRole = event.getSender().getMeta<Phantom|undefined>("pgg.api.role");
+      if (!(senderRole instanceof Phantom)) {
+        return;
+      }
+
+      if (senderRole.state !== PhantomState.Transformed) {
+        return;
+      }
+
+      event.cancel();
+      
+      const messages = Services.get(ServiceType.Chat).getMessagesByPlayer(event.getSender());
+      messages.push({
+        uuid: event.getUuid(),
+        sender: event.getSender(),
+        message: event.getMessage()
+      });
+
+      const sender = event.getSender();
+      const message = event.getMessage();
+      
+      const color = Palette.playerBody(sender.getColor());
+
+      const players = event.getSender().getLobby().getPlayers();
+
+      const promises: Promise<void>[] = [];
+      for (const player of sender.getLobby().getPlayers()) {
+
+        const connection = player.getConnection();
+        if (!connection)
+          continue;
+
+        const receiverIsDead = player.getMeta<boolean | undefined>("pgg.countAsDead") || player.isDead();
+
+        if (!receiverIsDead) {  // only send the normal message to other dead players
+          continue;
+        }
+
+        promises.push(connection.sendReliable([
+          new SetChatMessagePacket(
+            event.getUuid(),
+            player === sender ? ChatMessageAlign.Right : ChatMessageAlign.Left,
+            sender.getName().toString(),
+            true,
+            false, //todo set whether voted
+            sender.getHat(),
+            sender.getPet(),
+            sender.getSkin(),
+            color.dark as Color,
+            color.light as Color,
+            Palette.playerVisor() as Color,
+            sender === player ? -1000 : 0.5 + sender.getId() / 15,
+            message
+          )
+        ]));
+      }
+
+      const playerPool = players.filter(player => player.getConnection() && player !== sender && !player.isDead());
+      const randomPlayer = playerPool[Math.floor(Math.random() * playerPool.length)];
+
+      if (!randomPlayer)
+        return;
+
+      promises.push(randomPlayer.getConnection()!.sendReliable([
+        new SetChatMessagePacket(
+          event.getUuid(),
+          ChatMessageAlign.Left,
+          EmojiService.static("phantom") + " " + sender.getName().toString(),
+          true,
+          false, //todo set whether voted
+          sender.getHat(),
+          sender.getPet(),
+          sender.getSkin(),
+          color.dark as Color,
+          color.light as Color,
+          Palette.playerVisor() as Color,
+          0.5 + sender.getId() / 15,
+          typeof message === "string"
+            ? generatePhantomOoOoos(message)
+            : generateByLength(Math.floor(Math.random() * 15))
+        )
+      ]));
+      
+      await Promise.all(promises);
+    });
   }
 
   getRoles(lobby: LobbyInstance): RoleAssignmentData[] {
@@ -199,11 +309,13 @@ export default class extends BaseMod {
         role: Swooper,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SwooperProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
-      }, {
+      },
+      {
         role: Poisoner,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
-      }, {
+      },
+      {
         role: Jester,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
@@ -237,7 +349,7 @@ export default class extends BaseMod {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithProbability)?.getValue()?.value ?? 0),
         assignWith: RoleAlignment.Crewmate,
-      }, 
+      },
       //{
       //  role: Impervious,
       //  playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.ImperviousProbability).getValue().value),
@@ -376,7 +488,7 @@ export default class extends BaseMod {
         }
 
         snitchTaskCount.setValue(nv);
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks) !== undefined) {
         await Promise.all([
           gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
@@ -428,7 +540,7 @@ export default class extends BaseMod {
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Uses`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 13),
         gameOptions.createOption(TownOfPolusGameOptionCategories.Config, `<color=#3d85c67f>Locksmith</color> <alpha=#7f>Range`, new EnumValue(0, ["Unavailable<alpha=#FF>"]), GameOptionPriority.Normal + 14),
       ]);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if ((newLevel.getValue() as EnumValue).index >= 2 && gameOptions.getOption(`<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`) !== undefined) {
       await Promise.all([
         gameOptions.deleteOption(`<size=150%><sprite index=14 color=#FFFFFF7f> </size><color=#3d85c67f>Locksmith</color><alpha=#7f>`),
