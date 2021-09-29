@@ -21,7 +21,8 @@ import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crew
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
 import { VanillaWinConditions } from "@polusgg/plugin-polusgg-api/src/services/endGame/vanillaWinConditions";
-import { DeathReason } from "@nodepolus/framework/src/types/enums";
+import { DeathReason, SystemType } from "@nodepolus/framework/src/types/enums";
+import { SubmergedOxygenSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems/submergedOxygenSystem";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
 
 export class PhantomManager extends BaseManager {
@@ -146,10 +147,6 @@ export class Phantom extends Crewmate {
 
   async handleMurder(): Promise<void> {
     if (this.state !== PhantomState.Alive) {
-      if (this.state === PhantomState.Transformed) {
-        console.error("Phantom should never die while transformed! This is undefined behaviour, and should never occur under any circumstance!");
-      }
-
       return;
     }
 
@@ -184,6 +181,23 @@ export class Phantom extends Crewmate {
         await Services.get(ServiceType.Hud).setHudString(this.owner, Location.MeetingButtonHudText, `<size=90%>You've finished your tasks.\n\nCall a meeting and win!</size>`);
       }
     });
+
+    this.catch("submerged.room.oxygen.console.repaired", ev => ev.getGame())
+      .execute(ev => {
+        ev.cancel();
+        const system = ev.getGame().getLobby().getShipStatus()?.getShipStatus().getSystemFromType(SystemType.Oxygen) as SubmergedOxygenSystem|undefined;
+
+        if (system) {
+          system.addPlayerWithMask(ev.getPlayer().getId());
+
+          if (system.getPlayersWithMask().length === ev.getGame().getLobby().getPlayers().filter(p => !p.isDead() && p.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() !== "Phantom").length) {
+            system.setDuration(10000);
+            system.clearPlayersWithMasks();
+          }
+          
+          ev.getGame().getLobby().getHostInstance().getSystemsHandler()?.sendDataUpdate();
+        }
+      });
 
     this.catch("meeting.vote.added", x => x.getVoter())
       .execute(event => event.cancel());
