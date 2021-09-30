@@ -94,6 +94,9 @@ export class Poisoner extends Impostor {
       alignment: EdgeAlignments.RightBottom,
       currentTime: 15,
     }).then(button => {
+      Services.get(ServiceType.CoroutineManager)
+        .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
+
       this.catch("player.died", e => e.getPlayer()).execute(() => button.destroy());
 
       button.on("clicked", async () => {
