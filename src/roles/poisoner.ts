@@ -119,15 +119,17 @@ export class Poisoner extends Impostor {
         const timer = setInterval(async () => {
           if (target.getGameDataEntry().isDisconnected()) {
             clearInterval(timer);
+            target.setMeta("pgg.top.isPoisoned", false);
             this.poisonedPlayers.delete(target);
           } else if (timeElapsed >= poisonDuration) {
             clearInterval(timer);
+            
+            target.setMeta("pgg.top.isPoisoned", false);
             
             if (target.getLobby().getGame() !== undefined) {
               await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
           
               hudManager.closeHud(target);
-              target.setMeta("pgg.top.isPoisoned", false);
               target.kill();
               target.getGameDataEntry().setDead(true);
               target.updateGameData();
@@ -146,9 +148,11 @@ export class Poisoner extends Impostor {
             }
           } else if (target.getLobby().getGame() === undefined) {
             clearInterval(timer);
+            target.setMeta("pgg.top.isPoisoned", false);
             this.poisonedPlayers.delete(target);
           } else if (target.isDead()) {
             clearInterval(timer);
+            target.setMeta("pgg.top.isPoisoned", false);
             this.poisonedPlayers.delete(target);
             await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
           } else {
