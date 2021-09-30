@@ -33,6 +33,8 @@ export class Poisoner extends Impostor {
     preventBaseEmoji: true,
   };
 
+  poisonedPlayers: Map<PlayerInstance, number> = new Map;
+
   async onReadyImpostor(): Promise<void> {
     this.setOutlineColor([160, 0, 252]);
 
@@ -112,8 +114,13 @@ export class Poisoner extends Impostor {
 
         timeElapsed += 1;
 
+        this.poisonedPlayers.set(target, timeElapsed);
+
         const timer = setInterval(async () => {
-          if (timeElapsed >= poisonDuration) {
+          if (target.getGameDataEntry().isDisconnected()) {
+            clearInterval(timer);
+            this.poisonedPlayers.delete(target);
+          } else if (timeElapsed >= poisonDuration) {
             clearInterval(timer);
             
             if (target.getLobby().getGame() !== undefined) {
@@ -134,16 +141,22 @@ export class Poisoner extends Impostor {
               if (target.getMeta<BaseRole>("pgg.api.role").getName() === "Phantom") {
                 Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, true);
               }
+
+              this.poisonedPlayers.delete(target);
             }
           } else if (target.getLobby().getGame() === undefined) {
             clearInterval(timer);
+            this.poisonedPlayers.delete(target);
           } else if (target.isDead()) {
             clearInterval(timer);
+            this.poisonedPlayers.delete(target);
             await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
           } else {
             await hudManager.setHudString(target, Location.TaskText, this.getPoisonedText(target.getMeta<BaseRole>("pgg.api.role").getDescriptionText(), poisonDuration - timeElapsed));
+            this.poisonedPlayers.set(target, timeElapsed);
           }
           timeElapsed += 1;
+          await hudManager.setHudString(this.owner, Location.TaskText, this.getDescriptionText());
         }, 1000);
       });
     });
@@ -168,8 +181,27 @@ You can’t call a meeting or report bodies.</color>${baseText.includes("Fake Ta
   }
 
   getDescriptionText(): string {
-    return `<color=${COLOR}>Role: Poisoner
-Sabotage and poison the crewmates</color>
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+    const poisonDuration = gameOptions.getOption(TownOfPolusGameOptionNames.PoisonerPoisonDuration).getValue().value;
+
+    let description = `<color=${COLOR}>Role: Poisoner
+Sabotage and poison the crewmates</color>`;
+
+    if (this.poisonedPlayers) {
+      for (const [ player, timeElapsed ] of this.poisonedPlayers) {
+        const connection = this.owner.getConnection();
+  
+        const secondsLeft = poisonDuration - timeElapsed;
+        if (connection) {
+          description += `
+  ${Services.get(ServiceType.Name).getFor(connection, player)} will die in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}`;
+        }
+      }
+    }
+
+    description += `
 Fake Tasks:`;
+
+    return description;
   }
 }
