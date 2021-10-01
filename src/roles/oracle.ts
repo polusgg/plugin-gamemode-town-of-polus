@@ -15,6 +15,8 @@ import { GameState } from "@nodepolus/framework/src/types/enums";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { EmojiService } from "@polusgg/plugin-polusgg-api/src/services/emojiService/emojiService";
+import { Phantom } from "./phantom";
+import { PhantomState } from "../types/enums/phantomState";
 
 export class OracleManager extends BaseManager {
   getId(): string { return "oracle" }
@@ -50,7 +52,7 @@ export class Oracle extends Crewmate {
     });
   }
 
-  * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+  *coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
     if (player.getLobby().getGameState() !== GameState.Started) {
       yield;
     }
@@ -135,14 +137,23 @@ export class Oracle extends Crewmate {
 
       // We don't do checks for disconnected oracles as oracles who disconnect after predicting on someone ruin the game for public lobbies
       if (this.owner.isDead() && !this.enchanted.isDead()) {
-        const realAlignment = getAlignmentSpriteForRole(this.enchanted.getMeta<BaseRole>("pgg.api.role"));
+        const enchantedRole = this.enchanted.getMeta<BaseRole>("pgg.api.role");
+        const realAlignment = getAlignmentSpriteForRole(enchantedRole);
         const displayCorrectly = resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleAccuracy).getValue().value);
 
         console.log("SettingName", realAlignment, displayCorrectly);
 
         if (displayCorrectly === 1) {
           Services.get(ServiceType.Name).set(this.enchanted, `${realAlignment} ${this.enchanted.getName().toString()}`);
-          Services.get(ServiceType.Name).setFor([ this.enchanted.getConnection()! ], this.enchanted, `${realAlignment} ${getSpriteForRole(this.enchanted.getMeta<BaseRole>("pgg.api.role"))} ${this.enchanted.getName().toString()}`);
+
+          if (enchantedRole.getName() === "Phantom") {
+            if ((enchantedRole as Phantom).state === PhantomState.Alive) {
+              Services.get(ServiceType.Name).setFor([ this.enchanted.getConnection()! ], this.enchanted, `${realAlignment} ${this.enchanted.getName().toString()}`);
+              return;
+            }
+          }
+
+          Services.get(ServiceType.Name).setFor([ this.enchanted.getConnection()! ], this.enchanted, `${realAlignment} ${getSpriteForRole(enchantedRole)} ${this.enchanted.getName().toString()}`);
         } else {
           let possibilities = [
             EmojiService.static("crewalign"),
