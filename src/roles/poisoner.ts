@@ -94,6 +94,13 @@ export class Poisoner extends Impostor {
       alignment: EdgeAlignments.RightBottom,
       currentTime: 15,
     }).then(button => {
+      this.catch("meeting.ended", event => event.getGame())
+        .execute(() => {
+          if (button) {
+            button.setCurrentTime(button.getMaxTime());
+          }
+        });
+
       Services.get(ServiceType.CoroutineManager)
         .beginCoroutine(this.owner, this.coSaturateButton(this.owner, button));
 
