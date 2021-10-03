@@ -1,5 +1,5 @@
 export enum TownOfPolusGameOptionNames {
-  EngineerProbability = "<size=150%><voffset=-0.1em><sprite index=7></voffset> </size><color=#F8BF14>Engineer</color>",
+  EngineerProbability = "<size=150%><voffset=-0.1em><sprite index=7></voffset> </size><color=#f8bf14>Engineer</color>",
 
   SwooperProbability = "<size=150%><voffset=-0.1em><sprite index=15></voffset> </size><color=#969696>Swooper</color>",
   SwooperCooldown = "<color=#969696>Swooper</color> Cooldown",
@@ -21,6 +21,18 @@ export enum TownOfPolusGameOptionNames {
   MorphlingProbability = "<size=150%><voffset=-0.1em><sprite index=21></voffset> </size><color=#40EB73>Morphling</color>",
   MorphlingCooldown = "<color=#40EB73>Morphling</color> Cooldown",
   MorphlingDuration = "<color=#40EB73>Morphling</color> Duration",
+  
+  MentorProbability = "<size=150%><voffset=-0.1em><sprite index=21></voffset> </size><color=#96b7cc>Mentor</color>",
+  MentorCooldown = "<color=#96b7cc>Mentor</color> Cooldown",
+  MentorRange = "<color=#96b7cc>Mentor</color> Range",
+  MentorStudents = "<color=#96b7cc>Mentor</color> Students",
+  StudentRoles = "<color=#96b7cc>Student</color> Roles",
+  
+  StudentEngineerEnabled = "    <color=#f8bf14>Engineer</color>",
+  StudentLocksmithEnabled = "    <color=#3d85c6>Locksmith</color>",
+  StudentOracleEnabled = "    <color=#2c4cc9>Oracle</color>",
+  StudentSheriffEnabled = "    <color=#c49645>Sheriff</color>",
+  StudentSnitchEnabled = "    <color=#00ffdd>Snitch</color>",
 
   OracleProbability = "<size=150%><voffset=-0.1em><sprite index=8></voffset> </size><color=#2c4cc9>Oracle</color>",
   OracleCooldown = "<color=#2c4cc9>Oracle</color> Cooldown",

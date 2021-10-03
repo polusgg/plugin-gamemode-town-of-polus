@@ -26,7 +26,7 @@ const COLOR = "#3d85c6";
 const LOCKSMITH_DEAD_STRING = `<color=${COLOR}>Role: Locksmith</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
-const DOOR_POSITIONS_BY_ID = {
+export const DOOR_POSITIONS_BY_ID = {
   [Level.TheSkeld]: [
     [new Vector2(5.1432, 1.3356), 0],
     [new Vector2(-0.708, -4.992), 1],
@@ -96,7 +96,7 @@ const DOOR_POSITIONS_BY_ID = {
   ],
 } as unknown as Record<Level, [Vector2, number][]>;
 
-const LOCKSMITH_RANGE_BY_OPTION = new Map<string, number>([
+export const LOCKSMITH_RANGE_BY_OPTION = new Map<string, number>([
   ["Short", 0.6],
   ["Normal", 1],
   ["Long", 2.5],
