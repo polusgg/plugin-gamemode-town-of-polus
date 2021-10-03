@@ -1,4 +1,3 @@
-import { RoleAssignmentData } from "@polusgg/plugin-polusgg-api/src/services/roleManager/roleManagerService";
 import { BaseMod } from "@polusgg/plugin-polusgg-api/src/baseMod/baseMod";
 import { PluginMetadata } from "@nodepolus/framework/src/api/plugin";
 import { LobbyInstance } from "@nodepolus/framework/src/api/lobby";
@@ -31,6 +30,7 @@ import { ChatMessageAlign, SetChatMessagePacket } from "@polusgg/plugin-polusgg-
 import { Color } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 import { PhantomState } from "./src/types/enums/phantomState";
+import { Game } from "@nodepolus/framework/src/api/game/game";
 //import { Impervious, ImperviousManager } from "./src/roles/impervious";
 
 export type TownOfPolusGameOptions = {
@@ -293,10 +293,10 @@ export default class extends BaseMod {
     });
   }
 
-  getRoles(lobby: LobbyInstance): RoleAssignmentData[] {
-    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(lobby);
+  assignRoles(game: Game): void {
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(game.getLobby());
 
-    return [
+    const assignmentData = [
       {
         role: Engineer,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.EngineerProbability).getValue().value),
@@ -356,6 +356,27 @@ export default class extends BaseMod {
       //  assignWith: RoleAlignment.Crewmate,
       //},
     ];
+
+    const roleAssignedData = Services.get(ServiceType.RoleManager).getRolesAssigned(game, assignmentData);
+
+    if (!roleAssignedData)
+      return;
+
+    let numCrewmates = 0;
+    for (let i = 0; i < roleAssignedData.allRoleAssignments.length; i++) {
+      if(roleAssignedData.allRoleAssignments[i].role === Crewmate) {
+        numCrewmates++;
+      }
+    }
+
+    if (numCrewmates < 1) {
+      const mentorAssignment = assignmentData.find(data => data.role === Mentor);
+      if (mentorAssignment) {
+        mentorAssignment.playerCount = 0;
+      }
+    }
+
+    Services.get(ServiceType.RoleManager).assignRoles(game, assignmentData);
   }
 
   async onEnable(lobby: LobbyInstance): Promise<void> {
