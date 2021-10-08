@@ -74,7 +74,6 @@ export type TownOfPolusGameOptions = {
   [TownOfPolusGameOptionNames.PhantomProbability]: NumberValue;
   [TownOfPolusGameOptionNames.PhantomRemainingTasks]: NumberValue;
   [TownOfPolusGameOptionNames.PhantomAppearTime]: NumberValue;
-  [TownOfPolusGameOptionNames.PhantomRevealTime]: EnumValue;
 
   /* Serial Killer */
   [TownOfPolusGameOptionNames.SerialKillerProbability]: NumberValue;
@@ -457,7 +456,6 @@ export default class extends BaseMod {
       //Neutral Role Options
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRemainingTasks, new NumberValue(4, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 50),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomAppearTime, new NumberValue(10, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 51),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRevealTime, new EnumValue(0, ["Immediately", "After Meeting"]), GameOptionPriority.Normal + 52),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(30, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 53),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerMinPlayers, new NumberValue(6, 1, 4, 15, false, "{0} players"), GameOptionPriority.Normal + 54),

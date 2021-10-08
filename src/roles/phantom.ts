@@ -215,21 +215,6 @@ export class Phantom extends Crewmate {
       position: this.owner.getPosition(),
     }, notMurderers);*/
 
-    if (Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby()).getOption(TownOfPolusGameOptionNames.PhantomRevealTime)
-      .getValue()
-      .getSelected() === "After Meeting") {
-      await (async (): Promise<void> => new Promise<void>(resolve => {
-        this.catch("meeting.started", m => m.getGame()).execute(_ => {
-          if (!_.isCancelled() && _.getCaller().getId() !== this.owner.getId()) {
-            resolve();
-          }
-        });
-        this.catch("game.ended", g => g.getGame()).execute(_ => {
-          resolve();
-        });
-      }))();
-    }
-
     this.state = PhantomState.Transformed;
     Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
 
