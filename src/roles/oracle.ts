@@ -52,7 +52,7 @@ export class Oracle extends Crewmate {
     });
   }
 
-  *coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+  * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
     if (player.getLobby().getGameState() !== GameState.Started) {
       yield;
     }

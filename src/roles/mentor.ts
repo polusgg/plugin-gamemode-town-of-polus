@@ -324,7 +324,7 @@ Finish your tasks, <color=#ff1919>Your student has died.</color>`;
       return `<color=${COLOR}>Role: Mentor
 Finish your tasks and teach students.
 Next student: ${nextTarget.getName()}
-${remaining} Lesson${remaining === 1 ? "" : "s"} remaining</color>`;
+${remaining} lesson${remaining === 1 ? "" : "s"} remaining</color>`;
     }
 
     return `<color=${COLOR}>Role: Mentor

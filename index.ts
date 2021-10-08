@@ -545,10 +545,10 @@ export default class extends BaseMod {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (gameOptions.getOption(TownOfPolusGameOptionNames.SnitchRemainingTasks) === undefined) {
           await Promise.all([
-            gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 4),
-            gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 18),
-            gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
-            gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
+            gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(50, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 6),
+            gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(2, 1, 0, 6, false, "{0} tasks"), GameOptionPriority.Normal + 48),
+            gameOptions.deleteOption("<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>"),
+            gameOptions.deleteOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks"),
           ]);
         }
 
@@ -568,16 +568,16 @@ export default class extends BaseMod {
         await Promise.all([
           gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
           gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
-          gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 18),
-          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 4),
+          gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, "<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 6),
+          gameOptions.createOption(TownOfPolusGameOptionCategories.Config, "<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks", new EnumValue(0, ["Unavailable"]), GameOptionPriority.Normal + 48),
         ]);
       }
     } catch { }
 
     if (!this.getEnabled(opt.getLobby())) {
       await Promise.all([
-        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
-        gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
+        gameOptions.deleteOption("<size=150%><sprite index=11></size> <color=#00ffdd>Snitch</color><alpha=#7f>"),
+        gameOptions.deleteOption("<color=#00ffdd7f>Snitch</color> <alpha=#7f>Remaining Tasks"),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchRemainingTasks),
         gameOptions.deleteOption(TownOfPolusGameOptionNames.SnitchProbability),
       ]);
