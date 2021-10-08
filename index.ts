@@ -38,6 +38,7 @@ import { Game } from "@nodepolus/framework/src/api/game/game";
 export type TownOfPolusGameOptions = {
   /* Engineer */
   [TownOfPolusGameOptionNames.EngineerProbability]: NumberValue;
+  [TownOfPolusGameOptionNames.EngineerUses]: EnumValue;
 
   /* Grenadier */
   [TownOfPolusGameOptionNames.GrenadierProbability]: NumberValue;
@@ -432,6 +433,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.PoisonerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 22),
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.SwooperProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 23),
 
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.EngineerUses, new EnumValue(0, [ "Per Game", "Per Round" ]), GameOptionPriority.Normal + 20),
       //Crewmate Role Options
       //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.ImperviousCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 30),
 

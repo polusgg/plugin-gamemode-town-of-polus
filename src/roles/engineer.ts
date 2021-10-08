@@ -11,7 +11,8 @@ import { GameState } from "@nodepolus/framework/src/types/enums";
 // import { BaseSystem, HeliSabotageSystem, HqHudSystem, HudOverrideSystem, LaboratorySystem, LifeSuppSystem, ReactorSystem, SwitchSystem } from "@nodepolus/framework/src/protocol/entities/shipStatus/systems";
 import { Button } from "@polusgg/plugin-polusgg-api/src/services/buttonManager";
 import { Crewmate } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
-import { getSpriteForRole } from "../..";
+import { getSpriteForRole, TownOfPolusGameOptions } from "../..";
+import { TownOfPolusGameOptionNames } from "../types";
 // import { InternalSystemType } from "@nodepolus/framework/src/protocol/entities/shipStatus/baseShipStatus/internalSystemType";
 
 export class EngineerManager extends BaseManager {
@@ -53,7 +54,7 @@ export class Engineer extends Crewmate {
       ?.isSabotaged(true) ?? false;
   }
 
-  * coSaturateButton(player: PlayerInstance, button: Button): Generator<void, void, number> {
+  * coSaturateButton(player: PlayerInstance): Generator<void, void, number> {
     if (player.getLobby().getGameState() !== GameState.Started) {
       yield;
     }
@@ -63,24 +64,21 @@ export class Engineer extends Crewmate {
         return;
       }
 
-      const isSaturated = button.isSaturated();
-
-      if (this.sabotageIsOccurring() !== isSaturated) {
-        button.setSaturated(!isSaturated);
+      if (this.button) {
+        const isSaturated = this.button.isSaturated();
+  
+        if (this.sabotageIsOccurring() !== isSaturated) {
+          this.button.setSaturated(!isSaturated);
+        }
       }
+
       yield;
     }
   }
 
   async onReady(): Promise<void> {
-    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
-      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
-      maxTimer: 0.1,
-      position: new Vector2(-2.1, -0.7),
-      alignment: EdgeAlignments.RightBottom,
-      currentTime: 0,
-      saturated: false,
-    });
+    const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions>(this.owner.getLobby());
+    await this.spawnButton();
 
     this.catch("player.died", event => event.getPlayer()).execute(_ => {
       if (this.button !== undefined) {
@@ -89,8 +87,27 @@ export class Engineer extends Crewmate {
       }
     });
 
+    if (gameOptions.getOption(TownOfPolusGameOptionNames.EngineerUses).getValue().getSelected() === "Per Round") {
+      this.catch("meeting.started", event => event.getGame()).execute(_ => {
+        if (!this.button) {
+          this.spawnButton();
+        }
+      });
+    }
+
     Services.get(ServiceType.CoroutineManager)
-      .beginCoroutine(this.owner, this.coSaturateButton(this.owner, this.button));
+      .beginCoroutine(this.owner, this.coSaturateButton(this.owner));
+  }
+
+  async spawnButton() {
+    this.button = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
+      asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Fix.png"),
+      maxTimer: 0.1,
+      position: new Vector2(-2.1, -0.7),
+      alignment: EdgeAlignments.RightBottom,
+      currentTime: 0,
+      saturated: false,
+    });
 
     this.button.on("clicked", () => {
       const host = this.owner.getLobby().getHostInstance();
