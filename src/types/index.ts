@@ -1,5 +1,6 @@
 export enum TownOfPolusGameOptionNames {
   EngineerProbability = "<size=150%><voffset=-0.1em><sprite index=7></voffset> </size><color=#f8bf14>Engineer</color>",
+  EngineerUses = "</size><color=#f8bf14>Engineer</color> Uses",
 
   SwooperProbability = "<size=150%><voffset=-0.1em><sprite index=15></voffset> </size><color=#969696>Swooper</color>",
   SwooperCooldown = "<color=#969696>Swooper</color> Cooldown",
@@ -41,8 +42,7 @@ export enum TownOfPolusGameOptionNames {
   PhantomProbability = "<size=150%><voffset=-0.1em><sprite index=9></voffset> </size><color=#8cffff>Phantom</color>",
   PhantomRemainingTasks = "<color=#8cffff>Phantom</color> Tasks",
   PhantomAppearTime = "<color=#8cffff>Phantom</color> Immunity",
-  PhantomRevealTime = "<color=#8cffff>Phantom</color> Spawn",
-
+  
   SerialKillerProbability = "<size=150%><voffset=-0.1em><sprite index=10></voffset> </size><color=#ff547c>Serial Killer</color>",
   SerialKillerCooldown = "<color=#ff547c>Serial Killer</color> Cooldown",
   SerialKillerMinPlayers = "<color=#ff547c>Serial Killer</color> Minimum Players",
