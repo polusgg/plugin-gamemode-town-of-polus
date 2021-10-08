@@ -310,7 +310,7 @@ export class Student extends Crewmate {
 
     this.abilityButton = await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
       asset: AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Predict.png"),
-      maxTimer: gameOptions.getOption(TownOfPolusGameOptionNames.OracleCooldown).getValue().value,
+      maxTimer: 10,//gameOptions.getOption(TownOfPolusGameOptionNames.OracleCooldown).getValue().value,
       position: new Vector2(-2.1, -0.7),
       alignment: EdgeAlignments.RightBottom,
       currentTime: 10,
