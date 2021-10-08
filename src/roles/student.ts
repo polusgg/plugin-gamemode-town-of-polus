@@ -654,9 +654,9 @@ export class Student extends Crewmate {
 
       if (taskLeftCount == remainingTasks && !this.owner.isDead()) {
         const impostor = event.getPlayer().getLobby().getPlayers()
-          .find(async player => {
+          .find(player => {
             if (!player.isDead() && player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              return;
+              return true;
             }
           });
 
@@ -681,15 +681,14 @@ export class Student extends Crewmate {
         Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getDescriptionText());
 
         const impostor = event.getPlayer().getLobby().getPlayers()
-          .find(async player => {
+          .find(player => {
             if (!player.isDead() && player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() == RoleAlignment.Impostor) {
-              return;
+              return true;
             }
           });
 
         if (!impostor)
           return;
-
 
         const poi = await poiManager.spawnPointOfInterest(this.owner.getSafeConnection(), AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/ImpostorArrow.png"), impostor.getPosition(), impostor);
         const realAlignment = getAlignmentSpriteForRole(impostor.getMeta<BaseRole>("pgg.api.role"));
