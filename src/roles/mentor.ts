@@ -29,7 +29,7 @@ export class MentorManager extends BaseManager {
 
 export enum MentorRange {
   "Short" = 1,
-  "Medium" = 2,
+  "Normal" = 2,
   "Long" = 3,
 }
 
