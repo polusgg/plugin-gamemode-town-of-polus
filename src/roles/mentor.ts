@@ -313,7 +313,7 @@ export class Mentor extends Crewmate {
   getDescriptionText(): string {
     if (!this.targets || this.targets.length === 0) {
       return `<color=${COLOR}>Role: Mentor
-Finish your tasks, you have no students`;
+Finish your tasks, you have no students</color>`;
     }
 
     const nextTarget = this.getNextTarget();
@@ -321,7 +321,7 @@ Finish your tasks, you have no students`;
     if (nextTarget) {
       if (nextTarget.isDead()) {
         return `<color=${COLOR}>Role: Mentor
-Finish your tasks, <color=#ff1919>Your student has died.</color>`;
+Finish your tasks, <color=#ff1919>Your next student has died.</color></color>`;
       }
 
       const remaining = this.targets.length - this.numLessons;

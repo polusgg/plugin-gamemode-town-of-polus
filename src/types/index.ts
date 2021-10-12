@@ -23,7 +23,7 @@ export enum TownOfPolusGameOptionNames {
   MorphlingCooldown = "<color=#40EB73>Morphling</color> Cooldown",
   MorphlingDuration = "<color=#40EB73>Morphling</color> Duration",
   
-  MentorProbability = "<size=150%><voffset=-0.1em><sprite index=21></voffset> </size><color=#96b7cc>Mentor</color>",
+  MentorProbability = "<size=150%><voffset=-0.1em><sprite index=30></voffset> </size><color=#96b7cc>Mentor</color>",
   MentorCooldown = "<color=#96b7cc>Mentor</color> Cooldown",
   MentorRange = "<color=#96b7cc>Mentor</color> Range",
   MentorStudents = "<color=#96b7cc>Mentor</color> Students",
