@@ -14,6 +14,7 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { PoisonerRange } from "../types/enums/poisonerRange";
 import { Palette } from "@nodepolus/framework/src/static";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
+import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
 
 const COLOR = "#a000fc";
 
@@ -153,6 +154,26 @@ export class Poisoner extends Impostor {
               if (target.getMeta<BaseRole>("pgg.api.role").getName() === "Phantom") {
                 Services.get(ServiceType.Hud).setHudVisibility(target, HudItem.CallMeetingButton, true);
               }
+          
+              if (target.getMeta<BaseRole>("pgg.api.role").getName() === "Serial Killer") {
+                if (this.owner.getLobby().getPlayers().every(player => player.isDead() || !player.isImpostor())) {
+                  Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getSafeGame()!, {
+                    endGameData: new Map(this.owner.getLobby().getPlayers()
+                      .map(player2 => {
+                        const isCrewmate = player2.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate;
+                        return [player2, {
+                        title: isCrewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+                        subtitle: player2 === target ? `You died from poison` : `The <color=#ff547c>Serial Killer</color> died from poison`,
+                        color: Palette.crewmateBlue() as Mutable<[ number, number, number, number ]>,
+                        yourTeam: this.owner.getLobby().getPlayers()
+                          .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+                        winSound: WinSoundType.CrewmateWin,
+                        hasWon: isCrewmate,
+                      }]})),
+                    intentName: "serialKilledAll",
+                  });
+                }
+              }
 
               this.poisonedPlayers.delete(target);
             }
@@ -208,7 +229,7 @@ Sabotage and poison the crewmates</color>`;
         const secondsLeft = poisonDuration - timeElapsed;
         if (connection) {
           description += `
-  ${Services.get(ServiceType.Name).getFor(connection, player)} will die in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}`;
+${Services.get(ServiceType.Name).getFor(connection, player)} will die in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}`;
         }
       }
     }
