@@ -59,7 +59,7 @@ export class Mentor extends Crewmate {
   crewmateTarget?: PlayerInstance;
   numLessons: number;
 
-  teachButton!: Button;
+  teachButton?: Button;
   abilityButton?: Button;
 
   constructor(owner: PlayerInstance) {
@@ -135,10 +135,15 @@ export class Mentor extends Crewmate {
     Services.get(ServiceType.CoroutineManager)
       .beginCoroutine(this.owner, this.coSaturateButton(this.owner, this.teachButton, player => player === this.getNextTarget()));
 
+    this.catch("player.died", ev => ev.getPlayer())
+      .execute(() => {
+        this.teachButton?.destroy();
+        this.teachButton = undefined;
+      });
+
     this.teachButton.on("clicked", () => {
-      if (this.teachButton.getCurrentTime() != 0 || !this.teachButton.isSaturated() || this.teachButton.isDestroyed()) {
+      if (!this.teachButton || this.owner.isDead() || this.teachButton.getCurrentTime() != 0 || !this.teachButton.isSaturated() || this.teachButton.isDestroyed())
         return;
-      }
         
       const nextTarget = this.getNextTarget();
 
