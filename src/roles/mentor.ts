@@ -122,7 +122,7 @@ export class Mentor extends Crewmate {
         position: new Vector2(-2.1, -0.7),
         currentTime: 0,
         maxTimer: this.mentorCooldown,
-        isCountingDown: false,
+        isCountingDown: true,
         saturated: false,
         asset: teachAsset
     });
