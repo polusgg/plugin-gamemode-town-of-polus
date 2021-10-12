@@ -472,7 +472,7 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(1, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 48),
 
       //Neutral Role Options
-      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRemainingTasks, new NumberValue(4, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 50),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRemainingTasks, new NumberValue(4, 1, 1, 8, false, "{0} tasks"), GameOptionPriority.Normal + 50),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomAppearTime, new NumberValue(10, 5, 0, 60, false, "{0}s"), GameOptionPriority.Normal + 51),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SerialKillerCooldown, new NumberValue(30, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 53),
