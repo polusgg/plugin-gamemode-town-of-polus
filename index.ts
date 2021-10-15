@@ -24,16 +24,16 @@ import { Swooper, SwooperManager } from "./src/roles/swooper";
 import { Poisoner, PoisonerManager } from "./src/roles/poisoner";
 import { Morphling, MorphlingManager } from "./src/roles/morphling";
 // import { Crewmate, CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
-import { CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
+import { Crewmate, CrewmateManager } from "@polusgg/plugin-polusgg-api/src/baseRole/crewmate/crewmate";
 import { ImpostorManager } from "@polusgg/plugin-polusgg-api/src/baseRole/impostor/impostor";
 import { ChatMessageCreated } from "@polusgg/plugin-polusgg-api/src/services/chat/events/chatMessageCreated";
 import { ChatMessageAlign, SetChatMessagePacket } from "@polusgg/plugin-polusgg-api/src/packets/root/setChatMessage";
 import { Color } from "@nodepolus/framework/src/types";
 import { Palette } from "@nodepolus/framework/src/static";
 import { PhantomState } from "./src/types/enums/phantomState";
-//import { Mentor, MentorManager } from "./src/roles/mentor";
+import { Mentor, MentorManager } from "./src/roles/mentor";
 import { Game } from "@nodepolus/framework/src/api/game/game";
-//import { Impervious, ImperviousManager } from "./src/roles/impervious";
+import { IdentityThief, IdentityThiefManager } from "./src/roles/identitythief";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -49,11 +49,14 @@ export type TownOfPolusGameOptions = {
   /* Jester */
   [TownOfPolusGameOptionNames.JesterProbability]: NumberValue;
 
+  /* Identity Thief */
+  [TownOfPolusGameOptionNames.IdentityThief]: NumberValue;
+
   /* Morphling */
   [TownOfPolusGameOptionNames.MorphlingProbability]: NumberValue;
   [TownOfPolusGameOptionNames.MorphlingCooldown]: NumberValue;
   [TownOfPolusGameOptionNames.MorphlingDuration]: NumberValue;
-  
+
   /* Mentor */
   [TownOfPolusGameOptionNames.MentorProbability]: NumberValue;
   [TownOfPolusGameOptionNames.MentorCooldown]: NumberValue;
@@ -132,10 +135,11 @@ const roleEmojis = new Map([
   [EngineerManager, EmojiService.static("engineer")],
   [GrenadierManager, EmojiService.static("grenadier")],
   [JesterManager, EmojiService.static("jester")],
+  [IdentityThiefManager, EmojiService.static("identitythief")],
   [LocksmithManager, EmojiService.static("locksmith")],
   [OracleManager, EmojiService.static("oracle")],
   [PhantomManager, EmojiService.static("phantom")],
-  //[MentorManager, EmojiService.static("mentor")],
+  [MentorManager, EmojiService.static("mentor")],
   [SerialKillerManager, EmojiService.static("serialkiller")],
   [SheriffManager, EmojiService.static("sheriff")],
   [SnitchManager, EmojiService.static("snitch")],
@@ -334,33 +338,44 @@ export default class extends BaseMod {
         role: Jester,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
-      }, {
+      },
+      {
+        role: IdentityThief,
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.IdentityThief).getValue().value),
+        assignWith: RoleAlignment.Neutral
+      },
+      {
         role: Morphling,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
         assignWith: RoleAlignment.Impostor,
-      }, {
+      },
+      {
         role: Oracle,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.OracleProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
-      }, {
+      },
+      {
         role: Phantom,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.PhantomProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
-      }, {
+      },
+      {
         role: SerialKiller,
         playerCount: gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerMinPlayers).getValue().value <= game.getLobby().getPlayers().length ? resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SerialKillerProbability).getValue().value) : 0,
         assignWith: RoleAlignment.Neutral,
-      }, {
+      },
+      {
         role: Sheriff,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.SheriffProbability).getValue().value),
         assignWith: RoleAlignment.Crewmate,
       }, 
-      //{
-        //role: Mentor,
-        //// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        //playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MentorProbability).getValue().value),
-        //assignWith: RoleAlignment.Crewmate,
-      //}, 
+      {
+        role: Mentor,
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MentorProbability).getValue().value),
+        assignWith: RoleAlignment.Crewmate,
+      }, 
       {
         role: Snitch,
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -384,19 +399,19 @@ export default class extends BaseMod {
     if (!roleAssignedData)
       return;
 
-    // let numCrewmates = 0;
-    // for (let i = 0; i < roleAssignedData.allRoleAssignments.length; i++) {
-    //   if(roleAssignedData.allRoleAssignments[i].role === Crewmate) {
-    //     numCrewmates++;
-    //   }
-    // }
+    let numCrewmates = 0;
+    for (let i = 0; i < roleAssignedData.allRoleAssignments.length; i++) {
+      if(roleAssignedData.allRoleAssignments[i].role === Crewmate) {
+        numCrewmates++;
+      }
+    }
 
-    // if (numCrewmates < 1) {
-    //   const mentorAssignment = assignmentData.find(data => data.role === Mentor);
-    //   if (mentorAssignment) {
-    //     mentorAssignment.playerCount = 0;
-    //  }
-    // }
+    if (numCrewmates < 1) {
+      const mentorAssignment = assignmentData.find(data => data.role === Mentor);
+      if (mentorAssignment) {
+        mentorAssignment.playerCount = 0;
+     }
+    }
 
     Services.get(ServiceType.RoleManager).assignRoles(game, assignmentData);
   }
@@ -418,16 +433,17 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.EngineerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher),
       //gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.ImperviousProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 1),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.LocksmithProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 2),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.MentorProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 3),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.MentorProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 3),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.OracleProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 4),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SheriffProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 5),
       gameOptions.createOption(TownOfPolusGameOptionCategories.CrewmateRoles, TownOfPolusGameOptionNames.SnitchProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 6),
 
 
       //Neutral Role Probability
-      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 10),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.PhantomProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 11),
-      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 12),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.IdentityThief, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 10),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 11),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.PhantomProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 12),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 13),
 
       //Impostor Role Probability
       gameOptions.createOption(TownOfPolusGameOptionCategories.ImpostorRoles, TownOfPolusGameOptionNames.GrenadierProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 20),
@@ -443,10 +459,10 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithUses, new NumberValue(5, 1, 1, 10, false, "{0} uses"), GameOptionPriority.Normal + 32),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.LocksmithRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 33),
 
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 34),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 35),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorStudents, new NumberValue(3, 1, 2, 7, false, "{0} students"), GameOptionPriority.Normal + 36),
-      //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.StudentRoles, new EnumValue(0, ["All Roles", "Selected Roles"]), GameOptionPriority.Normal + 37),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 34),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorRange, new EnumValue(1, ["Short", "Normal", "Long"]), GameOptionPriority.Normal + 35),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.MentorStudents, new NumberValue(3, 1, 2, 7, false, "{0} students"), GameOptionPriority.Normal + 36),
+      gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.StudentRoles, new EnumValue(0, ["All Roles", "Selected Roles"]), GameOptionPriority.Normal + 37),
 
       //gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.OracleCooldown, new NumberValue(10, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 45),
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.OracleAccuracy, new NumberValue(100, 10, 0, 100, false, "{0}%"), GameOptionPriority.Normal + 46),
@@ -454,8 +470,6 @@ export default class extends BaseMod {
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SheriffCooldown, new NumberValue(30, 2.5, 10, 60, false, "{0}s"), GameOptionPriority.Normal + 47),
 
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.SnitchRemainingTasks, new NumberValue(1, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 48),
-
-
 
       //Neutral Role Options
       gameOptions.createOption(TownOfPolusGameOptionCategories.Config, TownOfPolusGameOptionNames.PhantomRemainingTasks, new NumberValue(4, 1, 1, 6, false, "{0} tasks"), GameOptionPriority.Normal + 50),

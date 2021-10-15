@@ -18,6 +18,8 @@ export enum TownOfPolusGameOptionNames {
   GrenadierBlindness = "<color=#728F3D>Grenadier</color> Blindness",
 
   JesterProbability = "<size=150%><voffset=-0.1em><sprite index=6></voffset> </size><color=#ff8cee>Jester</color>",
+  
+  IdentityThief = "<size=150%><voffset=-0.1em><sprite index=23></voffset> </size><color=#922152>Identity Thief</color>",
 
   MorphlingProbability = "<size=150%><voffset=-0.1em><sprite index=21></voffset> </size><color=#40EB73>Morphling</color>",
   MorphlingCooldown = "<color=#40EB73>Morphling</color> Cooldown",
