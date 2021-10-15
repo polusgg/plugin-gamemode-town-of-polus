@@ -14,7 +14,9 @@ import { TownOfPolusGameOptionNames } from "../types";
 import { PoisonerRange } from "../types/enums/poisonerRange";
 import { Palette } from "@nodepolus/framework/src/static";
 import { HudItem } from "@polusgg/plugin-polusgg-api/src/types/enums/hudItem";
+import { VanillaWinConditions } from "@polusgg/plugin-polusgg-api/src/services/endGame/vanillaWinConditions";
 import { WinSoundType } from "@polusgg/plugin-polusgg-api/src/types/enums/winSound";
+import { Player } from "@nodepolus/framework/src/player";
 
 const COLOR = "#a000fc";
 
@@ -86,6 +88,24 @@ export class Poisoner extends Impostor {
             await player.updateGameData();
           }
         }
+
+        if (VanillaWinConditions.shouldEndGameImpostors(ev.getGame().getLobby())) {
+          Services.get(ServiceType.EndGame).registerEndGameIntent(ev.getGame(), {
+            endGameData: new Map(ev.getGame().getLobby().getPlayers()
+              .map(player => [player as Player, {
+                title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Impostor ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+                subtitle: player.isImpostor() ? `You won by kills\nsomeone died as a meeting was called` : `<color=#FF1919FF>Impostors</color> won by kills\nsomeone died as a meeting was called`,
+                color: Palette.impostorRed() as Mutable<[number, number, number, number]>,
+                yourTeam: ev.getGame()
+                  .getLobby()
+                  .getPlayers()
+                  .filter(sus => sus.isImpostor()),
+                winSound: WinSoundType.ImpostorWin,
+                hasWon: player.isImpostor(),
+              }])),
+            intentName: "impostorKill",
+          });
+        }
       });
 
     await Services.get(ServiceType.Button).spawnButton(this.owner.getSafeConnection(), {
@@ -139,7 +159,7 @@ export class Poisoner extends Impostor {
             
             if (target.getLobby().getGame() !== undefined) {
               await hudManager.setHudString(target, Location.TaskText, target.getMeta<BaseRole>("pgg.api.role").getDescriptionText());
-          
+
               hudManager.closeHud(target);
               target.kill();
               target.getGameDataEntry().setDead(true);
@@ -173,6 +193,21 @@ export class Poisoner extends Impostor {
                     intentName: "serialKilledAll",
                   });
                 }
+              }
+
+              if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Serial Killer" && this.owner.isDead() && this.owner.getLobby().getPlayers().filter(p => !p.isDead() && !p.getGameDataEntry().isDisconnected() && p.isImpostor()).length == 0) {
+                Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getGame()!, {
+                  endGameData: new Map(this.owner.getLobby().getGame()!.getLobby().getPlayers()
+                    .map(player2 => [player2, {
+                      title: player2.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+                      subtitle: player2 === target ? "You got poisoned" : `The <color=#ff547c>Serial Killer</color> was poisoned to death`,
+                      color: [255, 84, 124, 255],
+                      yourTeam: this.owner.getLobby().getPlayers().filter(p => p.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
+                      winSound: WinSoundType.CrewmateWin,
+                      hasWon: player2.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate,
+                    }])),
+                  intentName: "serialVotedOut",
+                });
               }
 
               this.poisonedPlayers.delete(target);

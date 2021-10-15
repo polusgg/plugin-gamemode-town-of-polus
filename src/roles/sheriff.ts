@@ -54,7 +54,9 @@ export class Sheriff extends Impostor {
               .map(player => [player, {
                 title: player.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate ? "Victory" : "<color=#FF1919FF>Defeat</color>",
                 // subtitle: "<color=#FF1919FF>Sheriff</color> killed all <color=#C49645FF>Impostors</color>",
-                subtitle: player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}` : `<color=${COLOR}>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>`,
+                subtitle: event.getPlayer().getMeta<BaseRole | undefined>("pgg.api.role")?.getName() !== "Serial Killer" ?
+                  player === this.owner ? `You killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>` : `<color=${COLOR}>Sheriff</color> killed ${impostorCount != 1 ? "all" : "the"} <color=#FF1919FF>Impostor${impostorCount != 1 ? "s" : ""}</color>` :
+                  player === this.owner ? `You killed the <color=#ff547cff>Serial Killer</color>` : `<color=${COLOR}>Sheriff</color> killed the <color=#ff547cff>Serial Killer</color>`,
                 color: Palette.crewmateBlue() as Mutable<[number, number, number, number]>,
                 yourTeam: event.getPlayer().getLobby().getPlayers()
                   .filter(sus => sus.getMeta<BaseRole | undefined>("pgg.api.role")?.getAlignment() === RoleAlignment.Crewmate),
@@ -112,6 +114,21 @@ export class Sheriff extends Impostor {
                 }])),
             });
           }
+        }
+
+        if (this.owner.getLobby().getPlayers().filter(p => !p.isDead()).length == 2) {
+          await Services.get(ServiceType.EndGame).registerEndGameIntent(this.owner.getLobby().getSafeGame()!, {
+            endGameData: new Map(this.owner.getLobby().getPlayers()
+              .map(player => [player, {
+                title: "<color=#808080FF>Stalemate</color>",
+                subtitle: "The sheriff is at odds with a killer.",
+                color: [0x80, 0x80, 0x80, 0xFF],
+                yourTeam: [],
+                winSound: WinSoundType.Disconnect,
+                hasWon: false,
+              }])),
+            intentName: "sheriffStale",
+          });
         }
 
         // if (target.getMeta<BaseRole | undefined>("pgg.api.role")?.getName() === "Phantom") {

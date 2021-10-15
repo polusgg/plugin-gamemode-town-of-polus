@@ -88,7 +88,9 @@ export class SerialKiller extends Impostor {
     });
 
     this.catch("player.left", event => event.getLobby())
-      .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
+      .execute(event => {
+        this.checkEndCriteria(event.getLobby(), event.getPlayer())
+      });
 
     this.catch("player.kicked", event => event.getLobby())
       .execute(event => this.checkEndCriteria(event.getLobby(), event.getPlayer()));
@@ -99,7 +101,9 @@ export class SerialKiller extends Impostor {
     this.catch("player.murdered", event => event.getPlayer().getLobby())
       .execute(event => this.checkEndCriteria(event.getPlayer().getLobby(), event.getPlayer()));
 
-    this.catch("meeting.ended", event => event.getGame()).execute(event => {
+    this.catch("meeting.concluded", event => event.getGame()).execute(event => {
+      console.log(event.getGame().getLobby().getPlayers().filter(p => p.getId() !== this.owner.getId() && !p.isDead() && !p.getGameDataEntry().isDisconnected() && p.isImpostor()));
+
       if (event.getGame().getLobby().getPlayers()
         .filter(p => !p.isDead() && !p.getGameDataEntry().isDisconnected()).length === 1) {
         endGame.registerEndGameIntent(event.getGame().getLobby().getSafeGame()!, {
@@ -113,6 +117,47 @@ export class SerialKiller extends Impostor {
               hasWon: player2 === this.owner,
             }])),
           intentName: "serialKilledAll",
+        });
+      } else if (event.getGame().getLobby().getPlayers().filter(p => p.getId() !== this.owner.getId() && !p.isDead() && !p.getGameDataEntry().isDisconnected() && p.isImpostor()).length == 0) {
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "impostorDisconnected",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "crewmateSabotage",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "crewmateVote",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "impostorVote",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "impostorKill",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "sheriffMisfire",
+        });
+
+        endGame.registerExclusion(this.owner.getLobby().getSafeGame(), {
+          intentName: "sheriffKill",
+        });
+
+        endGame.registerEndGameIntent(event.getGame().getLobby().getSafeGame()!, {
+          endGameData: new Map(event.getGame().getLobby().getPlayers()
+            .map(player2 => [player2, {
+              title: player2 !== this.owner ? "Victory" : "<color=#FF1919FF>Defeat</color>",
+              subtitle: player2 === this.owner ? "You got voted out" : `<color=#8CFFFFFF>Crewmates</color> voted out the <color=${COLOR}>Serial Killer</color>`,
+              color: [255, 84, 124, 255],
+              yourTeam:this.owner.getLobby().getPlayers().filter(p => !p.isImpostor()),
+              winSound: WinSoundType.ImpostorWin,
+              hasWon: player2 !== this.owner,
+            }])),
+          intentName: "serialVotedOut",
         });
       }
     });
