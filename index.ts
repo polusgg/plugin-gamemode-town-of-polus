@@ -394,10 +394,10 @@ export default class extends BaseMod {
       //},
     ];
 
-    // const roleAssignedData = Services.get(ServiceType.RoleManager).getRolesAssigned(game, assignmentData);
+    const roleAssignedData = Services.get(ServiceType.RoleManager).getRolesAssigned(game, assignmentData);
 
-    // if (!roleAssignedData)
-    //   return;
+    if (!roleAssignedData)
+      return;
 
     let numCrewmates = 0;
     for (let i = 0; i < roleAssignedData.allRoleAssignments.length; i++) {
