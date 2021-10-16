@@ -19,6 +19,7 @@ import { Locksmith } from "./locksmith";
 import { Oracle } from "./oracle";
 import { Snitch } from "./snitch";
 import { Sheriff } from "./sheriff";
+import { getSpriteForRole } from "../..";
 
 const COLOR = "#96b7cc";
 
@@ -66,6 +67,14 @@ export class Mentor extends Crewmate {
 
   constructor(owner: PlayerInstance) {
     super(owner);
+
+    if (owner.getConnection() !== undefined) {
+      Services.get(ServiceType.Name).setFor(this.owner.getSafeConnection(), this.owner, `${getSpriteForRole(this)} ${Services.get(ServiceType.Name).getFor(this.owner.getSafeConnection(), this.owner)}`);
+
+      Services.get(ServiceType.Resource).load(owner.getConnection()!, AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus")).then(this.onReady.bind(this));
+    } else {
+      this.onReady();
+    }
 
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions>(this.owner.getLobby());
     const totalTaskCount = gameOptions.getOption("Long Tasks").getValue().value + gameOptions.getOption("Short Tasks").getValue().value + gameOptions.getOption("Common Tasks").getValue().value;

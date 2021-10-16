@@ -20,7 +20,7 @@ export class IdentityThiefManager extends BaseManager {
 
 const COLOR = "#922152";
 
-const IDENTITY_THIEF_DEAD_STRING = `<color=${COLOR}>Role: IdentityThief</color>
+const IDENTITY_THIEF_DEAD_STRING = `<color=${COLOR}>Role: Identity Thief</color>
 <color=#ff1919>You're dead, finish your tasks.</color>`;
 
 export class IdentityThief extends Crewmate {
@@ -166,7 +166,7 @@ export class IdentityThief extends Crewmate {
   }
 
   getDescriptionText(): string {
-    return `<color=${COLOR}>Role: IdentityThief
+    return `<color=${COLOR}>Role: Identity Thief
 Steal the identity of a dead body.</color>
 Fake Tasks:`;
   }
