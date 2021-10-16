@@ -29,7 +29,7 @@ export class MentorManager extends BaseManager {
 
 export enum MentorRange {
   "Short" = 1,
-  "Normal" = 2,
+  "Medium" = 2,
   "Long" = 3,
 }
 
@@ -46,9 +46,9 @@ export class Mentor extends Crewmate {
     preventBaseEmoji: true,
   };
 
-  private readonly mentorRange: number;
-  private readonly mentorCooldown: number;
-  private readonly numStudents: number;
+  private mentorRange: number;
+  private mentorCooldown: number;
+  private numStudents: number;
 
   /*private readonly mentorMaxUses: number;
   private mentorCurrentUses: number;*/
@@ -60,11 +60,10 @@ export class Mentor extends Crewmate {
   numLessons: number;
 
   teachButton?: Button;
-  abilityButton?: Button;
 
   constructor(owner: PlayerInstance) {
     super(owner);
-    
+
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions>(this.owner.getLobby());
     const totalTaskCount = gameOptions.getOption("Long Tasks").getValue().value + gameOptions.getOption("Short Tasks").getValue().value + gameOptions.getOption("Common Tasks").getValue().value;
 
@@ -122,7 +121,7 @@ export class Mentor extends Crewmate {
         position: new Vector2(-2.1, -0.7),
         currentTime: 0,
         maxTimer: this.mentorCooldown,
-        isCountingDown: true,
+        isCountingDown: false,
         saturated: false,
         asset: teachAsset
     });
@@ -141,10 +140,50 @@ export class Mentor extends Crewmate {
         this.teachButton = undefined;
       });
 
+    this.catch("meeting.started", ev => ev.getGame().getLobby())
+      .execute(ev => {
+        for (let i = 0; i < this.targets.length; i++) {
+          const target = this.targets[i];
+          if (target.isDead()) {
+            if (target === this.crewmateTarget) {
+              this.crewmateTarget = this.targets.find(target => !target.isDead() && target.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate");
+              if (!this.crewmateTarget) {
+                this.crewmateTarget = this.owner.getLobby().getPlayers().find(player => !player.isDead() && player.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate");
+                if (this.crewmateTarget) {
+                  this.targets[i] = this.crewmateTarget;
+                } else {
+                  this.crewmateTarget = this.owner;
+                  this.numStudents--;
+                  this.targets.splice(i, 1);
+                  i--;
+                }
+                continue;
+              }
+            }
+
+            if (this.numStudents >= i) {
+              const randomPlayers = this.owner.getLobby().getPlayers().filter(player => player !== this.crewmateTarget && player !== this.owner);
+              this.targets[i] = this.getRandomPlayers(randomPlayers, 1)[0];
+              if (!this.targets[i]) {
+                this.numStudents--;
+                this.targets.splice(i, 1);
+                i--;
+              }
+            }
+          }
+        }
+        if (this.numLessons >= this.targets.length) {
+          this.giveStudentRole();
+        } else {
+          Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getDescriptionText());
+        }
+      });
+
     this.teachButton.on("clicked", () => {
-      if (!this.teachButton || this.owner.isDead() || this.teachButton.getCurrentTime() != 0 || !this.teachButton.isSaturated() || this.teachButton.isDestroyed())
+      if (!this.teachButton || this.teachButton.getCurrentTime() != 0 || !this.teachButton.isSaturated() || this.teachButton.isDestroyed()) {
         return;
-        
+      }
+
       const nextTarget = this.getNextTarget();
 
       const target = this.teachButton.getTargets(this.mentorRange)
@@ -157,37 +196,61 @@ export class Mentor extends Crewmate {
       this.numLessons++;
 
       if (this.numLessons >= this.targets.length) {
-        Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getTaughtDescriptionText());
-        this.teachButton.destroy();
-
-        if (this.crewmateTarget) {
-          const randomRole = this.rolePool[Math.floor(Math.random() * this.rolePool.length)];
-          const student = Services.get(ServiceType.RoleManager).assignRole(this.crewmateTarget, Student, true) as Student;
-
-          switch (randomRole) {
-            case Engineer:
-              student.giveEngineer();
-              break;
-            case Locksmith:
-              student.giveLocksmith();
-              break;
-            case Oracle:
-              student.giveOracle();
-              break;
-            case Sheriff:
-              student.giveSheriff();
-              break;
-            case Snitch:
-              student.giveSnitch();
-              break;
-          }
-        }
+        this.giveStudentRole();
       } else {
         Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getDescriptionText());
       }
 
       this.teachButton.reset();
     });
+  }
+
+  giveStudentRole() {
+    Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getTaughtDescriptionText());
+    this.teachButton?.destroy();
+
+    if (this.crewmateTarget) {
+      if (this.crewmateTarget.isDead()) { // oh no! the target is dead, pick an heir to the throne
+        if (this.crewmateTarget === this.owner)
+          return;
+
+        const targetIdx = this.targets.indexOf(this.crewmateTarget);
+        if (targetIdx > -1) {
+          this.numStudents--;
+          this.targets.splice(targetIdx, 1);
+        }
+
+        this.crewmateTarget = this.targets.find(target => !target.isDead() && target.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate")
+          || this.owner.getLobby().getPlayers().find(player => !player.isDead() && player.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate")
+          || this.owner;
+      }
+
+      const randomRole = this.rolePool[Math.floor(Math.random() * this.rolePool.length)];
+      const student = Services.get(ServiceType.RoleManager).assignRole(this.crewmateTarget, Student, true) as Student;
+
+      if (this.crewmateTarget === this.owner) {
+        student.wasMentor = true;
+        Services.get(ServiceType.Hud).setHudString(student.owner, Location.TaskText, student.getDescriptionText());
+      }
+
+      switch (randomRole) {
+        case Engineer:
+          student.giveEngineer();
+          break;
+        case Locksmith:
+          student.giveLocksmith();
+          break;
+        case Oracle:
+          student.giveOracle();
+          break;
+        case Sheriff:
+          student.giveSheriff();
+          break;
+        case Snitch:
+          student.giveSnitch();
+          break;
+      }
+    }
   }
 
   *coSaturateButton(player: PlayerInstance, button: Button, targetSelector: (player: PlayerInstance) => boolean): Generator<void, void, number> {
@@ -274,27 +337,37 @@ export class Mentor extends Crewmate {
     return this.targets[this.numLessons];
   }
 
-  assignTargets() {
-    this.crewmateTarget = this.owner.getLobby().getPlayers()
-      .filter(player => player.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate")[0];
+  getCrewmateTarget() {
+    const allCrewmates = this.owner.getLobby().getPlayers()
+      .filter(player => !player.isDead() && player.getMeta<BaseRole|undefined>("pgg.api.role")?.getName() === "crewmate");
 
-    if (!this.crewmateTarget) {
-      return;
-    }
+    return allCrewmates[Math.floor(Math.random() * allCrewmates.length)];
+  }
 
-    const randomPlayers = this.owner.getLobby().getPlayers().filter(player => player !== this.crewmateTarget && player !== this.owner);
-
-    for (let i = 0; i < this.numStudents - 1; i++) {
+  getRandomPlayers(randomPlayers: PlayerInstance[], num: number) {
+    const targets: PlayerInstance[] = [];
+    for (let i = 0; i < num - 1; i++) {
       const random = randomPlayers.splice(Math.floor(Math.random() * randomPlayers.length), 1);
 
       if (!random[0])
         break;
 
-      this.targets.push(random[0]);
+      targets.push(random[0]);
+    }
+    return targets;
+  }
+
+  assignTargets() {
+    this.crewmateTarget = this.getCrewmateTarget();
+
+    if (!this.crewmateTarget) {
+      this.crewmateTarget = this.owner;
     }
 
-    this.targets.splice(Math.floor(Math.random() * (randomPlayers.length + 1)), 0, this.crewmateTarget);
-    
+    const randomPlayers = this.owner.getLobby().getPlayers().filter(player => player !== this.crewmateTarget && player !== this.owner);
+    this.targets = this.getRandomPlayers(randomPlayers, this.numStudents);
+
+    this.targets.splice(Math.floor(Math.random() * (this.targets.length + 1)), 0, this.crewmateTarget);
     Services.get(ServiceType.Hud).setHudString(this.owner, Location.TaskText, this.getDescriptionText());
   }
 

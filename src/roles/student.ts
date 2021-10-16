@@ -56,25 +56,22 @@ export class Student extends Crewmate {
   private doors: [Vector2, number][] = [];
 
   oracleEnchanted?: PlayerInstance;
-
   snitchFinishedTasks: boolean;
-
   role?: typeof BaseRole;
-
-  teachButton!: Button;
   abilityButton?: Button;
+  wasMentor: boolean;
 
   constructor(owner: PlayerInstance) {
     super(owner);
 
     const gameOptions = Services.get(ServiceType.GameOptions).getGameOptions<TownOfPolusGameOptions & LobbyDefaultOptions>(this.owner.getLobby());
 
-    this.locksmithCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithCooldown).getValue();
+    this.locksmithCooldown = gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithCooldown)?.getValue();
     this.locksmithMaxUses = 1;
     this.locksmithLeftUses = this.locksmithMaxUses; // gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithUses).getValue();
 
     this.locksmithRange = LOCKSMITH_RANGE_BY_OPTION.get(gameOptions.getOption(TownOfPolusGameOptionNames.LocksmithRange)
-      .getValue()
+      ?.getValue()
       .getSelected())!;
 
     this.lockpickOpen = AssetBundle.loadSafeFromCache("TownOfPolus/TownOfPolus").getSafeAsset("Assets/Mods/TownOfPolus/Open.png");
@@ -84,9 +81,10 @@ export class Student extends Crewmate {
     this.doors = DOOR_POSITIONS_BY_ID[this.owner.getLobby().getLevel()];
 
     this.snitchFinishedTasks = false;
+    this.wasMentor = false;
 
     this.onReady();
-    
+
     this.catch("player.died", event => event.getPlayer()).execute(_ => {
       this.abilityButton?.destroy();
       this.role = undefined;
@@ -215,7 +213,7 @@ export class Student extends Crewmate {
       saturated: false,
       asset: this.lockpickNone,
     });
-    
+
     this.catch("meeting.ended", event => event.getGame())
       .execute(() => {
         if (this.role !== Locksmith)
@@ -230,7 +228,7 @@ export class Student extends Crewmate {
 
       this.updateLockdownButton(move.getNewPosition());
     });
-    
+
     this.catch("room.doors.closed", e => e.getGame()).execute(() => {
       if (this.role !== Locksmith)
         return;
@@ -479,7 +477,7 @@ export class Student extends Crewmate {
     this.catch("player.died", e => e.getPlayer()).execute(event => {
       if (this.role !== Sheriff)
         return;
-        
+
       Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, this.getDescriptionText());
     });
 
@@ -728,22 +726,24 @@ export class Student extends Crewmate {
   }
 
   getDescriptionText(): string {
+    const base = `<color=${COLOR}>Role: Student${this.wasMentor ? "\nYou have transcended all possibility and trained yourself" : ""}</color>`;
+
     if (this.role === Engineer) {
-      return `<color=${COLOR}>Role: Student</color>
+      return `${base}
 <color=#F8BF14>Learned Role: Engineer
 Finish your tasks.
 You can fix 1 sabotage.</color>`;
     }
-    
+
     if (this.role === Locksmith) {
-      return `<color=${COLOR}>Role: Student</color>
+      return `${base}
 <color=#3d85c6>Learned Role: Locksmith
 Finish your tasks and open/close doors.
 You have ${this.locksmithLeftUses} use${this.locksmithLeftUses != 1 ? "s" : ""} left.</color>`;
     }
 
     if (this.role === Oracle) {
-      return `<color=${COLOR}>Role: Student</color>
+      return `${base}
 <color=#2c4cc9>Learned Role: Oracle
 Finish your tasks.
 You can predict a player's alignment. It
@@ -751,20 +751,20 @@ will be revealed if your body is found.</color>`;
     }
 
     if (this.role === Sheriff) {
-      return `<color=${COLOR}>Role: Student</color>
+      return `${base}
 <color=#c49645>Learned Role: Sheriff
-Finish your tasks and shoot the impostors.</color>`;
+Finish your tasks and shoot an impostor.</color>`;
     }
 
     if (this.role === Snitch) {
       if (this.snitchFinishedTasks) {
-        return `<color=${COLOR}>Role: Student</color>
+        return `${base}
 <color=#00ffdd>Learned Role: Snitch
-You've finished your tasks, find\nthe impostors.</color>`;
+You've finished your tasks, find\nan impostor.</color>`;
       } else {
-        return `<color=${COLOR}>Role: Student</color>
+        return `${base}
 <color=#00ffdd>Learned Role: Snitch
-Finish your tasks to reveal the impostors.</color>`;
+Finish your tasks to reveal an impostor.</color>`;
       }
     }
 
