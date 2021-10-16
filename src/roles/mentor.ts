@@ -96,15 +96,15 @@ export class Mentor extends Crewmate {
         this.rolePool.push(Engineer);
       }
 
-      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentSheriffEnabled).getValue().value && this.owner.getLobby().getLevel() >= 2) {
+      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentLocksmithEnabled).getValue().value && this.owner.getLobby().getLevel() >= 2) {
         this.rolePool.push(Locksmith);
       }
 
-      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentLocksmithEnabled).getValue().value) {
+      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentOracleEnabled).getValue().value) {
         this.rolePool.push(Oracle);
       }
 
-      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentOracleEnabled).getValue().value) {
+      if (gameOptions.getOption(TownOfPolusGameOptionNames.StudentSheriffEnabled).getValue().value) {
         this.rolePool.push(Sheriff);
       }
 
