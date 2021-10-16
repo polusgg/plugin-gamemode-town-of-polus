@@ -726,7 +726,7 @@ export class Student extends Crewmate {
   }
 
   getDescriptionText(): string {
-    const base = `<color=${COLOR}>Role: Student${this.wasMentor ? "\nYou have transcended all possibility and trained yourself." : ""}</color>`;
+    const base = `<color=${COLOR}>Role: Student${this.wasMentor ? "\nYou have transcended all possibility and\ntrained yourself." : ""}</color>`;
 
     if (this.role === Engineer) {
       return `${base}
