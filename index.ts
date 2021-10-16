@@ -33,7 +33,7 @@ import { Palette } from "@nodepolus/framework/src/static";
 import { PhantomState } from "./src/types/enums/phantomState";
 import { Mentor, MentorManager } from "./src/roles/mentor";
 import { Game } from "@nodepolus/framework/src/api/game/game";
-import { IdentityThief, IdentityThiefManager } from "./src/roles/identitythief";
+// import { IdentityThief, IdentityThiefManager } from "./src/roles/identitythief";
 
 export type TownOfPolusGameOptions = {
   /* Engineer */
@@ -135,7 +135,7 @@ const roleEmojis = new Map([
   [EngineerManager, EmojiService.static("engineer")],
   [GrenadierManager, EmojiService.static("grenadier")],
   [JesterManager, EmojiService.static("jester")],
-  [IdentityThiefManager, EmojiService.static("identitythief")],
+  // [IdentityThiefManager, EmojiService.static("identitythief")],
   [LocksmithManager, EmojiService.static("locksmith")],
   [OracleManager, EmojiService.static("oracle")],
   [PhantomManager, EmojiService.static("phantom")],
@@ -339,12 +339,12 @@ export default class extends BaseMod {
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.JesterProbability).getValue().value),
         assignWith: RoleAlignment.Neutral,
       },
-      {
-        role: IdentityThief,
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.IdentityThief).getValue().value),
-        assignWith: RoleAlignment.Neutral
-      },
+      // {
+      //   role: IdentityThief,
+      //   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      //   playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.IdentityThief).getValue().value),
+      //   assignWith: RoleAlignment.Neutral
+      // },
       {
         role: Morphling,
         playerCount: resolveOptionPercent(gameOptions.getOption(TownOfPolusGameOptionNames.MorphlingProbability).getValue().value),
@@ -440,7 +440,7 @@ export default class extends BaseMod {
 
 
       //Neutral Role Probability
-      gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.IdentityThief, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 10),
+      // gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.IdentityThief, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 10),
       gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.JesterProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 11),
       gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.PhantomProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 12),
       gameOptions.createOption(TownOfPolusGameOptionCategories.NeutralRoles, TownOfPolusGameOptionNames.SerialKillerProbability, new NumberValue(0, 10, 0, 100, false, "{0}%"), GameOptionPriority.Higher + 13),
