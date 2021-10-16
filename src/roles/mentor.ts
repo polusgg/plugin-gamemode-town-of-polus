@@ -22,6 +22,9 @@ import { Sheriff } from "./sheriff";
 
 const COLOR = "#96b7cc";
 
+const MENTOR_DEAD_STRING = `<color=${COLOR}>Role: Mentor</color>
+<color=#ff1919>You're dead, finish your tasks.</color>`;
+
 export class MentorManager extends BaseManager {
   getId(): string { return "mentor" }
   getTypeName(): string { return "mentor" }
@@ -29,7 +32,7 @@ export class MentorManager extends BaseManager {
 
 export enum MentorRange {
   "Short" = 1,
-  "Medium" = 2,
+  "Normal" = 2,
   "Long" = 3,
 }
 
@@ -101,6 +104,10 @@ export class Mentor extends Crewmate {
       }
     }
 
+    this.catch("player.died", e => e.getPlayer()).execute(event => {
+      Services.get(ServiceType.Hud).setHudString(event.getPlayer(), Location.TaskText, MENTOR_DEAD_STRING);
+    });
+
     this.targets = [];
     this.numLessons = 0;
 
@@ -121,7 +128,7 @@ export class Mentor extends Crewmate {
         position: new Vector2(-2.1, -0.7),
         currentTime: 0,
         maxTimer: this.mentorCooldown,
-        isCountingDown: false,
+        isCountingDown: true,
         saturated: false,
         asset: teachAsset
     });
@@ -386,7 +393,7 @@ export class Mentor extends Crewmate {
   getDescriptionText(): string {
     if (!this.targets || this.targets.length === 0) {
       return `<color=${COLOR}>Role: Mentor
-Finish your tasks, you have no students`;
+Finish your tasks, you have no students</color>`;
     }
 
     const nextTarget = this.getNextTarget();
@@ -394,7 +401,7 @@ Finish your tasks, you have no students`;
     if (nextTarget) {
       if (nextTarget.isDead()) {
         return `<color=${COLOR}>Role: Mentor
-Finish your tasks, <color=#ff1919>Your student has died.</color>`;
+Finish your tasks, <color=#ff1919>Your next student has died.</color></color>`;
       }
 
       const remaining = this.targets.length - this.numLessons;
