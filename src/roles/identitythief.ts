@@ -147,7 +147,7 @@ export class IdentityThief extends Crewmate {
       if (!role)
         return;
 
-      await Services.get(ServiceType.Name).set(this.owner, this.owner.getName().toString().replace("<sprite index=23> ", ""));
+      await Services.get(ServiceType.Name).set(this.owner, this.owner.getName().toString().replace("<sprite index=31> ", ""));
 
       Services.get(ServiceType.RoleManager).assignRole(this.owner, (role as any).constructor, true);
     });
@@ -167,6 +167,7 @@ export class IdentityThief extends Crewmate {
 
   getDescriptionText(): string {
     return `<color=${COLOR}>Role: IdentityThief
-Finish your tasks.</color>`;
+Steal the identity of a dead body.</color>
+Fake Tasks:`;
   }
 }
